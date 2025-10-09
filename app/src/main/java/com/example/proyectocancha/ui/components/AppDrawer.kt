@@ -1,5 +1,6 @@
 package com.example.proyectocancha.ui.components
 
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
@@ -12,6 +13,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.Color
+
+// ..
+
 
 data class DrawerItem( // Estructura de un ítem de menú lateral
     val label: String, // Texto a mostrar
@@ -36,7 +41,12 @@ fun AppDrawer(
                 onClick = item.onClick, // Acción al pulsar
                 icon = { Icon(item.icon, contentDescription = item.label) }, // Ícono
                 modifier = Modifier, // Sin mods extra
-                colors = NavigationDrawerItemDefaults.colors() // Estilo por defecto
+                colors = NavigationDrawerItemDefaults.colors(
+                    selectedContainerColor = Color(0xFF4CAF50), // Verde para ítem seleccionado
+                    unselectedContainerColor = Color.Transparent, // Fondo transparente si no está seleccionado
+                    selectedTextColor = Color.White, // Texto blanco cuando está seleccionado
+                    unselectedTextColor = Color(0xFF4CAF50) // Texto verde cuando no está seleccionado
+                ) // Estilo por defecto
             )
         }
     }
