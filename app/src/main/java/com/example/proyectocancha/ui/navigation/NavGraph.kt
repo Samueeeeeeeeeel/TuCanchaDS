@@ -85,12 +85,12 @@ fun AppNavGraph(navController: NavHostController) { // Recibe el controlador
                 }
                 composable(Routess.register.path) {
                     RegisterScreen(
-                        onRegistered = goLogin,
+                        onRegisteredOk = goLogin, // <-- Nombre corregido, usa la acción goLogin
                         onGoLogin = goLogin
                     )
+                }
 
                 }
             }
         }
     }
-}
