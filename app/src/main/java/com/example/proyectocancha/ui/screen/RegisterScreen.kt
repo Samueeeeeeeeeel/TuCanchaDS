@@ -24,7 +24,7 @@ fun RegisterScreen(
     onRegistered: () -> Unit, // Acción para ir a Login
     onGoLogin: () -> Unit     // Acción alternativa a Login
 ) {
-    val bg = MaterialTheme.colorScheme.tertiaryContainer // Fondo único
+    val bg = MaterialTheme.colorScheme.inverseOnSurface // Fondo único
 
     Box(
         modifier = Modifier

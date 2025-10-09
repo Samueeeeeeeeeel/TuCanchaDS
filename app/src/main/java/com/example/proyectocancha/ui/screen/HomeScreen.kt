@@ -30,7 +30,7 @@ fun HomeScreen(
     onGoLogin: () -> Unit,   // Acción a Login
     onGoRegister: () -> Unit // Acción a Registro
 ) {
-    val bg = MaterialTheme.colorScheme.surfaceVariant // Fondo agradable para Home
+    val bg = MaterialTheme.colorScheme.inverseOnSurface // Fondo agradable para Home
 
     Box( // Contenedor a pantalla completa
         modifier = Modifier
