@@ -89,7 +89,7 @@ fun LoginScreen(
                     errorEmail= validarEmail(email)
                     errorPassword= validarClaveFuerte(password)
                     if (errorEmail==null && errorPassword==null){
-                        onLoginOk()
+                        onLoginOkNavigateHome()
                     }
 
                 }, colors = ButtonDefaults.buttonColors(
@@ -108,5 +108,5 @@ fun LoginScreen(
 @Preview
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen(onLoginOk = {}, onGoRegister = {})
+    LoginScreen(onLoginOkNavigateHome = {}, onGoRegister = {})
 }

@@ -79,7 +79,7 @@ fun AppNavGraph(navController: NavHostController) { // Recibe el controlador
                 }
                 composable(Routess.login.path) {
                     LoginScreen(
-                        onLoginOk = goHome,
+                        onLoginOkNavigateHome = goHome,
                         onGoRegister = goRegister
                     )
                 }
