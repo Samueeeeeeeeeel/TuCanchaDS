@@ -7,5 +7,6 @@ sealed class Routess(val path: String) {
     data object home : Routess("home")
     data object login : Routess("login")
     data object register : Routess("register")
+    data object  profile : Routess("profile")
 }
 

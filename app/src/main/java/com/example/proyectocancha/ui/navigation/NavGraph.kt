@@ -21,6 +21,10 @@ import com.example.proyectocancha.ui.components.defaultDrawerItems // Ítems por
 import com.example.proyectocancha.ui.screen.HomeScreen // Pantalla Home
 import com.example.proyectocancha.ui.screen.LoginScreen // Pantalla Login
 import com.example.proyectocancha.ui.screen.RegisterScreen // Pantalla Registro
+import com.example.proyectocancha.ui.screen.ProfileScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectocancha.ui.viewmodel.AuthViewModel
+
 
 
 @Composable // Gráfico de navegación + Drawer + Scaffold
