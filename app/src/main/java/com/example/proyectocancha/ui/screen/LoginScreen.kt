@@ -122,10 +122,7 @@ private fun LoginScreenUi(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth()
             )
-            // Ya no debería haber errorEmail en esta pantalla si aplicaste las correcciones
-            errorMsg?.let {
-                Text(text = it, color = MaterialTheme.colorScheme.error)
-            }
+
             Spacer(Modifier.height(16.dp))
 
             // ---------- CONTRASEÑA ----------
@@ -174,13 +171,20 @@ private fun LoginScreenUi(
                 } else {
                     Text("Iniciar Sesión")
                 }
+
             }
 
             Spacer(Modifier.height(12.dp))
 
+
             OutlinedButton(onClick = onGoRegister, modifier = Modifier.fillMaxWidth()) {
                 Text("Crear cuenta")
             }
+            // Ya no debería haber errorEmail en esta pantalla si aplicaste las correcciones
+            errorMsg?.let {
+                Text(text = it, color = MaterialTheme.colorScheme.error)
+            }
+
         }
     }
 }
