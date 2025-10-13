@@ -85,18 +85,18 @@ fun LoginScreen(
 private fun LoginScreenUi(
     email: String,
     password: String,
-    emailError: String?,
-    passwordError: String?,
+    emailError: String?, // Se mantiene para el contrato, pero se ignora en la UI
+    passwordError: String?, // Se mantiene para el contrato, pero se ignora en la UI
     canSubmit: Boolean,
     isSubmitting: Boolean,
-    errorMsg: String?,
+    errorMsg: String?, // <-- ESTA ES LA VARIABLE CLAVE PARA EL MENSAJE UNIFICADO
     onEmailChange: (String) -> Unit,
     onPassChange: (String) -> Unit,
     onSubmit: () -> Unit,
     onGoRegister: () -> Unit
 ) {
     val bg = MaterialTheme.colorScheme.inverseOnSurface
-    var showPass by remember { mutableStateOf(false) } // Estado local para mostrar/ocultar contraseña
+    var showPass by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -115,20 +115,29 @@ private fun LoginScreenUi(
             // ---------- EMAIL ----------
             OutlinedTextField(
                 value = email,
-                onValueChange = onEmailChange, // Llama al VM
+                onValueChange = onEmailChange,
                 label = { Text("Correo Electrónico") },
                 singleLine = true,
+                // isError se mantiene: si el VM lo envía, se marca, aunque no mostremos el texto de error.
                 isError = emailError != null,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth()
             )
+            emailError?.let {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall // Estilo pequeño para errores
+                )
+            }
+
 
             Spacer(Modifier.height(16.dp))
 
             // ---------- CONTRASEÑA ----------
             OutlinedTextField(
                 value = password,
-                onValueChange = onPassChange, // Llama al VM
+                onValueChange = onPassChange,
                 label = { Text("Contraseña") },
                 singleLine = true,
                 isError = passwordError != null,
@@ -143,16 +152,15 @@ private fun LoginScreenUi(
                 },
                 modifier = Modifier.fillMaxWidth()
             )
-            // Ya no debería haber errorPassword en esta pantalla si aplicaste las correcciones
-            passwordError?.let {
-                Text(it, color = MaterialTheme.colorScheme.error)
-            }
+            // Eliminamos el bloque 'passwordError?.let { ... }'
+
             Spacer(Modifier.height(16.dp))
 
-            // ---------- ERROR GLOBAL DE CREDENCIALES UNIFICADO ----------
-            if (emailError != null) {
+            // ---------- ERROR GLOBAL DE CREDENCIALES UNIFICADO (CORRECCIÓN) ----------
+            // Este bloque debe ser el único que muestre el error de credenciales.
+            errorMsg?.let {
                 Text(
-                    text = emailError,
+                    text = it, // Muestra el mensaje "EMAIL O CONTRASEÑAS INVÁLIDOS"
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
@@ -160,8 +168,8 @@ private fun LoginScreenUi(
 
             // ---------- BOTONES ----------
             Button(
-                onClick = onSubmit, // Llama a submitLogin() del VM
-                enabled = canSubmit && !isSubmitting, // Se habilita según el estado del VM
+                onClick = onSubmit,
+                enabled = canSubmit && !isSubmitting,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if (isSubmitting) {
@@ -176,19 +184,14 @@ private fun LoginScreenUi(
 
             Spacer(Modifier.height(12.dp))
 
-
             OutlinedButton(onClick = onGoRegister, modifier = Modifier.fillMaxWidth()) {
                 Text("Crear cuenta")
             }
-            // Ya no debería haber errorEmail en esta pantalla si aplicaste las correcciones
-            errorMsg?.let {
-                Text(text = it, color = MaterialTheme.colorScheme.error)
-            }
+            // Eliminamos el último 'errorMsg?.let' duplicado que estaba aquí.
 
         }
     }
 }
-
 
 @Preview
 @Composable
