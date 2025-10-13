@@ -6,9 +6,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.proyectocancha.ui.navigation.Routess
 
 
@@ -111,4 +113,11 @@ fun ProfileScreen(
         }
     }
 }
-
+@Preview(showBackground = true)
+@Composable
+fun ProfileScreenPreview() {
+    // Si tu tema se llama 'ProyectoCanchaTheme', úsalo aquí.
+    // ProyectoCanchaTheme {
+    ProfileScreen(navController = rememberNavController())
+    // }
+}
