@@ -8,19 +8,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import com.example.proyectocancha.ui.navigation.Routess
+
 
 
 @Composable
 fun ProfileScreen(
-    onGoHome: () -> Unit,
-    userName: String,
-    userEmail: String,
-    userPhone: String,
-    userBirthdate: String,
-    onEditProfile: () -> Unit,
-    onChangePassword: () -> Unit,
-    onLogout: () -> Unit
+    navController: NavHostController // SÓLO ACEPTAMOS EL NAVCONTROLLER
 ) {
+    // --- Valores Ficticios/Hardcodeados para el diseño ---
+    val userName = "Juan Pérez"
+    val userEmail = "juan.perez@example.com"
+    val userPhone = "+56 9 8765 4321"
+    val userBirthdate = "15/05/1990"
+
+    // --- Definición de Acciones de Navegación ---
+    val onEditProfile: () -> Unit = { /* TODO: Navegar a Routess.editProfile */ }
+    val onChangePassword: () -> Unit = { /* TODO: Navegar a Routess.changePassword */ }
+    val onLogout: () -> Unit = { navController.navigate(Routess.login.path) {
+        // Limpiar el Back Stack al cerrar sesión
+        popUpTo(Routess.principal.path) { inclusive = true }
+    }}
+
+    // El onGoHome ya no es necesario, puedes usar navController.navigate(Routess.principal.path)
+
     val bg = MaterialTheme.colorScheme.background
     Column(
         modifier = Modifier
@@ -29,6 +41,9 @@ fun ProfileScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // ... RESTO DEL CONTENIDO DE TU PANTALLA ...
+        // (Usando userName, userEmail, onEditProfile, onLogout, etc., definidos arriba)
+
         // Nombre
         Text(
             text = userName,
@@ -88,7 +103,7 @@ fun ProfileScreen(
 
         // Botón Cerrar sesión
         OutlinedButton(
-            onClick = onLogout,
+            onClick = onLogout, // Usa la acción de logout definida arriba
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
         ) {

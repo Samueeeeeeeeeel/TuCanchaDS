@@ -1,100 +1,123 @@
 package com.example.proyectocancha.ui.navigation
 
-import androidx.compose.foundation.layout.padding // Para aplicar innerPadding
-import androidx.compose.material3.Scaffold // Estructura base con slots
-import androidx.compose.runtime.Composable // Marcador composable
-import androidx.compose.ui.Modifier // Modificador
-import androidx.navigation.NavHostController // Controlador de navegación
-import androidx.navigation.compose.NavHost // Contenedor de destinos
-import androidx.navigation.compose.composable // Declarar cada destino
-import kotlinx.coroutines.launch // Para abrir/cerrar drawer con corrutinas
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import androidx.navigation.NavType
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.Job // Necesario para el tipo de retorno en AppTopBar
 
-import androidx.compose.material3.ModalNavigationDrawer // Drawer lateral modal
-import androidx.compose.material3.rememberDrawerState // Estado del drawer
-import androidx.compose.material3.DrawerValue // Valores (Opened/Closed)
-import androidx.compose.runtime.rememberCoroutineScope // Alcance de corrutina
-
-
-import com.example.proyectocancha.ui.components.AppTopBar// Barra superior
-import com.example.proyectocancha.ui.components.AppDrawer// Drawer composable
-import com.example.proyectocancha.ui.components.defaultDrawerItems // Ítems por defecto
-import com.example.proyectocancha.ui.screen.HomeScreen // Pantalla Home
-import com.example.proyectocancha.ui.screen.LoginScreen // Pantalla Login
-import com.example.proyectocancha.ui.screen.RegisterScreen // Pantalla Registro
+// IMPORTACIONES CORRECTAS DE COMPONENTES Y PANTALLAS
+import com.example.proyectocancha.ui.components.AppTopBar
+import com.example.proyectocancha.ui.components.AppDrawer // Importación del componente Drawer
+import com.example.proyectocancha.ui.components.defaultDrawerItems // Importación de los ítems del menú
+import com.example.proyectocancha.ui.screen.PrincipalScreen
+import com.example.proyectocancha.ui.screen.LoginScreen
+import com.example.proyectocancha.ui.screen.RegisterScreen
+import com.example.proyectocancha.ui.screen.CanchaDetailsScreen
 import com.example.proyectocancha.ui.screen.ProfileScreen
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.proyectocancha.ui.viewmodel.AuthViewModel
 
 
+// *******************************************************************
+// NOTA IMPORTANTE: Asumo que Routess está definido en Routess.kt
+// y que el tipo 'defaultDrawerItems' en AppDrawer se corrigió a List<DrawerItem>
+// *******************************************************************
 
 @Composable // Gráfico de navegación + Drawer + Scaffold
-fun AppNavGraph(navController: NavHostController) { // Recibe el controlador
+fun AppNavGraph(navController: NavHostController) {
 
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed) // Estado del drawer
-    val scope = rememberCoroutineScope() // Necesario para abrir/cerrar drawer
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
-    // Helpers de navegación (reutilizamos en topbar/drawer/botones)
-    val goHome: () -> Unit    = { navController.navigate(Routess.home.path) }    // Ir a Home
-    val goLogin: () -> Unit   = { navController.navigate(Routess.login.path) }   // Ir a Login
-    val goRegister: () -> Unit = { navController.navigate(Routess.register.path) } // Ir a Registro
+    // --- Helpers de Navegación ---
+    val goPrincipal: () -> Unit = { navController.navigate(Routess.principal.path) }
+    val goLogin: () -> Unit   = { navController.navigate(Routess.login.path) }
+    val goRegister: () -> Unit = { navController.navigate(Routess.register.path) }
 
-    ModalNavigationDrawer( // Capa superior con drawer lateral
-        drawerState = drawerState, // Estado del drawer
-        drawerContent = { // Contenido del drawer (menú)
-            AppDrawer( // Nuestro componente Drawer
-                currentRoute = null, // Puedes pasar navController.currentBackStackEntry?.destination?.route
-                items = defaultDrawerItems( // Lista estándar
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            AppDrawer(
+                currentRoute = null,
+                items = defaultDrawerItems(
                     onHome = {
-                        scope.launch { drawerState.close() } // Cierra drawer
-                        goHome() // Navega a Home
+                        scope.launch { drawerState.close() }
+                        goPrincipal()
                     },
                     onLogin = {
-                        scope.launch { drawerState.close() } // Cierra drawer
-                        goLogin() // Navega a Login
+                        scope.launch { drawerState.close() }
+                        goLogin()
                     },
                     onRegister = {
-                        scope.launch { drawerState.close() } // Cierra drawer
-                        goRegister() // Navega a Registro
+                        scope.launch { drawerState.close() }
+                        goRegister()
                     }
                 )
             )
         }
     ) {
-        Scaffold( // Estructura base de pantalla
-            topBar = { // Barra superior con íconos/menú
+        Scaffold(
+            topBar = {
                 AppTopBar(
-                    onOpenDrawer = { scope.launch { drawerState.open() } }, // Abre drawer
-                    onHome = goHome,     // Botón Home
-                    onLogin = goLogin,   // Botón Login
-                    onRegister = goRegister // Botón Registro
+                    onOpenDrawer = { scope.launch { drawerState.open() } },
+                    onHome = goPrincipal,
+                    onLogin = goLogin,
+                    onRegister = goRegister
                 )
             }
-        ) { innerPadding -> // Padding que evita solapar contenido
-            NavHost( // Contenedor de destinos navegables
-                navController = navController, // Controlador
-                startDestination = Routess.home.path, // Inicio: Home
-                modifier = Modifier.padding(innerPadding) // Respeta topBar
+        ) { innerPadding ->
+            NavHost(
+                navController = navController,
+                startDestination = Routess.principal.path,
+                modifier = Modifier.padding(innerPadding)
             ) {
-                composable(Routess.home.path) {
-                    HomeScreen(
-                        onGoLogin = goLogin,
-                        onGoRegister = goRegister
-                    )
+                // 1. PANTALLA PRINCIPAL (Canchas)
+                composable(Routess.principal.path) {
+                    PrincipalScreen(navController = navController)
+                }
+
+                // 2. DETALLE DE CANCHA
+                composable(
+                    route = Routess.courtDetail.path + "/{courtId}",
+                    arguments = listOf(navArgument("courtId") { type = NavType.IntType })
+                ) { backStackEntry ->
+                    val courtId = backStackEntry.arguments?.getInt("courtId") ?: 0
+                    CanchaDetailsScreen(navController = navController, courtId = courtId)
+                }
+
+                // 3. PERFIL DE USUARIO
+                composable(Routess.profile.path) {
+                    ProfileScreen(navController = navController)
                 }
                 composable(Routess.login.path) {
                     LoginScreen(
-                        onLoginOkNavigateHome = goHome,
+                        onLoginOkNavigateHome = goPrincipal, // Redirigir a Principal al iniciar sesión
                         onGoRegister = goRegister
                     )
                 }
+
+
+                // 5. REGISTRO
                 composable(Routess.register.path) {
                     RegisterScreen(
-                        onRegisteredOk = goLogin, // <-- Nombre corregido, usa la acción goLogin
+                        onRegisteredOk = goLogin,
                         onGoLogin = goLogin
                     )
                 }
 
+                // 6. RUTA 'HOME' (Redirección si se usa)
+                composable(Routess.home.path) {
+                    PrincipalScreen(navController = navController)
                 }
+
             }
         }
     }
+}

@@ -24,18 +24,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-// NOTA: Se eliminó la importación de KeyboardOptions y KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-// Importar las funciones de validación de tu dominio
+
 import com.example.proyectocancha.ui.domain.validation.validarEmail
 import com.example.proyectocancha.ui.domain.validation.validarClaveFuerte
+import com.example.proyectocancha.ui.domain.validation.validarConfirmacion
 import com.example.proyectocancha.ui.domain.validation.validarNombreSoloLetras
 import com.example.proyectocancha.ui.domain.validation.validatePhoneisDigitsOnly
-import com.example.proyectocancha.ui.domain.validation.validarConfirmacion
-
 
 @Composable
 fun RegisterScreen(
@@ -188,6 +186,7 @@ fun RegisterScreen(
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
