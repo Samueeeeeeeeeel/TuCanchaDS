@@ -39,6 +39,7 @@ fun AppNavGraph(navController: NavHostController) {
     val goPrincipal: () -> Unit = { navController.navigate(Routess.principal.path) }
     val goLogin: () -> Unit   = { navController.navigate(Routess.login.path) }
     val goRegister: () -> Unit = { navController.navigate(Routess.register.path) }
+    val goProfile: () -> Unit = { navController.navigate(Routess.profile.path) }
 
 
     ModalNavigationDrawer(
@@ -58,6 +59,10 @@ fun AppNavGraph(navController: NavHostController) {
                     onRegister = {
                         scope.launch { drawerState.close() }
                         goRegister()
+                    },
+                    onProfile = {
+                        scope.launch { drawerState.close() }
+                        navController.navigate(Routess.profile.path)
                     }
                 )
             )
@@ -69,7 +74,8 @@ fun AppNavGraph(navController: NavHostController) {
                     onOpenDrawer = { scope.launch { drawerState.open() } },
                     onHome = goPrincipal,
                     onLogin = goLogin,
-                    onRegister = goRegister
+                    onRegister = goRegister,
+                    onProfile = goProfile
                 )
             }
         ) { innerPadding ->
@@ -115,6 +121,10 @@ fun AppNavGraph(navController: NavHostController) {
                 // 6. RUTA 'HOME' (Redirección si se usa)
                 composable(Routess.home.path) {
                     PrincipalScreen(navController = navController)
+                }
+                //7.Ruta de Profile
+                composable(Routess.profile.path) {
+                    ProfileScreen(navController = navController)
                 }
 
             }

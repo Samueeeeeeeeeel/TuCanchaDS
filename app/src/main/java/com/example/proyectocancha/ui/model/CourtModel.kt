@@ -7,7 +7,6 @@ import com.example.proyectocancha.R
 data class Court(val id: Int, val name: String, val imageUrl: Int, val description: String)
 data class Promotion(val id: Int, val title: String, val imageUrl: Int, val ctaText: String)
 
-// DATOS DE EJEMPLO CENTRALIZADOS (Corta y pega estas listas aquí)
 val dummyPromotions = listOf(
     Promotion(1, "¡Promoción Destacada!", R.drawable.court_1, "Reservar"),
     Promotion(2, "Descuento de Verano", R.drawable.court_1, "Ver Oferta")

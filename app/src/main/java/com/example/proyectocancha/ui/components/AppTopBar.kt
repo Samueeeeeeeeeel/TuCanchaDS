@@ -29,7 +29,8 @@ fun AppTopBar(
     onOpenDrawer: () -> Unit, // Abre el drawer (hamburguesa)
     onHome: () -> Unit,       // Navega a Home
     onLogin: () -> Unit,      // Navega a Login
-    onRegister: () -> Unit    // Navega a Registro
+    onRegister: () -> Unit,    // Navega a Registro
+    onProfile: () -> Unit,   // Navega a Perfil
 ) {
     //lo que hace es crear una variable de estado recordada que le dice a la interfaz
     // si el menú desplegable de 3 puntitos debe estar visible (true) o oculto (false).
@@ -64,6 +65,9 @@ fun AppTopBar(
             IconButton(onClick = onRegister) { // Ir a Registro
                 Icon(Icons.Filled.Person, contentDescription = "Registro") // Ícono Registro
             }
+            IconButton(onClick = onProfile) {
+                Icon(Icons.Filled.AccountCircle, contentDescription = "Perfil")
+            }
             IconButton(onClick = { showMenu = true }) { // Abre menú overflow
                 Icon(Icons.Filled.MoreVert, contentDescription = "Más") // Ícono 3 puntitos
             }
@@ -82,6 +86,10 @@ fun AppTopBar(
                 DropdownMenuItem( // Opción Registro
                     text = { Text("Registro") },
                     onClick = { showMenu = false; onRegister() }
+                )
+                DropdownMenuItem( // Opción Perfil
+                    text = { Text("Perfil") },
+                    onClick = { showMenu = false; onProfile() }
                 )
             }
         }

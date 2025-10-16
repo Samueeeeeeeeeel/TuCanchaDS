@@ -1,6 +1,7 @@
 package com.example.proyectocancha.ui.components
 
 
+import androidx.compose.foundation.background
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
@@ -31,7 +32,8 @@ fun AppDrawer(
     modifier: Modifier = Modifier // Modificador opcional
 ) {
     ModalDrawerSheet( // Hoja que contiene el contenido del drawer
-        modifier = modifier // Modificador encadenable
+        modifier = modifier,
+        drawerContainerColor = Color.Black// Color de fondo
     ) {
         // Recorremos las opciones y pintamos ítems
         items.forEach { item -> // Por cada ítem
@@ -57,9 +59,11 @@ fun AppDrawer(
 fun defaultDrawerItems(
     onHome: () -> Unit,   // Acción Home
     onLogin: () -> Unit,  // Acción Login
-    onRegister: () -> Unit // Acción Registro
+    onRegister: () -> Unit, // Acción Registro
+    onProfile: () -> Unit  // Acción Perfil
 ): List<com.example.proyectocancha.ui.components.DrawerItem> = listOf(
     DrawerItem("Home", Icons.Filled.Home, onHome),          // Ítem Home
     DrawerItem("Login", Icons.Filled.AccountCircle, onLogin),       // Ítem Login
-    DrawerItem("Registro", Icons.Filled.Person, onRegister) // Ítem Registro
+    DrawerItem("Registro", Icons.Filled.Person, onRegister), // Ítem Registro
+    DrawerItem("Perfil", Icons.Filled.AccountCircle, onProfile)    // Ítem Perfil
 )

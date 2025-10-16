@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -101,15 +102,14 @@ private fun LoginScreenUi(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(bg)
-            .padding(16.dp),
+            .background(Color.Black),// Fondo negro
         contentAlignment = Alignment.Center
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Login", style = MaterialTheme.typography.headlineSmall)
+            Text("LOGIN", style = MaterialTheme.typography.headlineSmall, color = Color.White)
             Spacer(Modifier.height(16.dp))
 
             // ---------- EMAIL ----------
@@ -170,7 +170,8 @@ private fun LoginScreenUi(
             Button(
                 onClick = onSubmit,
                 enabled = canSubmit && !isSubmitting,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
             ) {
                 if (isSubmitting) {
                     CircularProgressIndicator(strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
