@@ -116,7 +116,7 @@ private fun LoginScreenUi(
             OutlinedTextField(
                 value = email,
                 onValueChange = onEmailChange,
-                label = { Text("Correo Electrónico") },
+                label = { Text("Correo Electrónico",color = Color.White) },
                 singleLine = true,
                 // isError se mantiene: si el VM lo envía, se marca, aunque no mostremos el texto de error.
                 isError = emailError != null,
@@ -138,7 +138,7 @@ private fun LoginScreenUi(
             OutlinedTextField(
                 value = password,
                 onValueChange = onPassChange,
-                label = { Text("Contraseña") },
+                label = { Text("Contraseña",color = Color.White) },
                 singleLine = true,
                 isError = passwordError != null,
                 visualTransformation = if (showPass) VisualTransformation.None else PasswordVisualTransformation(),
