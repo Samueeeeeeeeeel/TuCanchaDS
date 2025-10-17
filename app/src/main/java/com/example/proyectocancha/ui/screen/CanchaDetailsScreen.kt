@@ -1,6 +1,5 @@
 package com.example.proyectocancha.ui.screen
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -23,27 +22,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.proyectocancha.R // Asegúrate de que tus drawables están aquí
+import com.example.proyectocancha.R // Asegúrate de que R.drawable.court_1 exista
+// Importaciones desde el modelo centralizado
 import com.example.proyectocancha.ui.model.Court
-import com.example.proyectocancha.ui.model.Promotion
 import com.example.proyectocancha.ui.model.dummyCourts
-import com.example.proyectocancha.ui.model.dummyPromotions
+import com.example.proyectocancha.ui.navigation.Routess // <-- Importación necesaria para la navegación
+// Importaciones de tus colores de tema
 import com.example.proyectocancha.ui.theme.DarkGreen
 import com.example.proyectocancha.ui.theme.LightGrayBg
-
-
+import com.example.proyectocancha.ui.theme.Grey900
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) { // Nombre de la función cambiado
+fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
 
-    // 1. Lógica de Datos
-    // Busca la cancha usando el ID pasado por navegación
+    // 1. Lógica de Datos: Busca la cancha
     val court = dummyCourts.find { it.id == courtId } ?: Court(
         id = 0,
         name = "Cancha No Encontrada",
-        imageUrl = R.drawable.court_1, // Usar un placeholder
+        imageUrl = R.drawable.court_1,
         description = "La cancha seleccionada no existe o no está disponible."
     )
 
@@ -57,7 +55,7 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) { // Nom
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Color.White)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Grey900)
             )
         },
         // 3. Botón Fijo de Reserva (Bottom Bar)
@@ -65,12 +63,16 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) { // Nom
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.Black)
+                    .background(Grey900)
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Button(
-                    onClick = { /* TODO: Navegar a la pantalla de Checkout/Pago */ },
+                    // CAMBIO CLAVE: CONEXIÓN A LA PANTALLA DE DETALLE DE RESERVA
+                    onClick = {
+                        // Navega a la ruta de la nueva pantalla de confirmación
+                        navController.navigate(Routess.detalleReserva.path)
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = DarkGreen),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -80,15 +82,15 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) { // Nom
                 }
             }
         },
-        containerColor = Color.Black
+        containerColor = Grey900
     ) { paddingValues ->
 
         // 4. Contenido Principal Deslizable
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues) // Respeta la TopBar y la BottomBar
-                .verticalScroll(rememberScrollState()) // Permite el desplazamiento
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
         ) {
             // A. Imagen de la Cancha
             Image(
@@ -159,6 +161,5 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) { // Nom
 @Preview(showBackground = true)
 @Composable
 fun CanchaDetailsScreenPreview() {
-    // Asegúrate de pasar un ID válido para el preview (Ej: 1)
     CanchaDetailsScreen(rememberNavController(), courtId = 1)
 }

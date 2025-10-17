@@ -41,10 +41,11 @@ import com.example.proyectocancha.ui.theme.Grey900
 data class Court(val id: Int, val name: String, val imageUrl: Int, val description: String)
 
 val dummyCourts = listOf(
-    Court(1, "Cancha Roja - Principal", R.drawable.court_1, "Cancha con excelentes instalaciones"),
-    Court(2, "Cancha Azul - Sintético", R.drawable.court_1, "Césped sintético de alta calidad"),
-    Court(3, "Cancha Verde - Interior", R.drawable.court_1, "Cancha techada climatizada"),
-    Court(4, "Cancha Negra - Exterior", R.drawable.court_1, "Cancha con iluminación profesional")
+    // ESTOS SON LOS DATOS ACTUALIZADOS
+    Court(1, "Cancha Norte - Pasto Real", R.drawable.court_1, "Cancha con excelentes instalaciones"),
+    Court(2, "Cancha Sur - Sintético", R.drawable.court_1, "Césped sintético de alta calidad"),
+    Court(3, "Cancha Valle - Sintético", R.drawable.court_1, "Cancha techada climatizada"),
+    Court(4, "Cancha Pick - Baby Fut", R.drawable.court_1, "Cancha con iluminación profesional")
 )
 
 

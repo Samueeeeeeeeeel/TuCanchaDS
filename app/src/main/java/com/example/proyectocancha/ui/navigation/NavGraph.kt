@@ -11,22 +11,22 @@ import androidx.navigation.navArgument
 import androidx.navigation.NavType
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.Job // Necesario para el tipo de retorno en AppTopBar
+import kotlinx.coroutines.Job
 
 // IMPORTACIONES CORRECTAS DE COMPONENTES Y PANTALLAS
 import com.example.proyectocancha.ui.components.AppTopBar
-import com.example.proyectocancha.ui.components.AppDrawer // Importación del componente Drawer
-import com.example.proyectocancha.ui.components.defaultDrawerItems // Importación de los ítems del menú
+import com.example.proyectocancha.ui.components.AppDrawer
+import com.example.proyectocancha.ui.components.defaultDrawerItems
 import com.example.proyectocancha.ui.screen.PrincipalScreen
 import com.example.proyectocancha.ui.screen.LoginScreen
 import com.example.proyectocancha.ui.screen.RegisterScreen
 import com.example.proyectocancha.ui.screen.CanchaDetailsScreen
 import com.example.proyectocancha.ui.screen.ProfileScreen
+import com.example.proyectocancha.ui.screen.DetalleReservaScreen // <-- ¡IMPORTACIÓN AÑADIDA!
 
 
 // *******************************************************************
-// NOTA IMPORTANTE: Asumo que Routess está definido en Routess.kt
-// y que el tipo 'defaultDrawerItems' en AppDrawer se corrigió a List<DrawerItem>
+// NOTA IMPORTANTE: Asumo que Routess.detalleReserva está en minúsculas.
 // *******************************************************************
 
 @Composable // Gráfico de navegación + Drawer + Scaffold
@@ -79,18 +79,15 @@ fun AppNavGraph(navController: NavHostController) {
         ) { innerPadding ->
             NavHost(
                 navController = navController,
-                // CAMBIO 1: Establecer la ruta del Login como el destino inicial (startDestination).
                 startDestination = Routess.login.path,
                 modifier = Modifier.padding(innerPadding)
             ) {
 
-                // 1. PANTALLA DE LOGIN (Ahora es el inicio)
+                // 1. PANTALLA DE LOGIN
                 composable(Routess.login.path) {
                     LoginScreen(
-                        // Lógica para ir a Principal después de un login exitoso.
                         onLoginOkNavigateHome = {
                             navController.navigate(Routess.principal.path) {
-                                // Esto borra el Login de la pila para evitar volver con el botón 'atrás'.
                                 popUpTo(Routess.login.path) { inclusive = true }
                             }
                         },
@@ -98,7 +95,7 @@ fun AppNavGraph(navController: NavHostController) {
                     )
                 }
 
-                // 2. PANTALLA PRINCIPAL (Ahora es la Home App después del login)
+                // 2. PANTALLA PRINCIPAL
                 composable(Routess.principal.path) {
                     PrincipalScreen(navController = navController)
                 }
@@ -113,7 +110,6 @@ fun AppNavGraph(navController: NavHostController) {
                 }
 
                 // 4. PERFIL DE USUARIO
-                // NOTA: Tienes esta ruta duplicada (aquí y abajo), la mantengo para el cambio.
                 composable(Routess.profile.path) {
                     ProfileScreen(navController = navController)
                 }
@@ -126,11 +122,17 @@ fun AppNavGraph(navController: NavHostController) {
                     )
                 }
 
-                // 6. RUTA 'HOME' (Redirección si se usa)
+                // 6. RUTA 'HOME'
                 composable(Routess.home.path) {
                     PrincipalScreen(navController = navController)
+                }
+
+                // 7. DETALLE DE RESERVA
+                composable(Routess.detalleReserva.path) {
+                    DetalleReservaScreen(navController = navController)
                 }
             }
         }
     }
 }
+// ¡La función DetalleReservaScreen con el TODO fue eliminada de aquí!

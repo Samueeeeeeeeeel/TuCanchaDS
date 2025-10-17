@@ -1,19 +1,14 @@
 package com.example.proyectocancha.ui.model
 
-
 import com.example.proyectocancha.R
 
-// CLASES DE DATOS CENTRALIZADAS
+// Definición de la clase de datos
 data class Court(val id: Int, val name: String, val imageUrl: Int, val description: String)
-data class Promotion(val id: Int, val title: String, val imageUrl: Int, val ctaText: String)
 
-val dummyPromotions = listOf(
-    Promotion(1, "¡Promoción Destacada!", R.drawable.court_1, "Reservar"),
-    Promotion(2, "Descuento de Verano", R.drawable.court_1, "Ver Oferta")
-)
-
+// Lista de datos accesible globalmente
 val dummyCourts = listOf(
-    Court(1, "Cancha Principal A", R.drawable.court_1, "Cancha con excelentes instalaciones"),
-    Court(2, "Cancha B - Sintético", R.drawable.court_1, "Césped sintético de alta calidad"),
-    Court(3, "Cancha C - Interior", R.drawable.court_1, "Cancha techada climatizada")
+    Court(1, "Cancha Norte - Pasto Real", R.drawable.court_1, "Cancha con excelentes instalaciones y ambiente familiar."),
+    Court(2, "Cancha Sur - Sintético", R.drawable.court_1, "Césped sintético de alta calidad, ideal para juegos rápidos y ligeros."),
+    Court(3, "Cancha Valle - Sintético", R.drawable.court_1, "Cancha techada y climatizada, perfecta para jugar sin importar el clima."),
+    Court(4, "Cancha Pick - Baby Fut", R.drawable.court_1, "Cancha pequeña con iluminación profesional, especializada para baby fútbol.")
 )
