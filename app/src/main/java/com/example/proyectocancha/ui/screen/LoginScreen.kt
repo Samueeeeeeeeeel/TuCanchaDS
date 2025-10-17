@@ -1,5 +1,10 @@
 package com.example.proyectocancha.ui.screen
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,12 +22,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -108,7 +116,7 @@ private fun LoginScreenUi(
         contentAlignment = Alignment.Center
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.width(350.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text("LOGIN", style = MaterialTheme.typography.headlineSmall, color = Color.White)
@@ -118,19 +126,28 @@ private fun LoginScreenUi(
             OutlinedTextField(
                 value = email,
                 onValueChange = onEmailChange,
-                label = { Text("Correo Electrónico",color = Color.White) },
+                label = { Text("Correo Electrónico", color = Color.White) },
                 singleLine = true,
-                // isError se mantiene: si el VM lo envía, se marca, aunque no mostremos el texto de error.
                 isError = emailError != null,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    errorTextColor = Color.White
+                ),
                 modifier = Modifier.fillMaxWidth()
             )
-            emailError?.let {
+            AnimatedVisibility(
+                visible = emailError != null,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {emailError?.let {
                 Text(
                     text = it,
                     color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall // Estilo pequeño para errores
-                )
+                    style = MaterialTheme.typography.bodySmall
+                ) }
+
             }
 
 
@@ -144,6 +161,11 @@ private fun LoginScreenUi(
                 singleLine = true,
                 isError = passwordError != null,
                 visualTransformation = if (showPass) VisualTransformation.None else PasswordVisualTransformation(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    errorTextColor = Color.White
+                ),
                 trailingIcon = {
                     IconButton(onClick = { showPass = !showPass }) {
                         Icon(
@@ -157,9 +179,6 @@ private fun LoginScreenUi(
             // Eliminamos el bloque 'passwordError?.let { ... }'
 
             Spacer(Modifier.height(16.dp))
-
-            // ---------- ERROR GLOBAL DE CREDENCIALES UNIFICADO (CORRECCIÓN) ----------
-            // Este bloque debe ser el único que muestre el error de credenciales.
             errorMsg?.let {
                 Text(
                     text = it, // Muestra el mensaje "EMAIL O CONTRASEÑAS INVÁLIDOS"
@@ -172,13 +191,14 @@ private fun LoginScreenUi(
             Button(
                 onClick = onSubmit,
                 enabled = canSubmit && !isSubmitting,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
                 if (isSubmitting) {
                     CircularProgressIndicator(strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Validando...")
+                    Text("Validando...",color = Color.White)
                 } else {
                     Text("Iniciar Sesión")
                 }
@@ -187,7 +207,8 @@ private fun LoginScreenUi(
 
             Spacer(Modifier.height(12.dp))
 
-            OutlinedButton(onClick = onGoRegister, modifier = Modifier.fillMaxWidth()) {
+            ElevatedButton(onClick = onGoRegister, modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))) {
                 Text("Crear cuenta")
             }
             // Eliminamos el último 'errorMsg?.let' duplicado que estaba aquí.
@@ -201,7 +222,7 @@ private fun LoginScreenUi(
 fun LoginScreenPreview() {
     // Usamos la versión UI para el Preview para no depender del ViewModel
     LoginScreenUi(
-        email = "usuario@ejemplo.com", password = "password123",
+        email = "usuario@ejemplo.com", password = "Password123",
         emailError = null, passwordError = null,
         canSubmit = true, isSubmitting = false, errorMsg = null,
         onEmailChange = {}, onPassChange = {}, onSubmit = {}, onGoRegister = {}

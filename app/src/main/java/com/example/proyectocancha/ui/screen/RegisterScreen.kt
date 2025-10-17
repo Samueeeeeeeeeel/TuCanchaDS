@@ -15,6 +15,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -81,6 +82,11 @@ fun RegisterScreen(
                 label = { Text("Nombre Completo",color = Color.White) },
                 singleLine = true,
                 isError = errorNombre != null,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    errorTextColor = Color.White
+                ),
                 modifier = Modifier.fillMaxWidth(),
             )
             errorNombre?.let {
@@ -95,6 +101,11 @@ fun RegisterScreen(
                 label = { Text("Teléfono",color = Color.White) },
                 singleLine = true,
                 isError = errorTelefono != null,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    errorTextColor = Color.White
+                ),
                 // --- ELIMINADO: keyboardOptions = androidx.compose.ui.text.input.KeyboardOptions(keyboardType = KeyboardType.Phone),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -110,6 +121,11 @@ fun RegisterScreen(
                 label = { Text("Correo Electrónico",color = Color.White) },
                 singleLine = true,
                 isError = errorEmail != null,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    errorTextColor = Color.White
+                ),
                 // --- ELIMINADO: keyboardOptions = androidx.compose.ui.text.input.KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -125,6 +141,11 @@ fun RegisterScreen(
                 label = { Text("Contraseña",color = Color.White) },
                 singleLine = true,
                 isError = errorPassword != null,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    errorTextColor = Color.White
+                ),
                 visualTransformation = PasswordVisualTransformation(),
                 // --- ELIMINADO: keyboardOptions = androidx.compose.ui.text.input.KeyboardOptions(keyboardType = KeyboardType.Password),
                 modifier = Modifier.fillMaxWidth()
@@ -141,6 +162,11 @@ fun RegisterScreen(
                 label = { Text("Confirmar Contraseña",color = Color.White) },
                 singleLine = true,
                 isError = errorConfirmPassword != null,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    errorTextColor = Color.White
+                ),
                 visualTransformation = PasswordVisualTransformation(),
                 // --- ELIMINADO: keyboardOptions = androidx.compose.ui.text.input.KeyboardOptions(keyboardType = KeyboardType.Password),
                 modifier = Modifier.fillMaxWidth()
@@ -166,10 +192,7 @@ fun RegisterScreen(
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF1976D2), // Azul fuerte
-                    contentColor = Color.White
-                )
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))// Azul fuerte
             ) {
                 Text("CREAR CUENTA")
             }

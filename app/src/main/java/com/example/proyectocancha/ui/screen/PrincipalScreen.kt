@@ -31,6 +31,7 @@ import com.example.proyectocancha.ui.model.Court
 import com.example.proyectocancha.ui.model.Promotion
 import com.example.proyectocancha.ui.model.dummyCourts
 import com.example.proyectocancha.ui.model.dummyPromotions
+import com.example.proyectocancha.ui.theme.Grey900
 
 // --- Definiciones de Tema y Datos (Añade estas a tu archivo de tema o úsalas directamente) ---
 
