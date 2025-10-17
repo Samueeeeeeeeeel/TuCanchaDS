@@ -13,3 +13,6 @@ val Pink40 = Color(0xFF7D5260)
 val DarkGreen = Color(0xFF4CAF50)
 val LightGreen = Color(0xFF8BC34A)
 val LightGrayBg = Color(0xFFF0F0F0)
+
+val Teal = Color(0xFF008080)
+val Grey900 = Color(0xFF212121)

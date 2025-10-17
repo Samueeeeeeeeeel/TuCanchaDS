@@ -81,15 +81,31 @@ fun AppNavGraph(navController: NavHostController) {
         ) { innerPadding ->
             NavHost(
                 navController = navController,
-                startDestination = Routess.principal.path,
+                // CAMBIO 1: Establecer la ruta del Login como el destino inicial (startDestination).
+                startDestination = Routess.login.path,
                 modifier = Modifier.padding(innerPadding)
             ) {
-                // 1. PANTALLA PRINCIPAL (Canchas)
+
+                // 1. PANTALLA DE LOGIN (Ahora es el inicio)
+                composable(Routess.login.path) {
+                    LoginScreen(
+                        // Lógica para ir a Principal después de un login exitoso.
+                        onLoginOkNavigateHome = {
+                            navController.navigate(Routess.principal.path) {
+                                // Esto borra el Login de la pila para evitar volver con el botón 'atrás'.
+                                popUpTo(Routess.login.path) { inclusive = true }
+                            }
+                        },
+                        onGoRegister = goRegister
+                    )
+                }
+
+                // 2. PANTALLA PRINCIPAL (Ahora es la Home App después del login)
                 composable(Routess.principal.path) {
                     PrincipalScreen(navController = navController)
                 }
 
-                // 2. DETALLE DE CANCHA
+                // 3. DETALLE DE CANCHA
                 composable(
                     route = Routess.courtDetail.path + "/{courtId}",
                     arguments = listOf(navArgument("courtId") { type = NavType.IntType })
@@ -98,17 +114,11 @@ fun AppNavGraph(navController: NavHostController) {
                     CanchaDetailsScreen(navController = navController, courtId = courtId)
                 }
 
-                // 3. PERFIL DE USUARIO
+                // 4. PERFIL DE USUARIO
+                // NOTA: Tienes esta ruta duplicada (aquí y abajo), la mantengo para el cambio.
                 composable(Routess.profile.path) {
                     ProfileScreen(navController = navController)
                 }
-                composable(Routess.login.path) {
-                    LoginScreen(
-                        onLoginOkNavigateHome = goPrincipal, // Redirigir a Principal al iniciar sesión
-                        onGoRegister = goRegister
-                    )
-                }
-
 
                 // 5. REGISTRO
                 composable(Routess.register.path) {
@@ -122,11 +132,6 @@ fun AppNavGraph(navController: NavHostController) {
                 composable(Routess.home.path) {
                     PrincipalScreen(navController = navController)
                 }
-                //7.Ruta de Profile
-                composable(Routess.profile.path) {
-                    ProfileScreen(navController = navController)
-                }
-
             }
         }
     }

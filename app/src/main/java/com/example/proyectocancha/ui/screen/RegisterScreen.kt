@@ -34,6 +34,7 @@ import com.example.proyectocancha.ui.domain.validation.validarClaveFuerte
 import com.example.proyectocancha.ui.domain.validation.validarConfirmacion
 import com.example.proyectocancha.ui.domain.validation.validarNombreSoloLetras
 import com.example.proyectocancha.ui.domain.validation.validatePhoneisDigitsOnly
+import com.example.proyectocancha.ui.theme.Grey900
 
 @Composable
 fun RegisterScreen(
@@ -44,7 +45,7 @@ fun RegisterScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(bg)
+            .background(Grey900)
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -69,7 +70,7 @@ fun RegisterScreen(
         ) {
             Text(
                 "Crear una Cuenta",
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,color = Color.White
             )
             Spacer(Modifier.height(32.dp))
 
@@ -77,10 +78,10 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = nombre,
                 onValueChange = { nombre = it; errorNombre = null },
-                label = { Text("Nombre Completo") },
+                label = { Text("Nombre Completo",color = Color.White) },
                 singleLine = true,
                 isError = errorNombre != null,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
             errorNombre?.let {
                 Text(text = it, color = MaterialTheme.colorScheme.error)
@@ -91,7 +92,7 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = telefono,
                 onValueChange = { telefono = it; errorTelefono = null },
-                label = { Text("Teléfono") },
+                label = { Text("Teléfono",color = Color.White) },
                 singleLine = true,
                 isError = errorTelefono != null,
                 // --- ELIMINADO: keyboardOptions = androidx.compose.ui.text.input.KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -106,7 +107,7 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it; errorEmail = null },
-                label = { Text("Correo Electrónico") },
+                label = { Text("Correo Electrónico",color = Color.White) },
                 singleLine = true,
                 isError = errorEmail != null,
                 // --- ELIMINADO: keyboardOptions = androidx.compose.ui.text.input.KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -121,7 +122,7 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it; errorPassword = null; errorConfirmPassword = null },
-                label = { Text("Contraseña") },
+                label = { Text("Contraseña",color = Color.White) },
                 singleLine = true,
                 isError = errorPassword != null,
                 visualTransformation = PasswordVisualTransformation(),
@@ -137,7 +138,7 @@ fun RegisterScreen(
             OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it; errorConfirmPassword = null },
-                label = { Text("Confirmar Contraseña") },
+                label = { Text("Confirmar Contraseña",color = Color.White) },
                 singleLine = true,
                 isError = errorConfirmPassword != null,
                 visualTransformation = PasswordVisualTransformation(),
@@ -180,7 +181,7 @@ fun RegisterScreen(
                 onClick = onGoLogin,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Ya tengo una cuenta, iniciar sesión")
+                Text("Ya tengo una cuenta, iniciar sesión",color = Color.White)
             }
             Spacer(Modifier.height(24.dp))
         }

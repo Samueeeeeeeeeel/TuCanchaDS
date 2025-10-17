@@ -39,6 +39,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectocancha.ui.theme.Grey900
+import com.example.proyectocancha.ui.theme.Teal
 import com.example.proyectocancha.ui.viewmodel.AuthViewModel // Importación de tu VM
 
 // ----------------------------------------------------------------------
@@ -102,7 +104,7 @@ private fun LoginScreenUi(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black),// Fondo negro
+            .background(Grey900),
         contentAlignment = Alignment.Center
     ) {
         Column(
