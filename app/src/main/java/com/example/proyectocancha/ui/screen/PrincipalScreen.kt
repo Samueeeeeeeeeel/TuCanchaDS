@@ -9,13 +9,15 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -27,106 +29,84 @@ import androidx.navigation.compose.rememberNavController
 import com.example.proyectocancha.R
 import com.example.proyectocancha.ui.navigation.Routess
 import com.example.proyectocancha.ui.theme.ProyectoCanchaTheme
-import com.example.proyectocancha.ui.model.Court
-import com.example.proyectocancha.ui.model.Promotion
-import com.example.proyectocancha.ui.model.dummyCourts
-import com.example.proyectocancha.ui.model.dummyPromotions
+import com.example.proyectocancha.ui.theme.DarkGreen
+import com.example.proyectocancha.ui.theme.LightGreen
 import com.example.proyectocancha.ui.theme.Grey900
 
-// --- Definiciones de Tema y Datos (Añade estas a tu archivo de tema o úsalas directamente) ---
 
-// Define colores personalizados (debes tenerlos en tu archivo ui/theme/Color.kt)
-val DarkGreen = Color(0xFF4CAF50)
-val LightGreen = Color(0xFF8BC34A)
+// ----------------------------------------------------------------------
+// MODELOS Y DATOS (4 Canchas distintas)
+// ----------------------------------------------------------------------
 
-// Datos de ejemplo para las canchas y promociones (usa R.drawable.xxx con tus imágenes)
 data class Court(val id: Int, val name: String, val imageUrl: Int, val description: String)
-data class Promotion(val id: Int, val title: String, val imageUrl: Int, val ctaText: String)
-
-val dummyPromotions = listOf(
-    // Sustituye con tus Drawables. Si tienes errores, es porque no has añadido las imágenes a res/drawable.
-    Promotion(1, "¡Promoción Destacada!", R.drawable.court_1, "Reservar"),
-    Promotion(2, "Descuento de Verano", R.drawable.court_1, "Ver Oferta")
-)
 
 val dummyCourts = listOf(
-    Court(1, "Cancha Principal A", R.drawable.court_1, "Cancha con excelentes instalaciones"),
-    Court(2, "Cancha B - Sintético", R.drawable.court_1, "Césped sintético de alta calidad"),
-    Court(3, "Cancha C - Interior", R.drawable.court_1, "Cancha techada climatizada")
+    Court(1, "Cancha Roja - Principal", R.drawable.court_1, "Cancha con excelentes instalaciones"),
+    Court(2, "Cancha Azul - Sintético", R.drawable.court_1, "Césped sintético de alta calidad"),
+    Court(3, "Cancha Verde - Interior", R.drawable.court_1, "Cancha techada climatizada"),
+    Court(4, "Cancha Negra - Exterior", R.drawable.court_1, "Cancha con iluminación profesional")
 )
 
-// --- Composable PrincipalScreen ---
+
+// ----------------------------------------------------------------------
+// PANTALLA PRINCIPAL
+// ----------------------------------------------------------------------
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrincipalScreen(navController: NavController) {
+
+    val CardDarkBg = Color(0xFF333333)
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = "TUCANCHA!",
+                            text = "TuCancha!",
                             color = LightGreen,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(end = 8.dp)
                         )
-
                     }
                 },
+                // CAMBIO CLAVE: Se vacía el bloque actions {}
                 actions = {
-                    IconButton(onClick = { /* TODO: Implementar búsqueda */ }) {
-                        Icon(Icons.Filled.Search, contentDescription = "Buscar", tint = Color.White)
-                    }
-                    IconButton(onClick = { navController.navigate(Routess.profile) }) {
-                        Icon(Icons.Filled.AccountCircle, contentDescription = "Perfil", tint = Color.White)
-                    }
+                    // El espacio para acciones está ahora vacío.
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Grey900)
             )
         },
-        containerColor = Color.Black // Fondo general de la pantalla
+        containerColor = Grey900
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Grey900)
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
+
+            // 1. PESTAÑAS DE ACCIÓN RÁPIDA (Mi Perfil, Mis Reservas, Ver Todas)
             item {
                 Spacer(modifier = Modifier.height(8.dp))
+                QuickActionsTabRow(navController = navController)
+            }
+
+            // 2. TÍTULO DE LA SECCIÓN DE CANCHAS
+            item {
                 Text(
-                    text = "Ver Canchas",
+                    text = "Canchas Destacadas",
                     color = Color.White,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(
-                    onClick = { /* TODO: Implementar vista de todas las canchas */ },
-                    colors = ButtonDefaults.buttonColors(containerColor = DarkGreen),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Ver Todas las Canchas", color = Color.White)
-                }
             }
 
+            // 3. SECCIÓN 'VER CANCHAS' (Lista horizontal de las 4 canchas)
             item {
-                PromotionCard(promotion = dummyPromotions[0]) { promotion ->
-                    // Navegar al detalle de la cancha con el ID de la promoción
-                    navController.navigate(Routess.courtDetail.path + "/${promotion.id}")
-                }
-            }
-
-            item {
-                Text(
-                    text = "Promociones Destacadas",
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     items(dummyCourts.size) { index ->
                         CourtSmallCard(court = dummyCourts[index]) { court ->
@@ -136,100 +116,98 @@ fun PrincipalScreen(navController: NavController) {
                 }
             }
 
+            // 4. SECCIÓN 'MIS RESERVAS' (Bloque de contenido)
             item {
                 Text(
-                    text = "Próximas Reservas",
+                    text = "Mis Reservas",
                     color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    modifier = Modifier.padding(top = 8.dp)
                 )
-                // Placeholder de Reservas
-                Box(
+
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFF2C2C2E))
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
+                        .height(100.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = CardDarkBg)
                 ) {
-                    Text(
-                        text = "No hay reservas próximas",
-                        color = Color.Gray,
-                        fontSize = 16.sp
-                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "No tienes reservas activas.",
+                            color = Color.Gray,
+                            fontSize = 16.sp
+                        )
+                    }
                 }
             }
 
+            // 5. Espacio final
             item {
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Button(
-                        onClick = { /* TODO: Handle View Courts click */ },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2C2C2E)),
-                        modifier = Modifier.weight(1f).height(50.dp)
-                    ) {
-                        Text("Ver Canchas", color = Color.White)
-                    }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Button(
-                        onClick = { /* TODO: Implementar vista de reservas */ },
-                        colors = ButtonDefaults.buttonColors(containerColor = DarkGreen),
-                        modifier = Modifier.weight(1f).height(50.dp)
-                    ) {
-                        Text("Reservar", color = Color.White)
-                    }
-                }
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
 }
 
-// --- Componentes Reutilizables (Tarjetas) ---
+// ----------------------------------------------------------------------
+// COMPONENTES AUXILIARES (Se mantienen igual)
+// ----------------------------------------------------------------------
 
 @Composable
-fun PromotionCard(promotion: Promotion, onClick: (Promotion) -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(180.dp)
-            .clickable { onClick(promotion) },
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1C1E))
+fun QuickActionsTabRow(navController: NavController) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Image(
-                painter = painterResource(id = promotion.imageUrl),
-                contentDescription = promotion.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(12.dp))
-            )
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomStart) // Ajustado para parecerse más al diseño
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = promotion.title,
-                    color = Color.White,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(
-                    onClick = { onClick(promotion) },
-                    colors = ButtonDefaults.buttonColors(containerColor = DarkGreen)
-                ) {
-                    Text(promotion.ctaText, color = Color.White)
-                }
-            }
+        // Pestaña 1: Mi Perfil
+        ActionPill(
+            icon = Icons.Filled.AccountCircle,
+            text = "Mi Perfil",
+            onClick = { navController.navigate(Routess.profile.path) },
+            modifier = Modifier.weight(1f)
+        )
+        // Pestaña 2: Mis Reservas
+        ActionPill(
+            icon = Icons.Default.Menu,
+            text = "Mis Reservas",
+            onClick = { /* TODO: Implementar navegación a Mis Reservas */ },
+            modifier = Modifier.weight(1f)
+        )
+        // Pestaña 3: Ver Canchas
+        ActionPill(
+            icon = Icons.Default.ArrowForward,
+            text = "Ver Canchas",
+            onClick = { /* TODO: Implementar navegación a lista completa de canchas */ },
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+fun ActionPill(icon: ImageVector, text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .height(80.dp)
+            .padding(horizontal = 4.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = LightGreen)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(icon, contentDescription = text, tint = Color.White)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 }
@@ -242,7 +220,7 @@ fun CourtSmallCard(court: Court, onClick: (Court) -> Unit) {
             .height(160.dp)
             .clickable { onClick(court) },
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1C1E))
+        colors = CardDefaults.cardColors(containerColor = Grey900)
     ) {
         Column {
             Image(
@@ -273,7 +251,9 @@ fun CourtSmallCard(court: Court, onClick: (Court) -> Unit) {
     }
 }
 
-// --- Preview ---
+// ----------------------------------------------------------------------
+// PREVIEW
+// ----------------------------------------------------------------------
 
 @Preview(showBackground = true)
 @Composable

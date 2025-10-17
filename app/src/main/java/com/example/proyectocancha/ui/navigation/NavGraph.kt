@@ -73,8 +73,6 @@ fun AppNavGraph(navController: NavHostController) {
                 AppTopBar(
                     onOpenDrawer = { scope.launch { drawerState.open() } },
                     onHome = goPrincipal,
-                    onLogin = goLogin,
-                    onRegister = goRegister,
                     onProfile = goProfile
                 )
             }

@@ -28,6 +28,7 @@ import com.example.proyectocancha.ui.model.Court
 import com.example.proyectocancha.ui.model.Promotion
 import com.example.proyectocancha.ui.model.dummyCourts
 import com.example.proyectocancha.ui.model.dummyPromotions
+import com.example.proyectocancha.ui.theme.DarkGreen
 import com.example.proyectocancha.ui.theme.LightGrayBg
 
 
