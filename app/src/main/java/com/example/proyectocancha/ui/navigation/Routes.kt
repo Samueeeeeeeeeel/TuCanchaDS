@@ -11,5 +11,8 @@ sealed class Routess(val path: String) {
     data object principal : Routess("principal")
     data object courtDetail : Routess("courtDetail")
     data object detalleReserva : Routess("detalleReserva")
+    data object misReservas : Routess("misReservas")
+    data object reciboReserva : Routess("reciboReserva")
+    data object verCanchas : Routess("verCanchas")
 }
 

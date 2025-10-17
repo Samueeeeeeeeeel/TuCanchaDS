@@ -23,6 +23,9 @@ import com.example.proyectocancha.ui.screen.RegisterScreen
 import com.example.proyectocancha.ui.screen.CanchaDetailsScreen
 import com.example.proyectocancha.ui.screen.ProfileScreen
 import com.example.proyectocancha.ui.screen.DetalleReservaScreen // <-- ¡IMPORTACIÓN AÑADIDA!
+import com.example.proyectocancha.ui.screen.MisReservasScreen
+import com.example.proyectocancha.ui.screen.ReciboReservaScreen
+import com.example.proyectocancha.ui.screen.VerCanchasScreen
 
 
 // *******************************************************************
@@ -37,7 +40,7 @@ fun AppNavGraph(navController: NavHostController) {
 
     // --- Helpers de Navegación ---
     val goPrincipal: () -> Unit = { navController.navigate(Routess.principal.path) }
-    val goLogin: () -> Unit   = { navController.navigate(Routess.login.path) }
+    val goLogin: () -> Unit = { navController.navigate(Routess.login.path) }
     val goRegister: () -> Unit = { navController.navigate(Routess.register.path) }
     val goProfile: () -> Unit = { navController.navigate(Routess.profile.path) }
 
@@ -130,6 +133,16 @@ fun AppNavGraph(navController: NavHostController) {
                 // 7. DETALLE DE RESERVA
                 composable(Routess.detalleReserva.path) {
                     DetalleReservaScreen(navController = navController)
+                }
+                composable(Routess.reciboReserva.path) {
+                    ReciboReservaScreen(navController = navController)
+                }
+                // 9. MIS RESERVAS
+                composable(Routess.misReservas.path) {
+                    MisReservasScreen(navController = navController)
+                }
+                composable(Routess.verCanchas.path) {
+                    VerCanchasScreen(navController = navController)
                 }
             }
         }

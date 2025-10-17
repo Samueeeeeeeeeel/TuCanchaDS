@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -33,20 +34,13 @@ import com.example.proyectocancha.ui.theme.DarkGreen
 import com.example.proyectocancha.ui.theme.LightGreen
 import com.example.proyectocancha.ui.theme.Grey900
 
-
 // ----------------------------------------------------------------------
-// MODELOS Y DATOS (4 Canchas distintas)
+// IMPORTACIÓN DE MODELOS Y DATOS CENTRALIZADOS (¡ESTA ES LA CORRECCIÓN!)
 // ----------------------------------------------------------------------
 
-data class Court(val id: Int, val name: String, val imageUrl: Int, val description: String)
-
-val dummyCourts = listOf(
-    // ESTOS SON LOS DATOS ACTUALIZADOS
-    Court(1, "Cancha Norte - Pasto Real", R.drawable.court_1, "Cancha con excelentes instalaciones"),
-    Court(2, "Cancha Sur - Sintético", R.drawable.court_1, "Césped sintético de alta calidad"),
-    Court(3, "Cancha Valle - Sintético", R.drawable.court_1, "Cancha techada climatizada"),
-    Court(4, "Cancha Pick - Baby Fut", R.drawable.court_1, "Cancha con iluminación profesional")
-)
+// DEBES ASEGURARTE DE QUE ESTE PAQUETE SEA EL CORRECTO
+import com.example.proyectocancha.ui.model.Court
+import com.example.proyectocancha.ui.model.dummyCourts
 
 
 // ----------------------------------------------------------------------
@@ -71,10 +65,6 @@ fun PrincipalScreen(navController: NavController) {
                             modifier = Modifier.padding(end = 8.dp)
                         )
                     }
-                },
-                // CAMBIO CLAVE: Se vacía el bloque actions {}
-                actions = {
-                    // El espacio para acciones está ahora vacío.
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Grey900)
             )
@@ -109,9 +99,11 @@ fun PrincipalScreen(navController: NavController) {
             // 3. SECCIÓN 'VER CANCHAS' (Lista horizontal de las 4 canchas)
             item {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    items(dummyCourts.size) { index ->
-                        CourtSmallCard(court = dummyCourts[index]) { court ->
-                            navController.navigate(Routess.courtDetail.path + "/${court.id}")
+                    // Usa la lista dummyCourts importada
+                    items(dummyCourts) { court ->
+                        CourtSmallCard(court = court) { selectedCourt ->
+                            // Navega a la ruta de detalle de cancha con el ID
+                            navController.navigate(Routess.courtDetail.path + "/${selectedCourt.id}")
                         }
                     }
                 }
@@ -130,7 +122,8 @@ fun PrincipalScreen(navController: NavController) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp),
+                        .height(100.dp)
+                        .clickable { navController.navigate(Routess.misReservas.path) },
                     shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(containerColor = CardDarkBg)
                 ) {
@@ -141,7 +134,7 @@ fun PrincipalScreen(navController: NavController) {
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "No tienes reservas activas.",
+                            text = "No tienes reservas activas. Toca para ver.",
                             color = Color.Gray,
                             fontSize = 16.sp
                         )
@@ -158,7 +151,7 @@ fun PrincipalScreen(navController: NavController) {
 }
 
 // ----------------------------------------------------------------------
-// COMPONENTES AUXILIARES (Se mantienen igual)
+// COMPONENTES AUXILIARES (Sin cambios)
 // ----------------------------------------------------------------------
 
 @Composable
@@ -178,14 +171,14 @@ fun QuickActionsTabRow(navController: NavController) {
         ActionPill(
             icon = Icons.Default.Menu,
             text = "Mis Reservas",
-            onClick = { /* TODO: Implementar navegación a Mis Reservas */ },
+            onClick = { navController.navigate(Routess.misReservas.path) },
             modifier = Modifier.weight(1f)
         )
         // Pestaña 3: Ver Canchas
         ActionPill(
             icon = Icons.Default.ArrowForward,
             text = "Ver Canchas",
-            onClick = { /* TODO: Implementar navegación a lista completa de canchas */ },
+            onClick = { navController.navigate(Routess.verCanchas.path) },
             modifier = Modifier.weight(1f)
         )
     }

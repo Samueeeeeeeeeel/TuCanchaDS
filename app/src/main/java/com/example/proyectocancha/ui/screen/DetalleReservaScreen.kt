@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+// Importaciones de navegación y rutas
+import com.example.proyectocancha.ui.navigation.Routess
 // Importaciones de tus colores de tema
 import com.example.proyectocancha.ui.theme.DarkGreen
 import com.example.proyectocancha.ui.theme.Grey900
@@ -52,8 +54,8 @@ fun DetalleReservaScreen(navController: NavHostController) { // Nombre de la fun
         },
         // Botones de acción en la parte inferior
         bottomBar = {
-            DetalleReservaBottomBar( // Usando el nombre de la función auxiliar
-                onPayClicked = { /* TODO: Implementar lógica de pago */ },
+            DetalleReservaBottomBar(
+                navController = navController, // <-- ¡NAVCONTROLLER PASADO!
                 onBackClicked = { navController.popBackStack() },
                 totalPrice = total
             )
@@ -178,7 +180,7 @@ fun ResumenDePrecio(subtotal: Double, fee: Double, total: Double) {
 }
 
 @Composable
-fun DetalleReservaBottomBar(onPayClicked: () -> Unit, onBackClicked: () -> Unit, totalPrice: Double) { // Nombre de la función actualizado
+fun DetalleReservaBottomBar(navController: NavHostController, onBackClicked: () -> Unit, totalPrice: Double) { // <-- ¡NAVCONTROLLER EN LA FIRMA!
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -186,7 +188,11 @@ fun DetalleReservaBottomBar(onPayClicked: () -> Unit, onBackClicked: () -> Unit,
             .padding(16.dp)
     ) {
         Button(
-            onClick = onPayClicked,
+            // CAMBIO CLAVE: Navegación al ReciboReservaScreen
+            onClick = {
+                // Simula pago exitoso y navega a la siguiente pantalla
+                navController.navigate(Routess.reciboReserva.path)
+            },
             colors = ButtonDefaults.buttonColors(containerColor = DarkGreen),
             modifier = Modifier
                 .fillMaxWidth()

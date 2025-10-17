@@ -1,4 +1,4 @@
-#Fri Oct 17 16:59:18 CLST 2025
+#Fri Oct 17 18:23:30 CLST 2025
 base.0=C\:\\Users\\sable\\OneDrive\\Escritorio\\TuCanchaDS\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
 base.1=C\:\\Users\\sable\\OneDrive\\Escritorio\\TuCanchaDS\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
 base.2=C\:\\Users\\sable\\OneDrive\\Escritorio\\TuCanchaDS\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\11\\classes.dex
