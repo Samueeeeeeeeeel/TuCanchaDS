@@ -25,7 +25,6 @@ import com.example.proyectocancha.ui.screen.CanchaDetailsScreen
 import com.example.proyectocancha.ui.screen.ProfileScreen
 import com.example.proyectocancha.ui.screen.DetalleReservaScreen
 import com.example.proyectocancha.ui.screen.MisReservasScreen
-import com.example.proyectocancha.ui.screen.ReciboReservaScreen
 import com.example.proyectocancha.ui.screen.VerCanchasScreen
 
 @Composable
