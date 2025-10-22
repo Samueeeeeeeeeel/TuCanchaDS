@@ -6,6 +6,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Menu // <-- IMPORTADO (para Mis Reservas)
+import androidx.compose.material.icons.filled.ArrowForward // <-- IMPORTADO (para Ver Canchas)
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
@@ -15,6 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.proyectocancha.ui.theme.BlueGrey900
 
 // ..
 
@@ -33,7 +37,7 @@ fun AppDrawer(
 ) {
     ModalDrawerSheet( // Hoja que contiene el contenido del drawer
         modifier = modifier,
-        drawerContainerColor = Color.Black// Color de fondo
+        drawerContainerColor = BlueGrey900// Color de fondo
     ) {
         // Recorremos las opciones y pintamos ítems
         items.forEach { item -> // Por cada ítem
@@ -47,7 +51,13 @@ fun AppDrawer(
                     selectedContainerColor = Color(0xFF4CAF50), // Verde para ítem seleccionado
                     unselectedContainerColor = Color.Transparent, // Fondo transparente si no está seleccionado
                     selectedTextColor = Color.White, // Texto blanco cuando está seleccionado
-                    unselectedTextColor = Color(0xFF4CAF50) // Texto verde cuando no está seleccionado
+                    unselectedTextColor = Color(0xFF4CAF50), // Texto verde cuando no está seleccionado
+
+                    // --- ¡CAMBIOS AQUÍ! ---
+                    selectedIconColor = Color.White,   // Icono blanco (seleccionado)
+                    unselectedIconColor = Color.White    // Icono blanco (no seleccionado)
+                    // --- FIN DEL CAMBIO ---
+
                 ) // Estilo por defecto
             )
         }
@@ -58,12 +68,30 @@ fun AppDrawer(
 @Composable
 fun defaultDrawerItems(
     onHome: () -> Unit,   // Acción Home
-    onLogin: () -> Unit,  // Acción Login
-    onRegister: () -> Unit, // Acción Registro
-    onProfile: () -> Unit  // Acción Perfil
+    onProfile: () -> Unit,  // Acción Perfil
+    onVerCanchas: () -> Unit, // <-- AÑADIDO
+    onMisReservas: () -> Unit // <-- AÑADIDO
 ): List<com.example.proyectocancha.ui.components.DrawerItem> = listOf(
     DrawerItem("Home", Icons.Filled.Home, onHome),          // Ítem Home
-    DrawerItem("Login", Icons.Filled.AccountCircle, onLogin),       // Ítem Login
-    DrawerItem("Registro", Icons.Filled.Person, onRegister), // Ítem Registro
-    DrawerItem("Perfil", Icons.Filled.AccountCircle, onProfile)    // Ítem Perfil
+    DrawerItem("Perfil", Icons.Filled.AccountCircle, onProfile),   // Ítem Perfil
+    DrawerItem("Ver Canchas", Icons.Filled.ArrowForward, onVerCanchas), // <-- AÑADIDO
+    DrawerItem("Mis Reservas", Icons.Filled.Menu, onMisReservas)     // <-- AÑADIDO
 )
+
+@Preview(showBackground = true)
+@Composable
+fun AppDrawerPreview() {
+    // Lo llamamos directamente, sin el "ProyectoCanchaTheme { ... }"
+    // Le ponemos un fondo para que se vea, ya que tu drawer es transparente
+    AppDrawer(
+        currentRoute = null,
+        items = defaultDrawerItems(
+            onHome = { },
+            onProfile = { },
+            onVerCanchas = { }, // <-- AÑADIDO
+            onMisReservas = { }  // <-- AÑADIDO
+        ),
+        // Añadimos un fondo al preview para que el texto verde se vea
+        modifier = Modifier.background(Color.DarkGray)
+    )
+}

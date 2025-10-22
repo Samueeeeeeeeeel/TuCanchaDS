@@ -1,77 +1,76 @@
 package com.example.proyectocancha.ui.components
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.proyectocancha.ui.theme.BlueGrey900
 import com.example.proyectocancha.ui.theme.ProyectoCanchaTheme // Importación mantenida
+import com.example.proyectocancha.ui.theme.Grey900   // Asegúrate de tener esta importación
+import com.example.proyectocancha.ui.theme.LightGreen // Asegúrate de tener esta importación
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable // Composable reutilizable: barra superior
 fun AppTopBar(
-    onOpenDrawer: () -> Unit, // Abre el drawer (hamburguesa)
-    onHome: () -> Unit,       // Navega a Home
-    onProfile: () -> Unit,   // Navega a Perfil
+    onOpenDrawer: () -> Unit,  // Abre el drawer (hamburguesa)
+    onGoLogin: () -> Unit     // <-- PARÁMETRO CAMBIADO: Navega a Login
 ) {
-    var showMenu by remember { mutableStateOf(false) } // Estado del menú overflow
-
-    // CAMBIO CLAVE: Usar TopAppBar en lugar de CenterAlignedTopAppBar
-    TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors( // Usar topAppBarColors
-            containerColor = Color(0xFF4CAF50)
+    // CAMBIO CLAVE: Usar CenterAlignedTopAppBar para centrar el título
+    CenterAlignedTopAppBar(
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors( // Usar centerAligned...
+            containerColor = BlueGrey900// Color de fondo de la barra (como en Cinemark)
         ),
-        title = { // Slot del título
+
+        // 1. TÍTULO (Centrado)
+        title = {
             Text(
-                text = "TuCancha!", // Título visible, ahora alineado a la izquierda
-                style = MaterialTheme.typography.titleLarge,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                text = "TuCancha!", // Título visible
+                color = LightGreen,  // Color del título
+                fontWeight = FontWeight.Bold
             )
         },
-        navigationIcon = { // Ícono a la izquierda (hamburguesa)
+
+        // 2. ICONO DE NAVEGACIÓN (Izquierda - Hamburguesa)
+        navigationIcon = {
             IconButton(onClick = onOpenDrawer) { // Al presionar, abre drawer
-                Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menú") // Ícono
+                Icon(
+                    imageVector = Icons.Filled.Menu,
+                    contentDescription = "Menú",
+                    tint = Color.White // Color del ícono de hamburguesa
+                )
             }
         },
-        actions = { // Acciones a la derecha (íconos + overflow)
-            IconButton(onClick = onHome) { // Ir a Home
-                Icon(Icons.Filled.Home, contentDescription = "Home") // Ícono Home
-            }
-            IconButton(onClick = onProfile) {
-                Icon(Icons.Filled.AccountCircle, contentDescription = "Perfil")
-            }
-            IconButton(onClick = { showMenu = true }) { // Abre menú overflow
-                Icon(Icons.Filled.MoreVert, contentDescription = "Más") // Ícono 3 puntitos
-            }
-            DropdownMenu(
-                expanded = showMenu, // Si está abierto
-                onDismissRequest = { showMenu = false } // Cierra al tocar fuera
+
+        // 3. ACCIONES (Derecha - Botón Iniciar Sesión)
+        actions = {
+            Button(
+                onClick = onGoLogin, // Acción del botón
+                modifier = Modifier
+                    .padding(end = 8.dp) // Espacio desde el borde derecho
+                    .height(36.dp),     // Altura reducida para que quepa bien
+
+                // Color rojo similar al de la imagen
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = LightGreen // Un rojo oscuro
+                ),
+
+                // Reducimos el padding interno para que el texto se ajuste
+                contentPadding = PaddingValues(horizontal = 12.dp)
             ) {
-                DropdownMenuItem( // Opción Home
-                    text = { Text("Home") },
-                    onClick = { showMenu = false; onHome() }
-                )
-                DropdownMenuItem( // Opción Perfil
-                    text = { Text("Perfil") },
-                    onClick = { showMenu = false; onProfile() }
+                Text(
+                    text = "VER PERFIL",
+                    fontSize = 11.sp, // Fuente más pequeña para que quepa
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
                 )
             }
         }
@@ -83,9 +82,8 @@ fun AppTopBar(
 fun AppTopBarPreview() {
     ProyectoCanchaTheme {
         AppTopBar(
-            onOpenDrawer = { /* Acciones vacías para el Preview */ },
-            onHome = { /* Acciones vacías para el Preview */ },
-            onProfile = { /* Acciones vacías para el Preview */ }
+            onOpenDrawer = { /* Acción vacía para el Preview */ },
+            onGoLogin = { /* Acción vacía para el Preview */ } // <-- PARÁMETRO CAMBIADO
         )
     }
 }

@@ -3,6 +3,7 @@ package com.example.proyectocancha.ui.navigation
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -11,6 +12,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.NavType
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.navigation.compose.currentBackStackEntryAsState
 import kotlinx.coroutines.Job
 
 // IMPORTACIONES CORRECTAS DE COMPONENTES Y PANTALLAS
@@ -22,17 +24,12 @@ import com.example.proyectocancha.ui.screen.LoginScreen
 import com.example.proyectocancha.ui.screen.RegisterScreen
 import com.example.proyectocancha.ui.screen.CanchaDetailsScreen
 import com.example.proyectocancha.ui.screen.ProfileScreen
-import com.example.proyectocancha.ui.screen.DetalleReservaScreen // <-- ¡IMPORTACIÓN AÑADIDA!
+import com.example.proyectocancha.ui.screen.DetalleReservaScreen
 import com.example.proyectocancha.ui.screen.MisReservasScreen
 import com.example.proyectocancha.ui.screen.ReciboReservaScreen
 import com.example.proyectocancha.ui.screen.VerCanchasScreen
 
-
-// *******************************************************************
-// NOTA IMPORTANTE: Asumo que Routess.detalleReserva está en minúsculas.
-// *******************************************************************
-
-@Composable // Gráfico de navegación + Drawer + Scaffold
+@Composable
 fun AppNavGraph(navController: NavHostController) {
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -44,40 +41,66 @@ fun AppNavGraph(navController: NavHostController) {
     val goRegister: () -> Unit = { navController.navigate(Routess.register.path) }
     val goProfile: () -> Unit = { navController.navigate(Routess.profile.path) }
 
+    // --- ¡CAMBIOS AQUÍ! ---
+    // Añadimos los helpers para las nuevas rutas del drawer
+    val goVerCanchas: () -> Unit = { navController.navigate(Routess.verCanchas.path) } // <-- AÑADIDO
+    val goMisReservas: () -> Unit = { navController.navigate(Routess.misReservas.path) } // <-- AÑADIDO
+    // --- FIN DE CAMBIOS ---
+
+
+    // --- Lógica para mostrar/ocultar la barra (Esto está perfecto) ---
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = backStackEntry?.destination?.route
+
+    val showBarraYDrawer = when {
+        currentRoute == null -> false
+        currentRoute.startsWith(Routess.login.path) -> false
+        currentRoute.startsWith(Routess.register.path) -> false
+        else -> true
+    }
+    // --- FIN DE LA LÓGICA ---
+
 
     ModalNavigationDrawer(
         drawerState = drawerState,
+        gesturesEnabled = showBarraYDrawer, // Perfecto
         drawerContent = {
             AppDrawer(
                 currentRoute = null,
+
+                // --- ¡CAMBIOS AQUÍ! ---
+                // Actualizamos la llamada a defaultDrawerItems para que coincida
+                // con la nueva firma de la función en AppDrawer.kt
                 items = defaultDrawerItems(
                     onHome = {
                         scope.launch { drawerState.close() }
                         goPrincipal()
                     },
-                    onLogin = {
-                        scope.launch { drawerState.close() }
-                        goLogin()
-                    },
-                    onRegister = {
-                        scope.launch { drawerState.close() }
-                        goRegister()
-                    },
                     onProfile = {
                         scope.launch { drawerState.close() }
-                        navController.navigate(Routess.profile.path)
+                        goProfile() // Usamos el helper
+                    },
+                    onVerCanchas = { // <-- AÑADIDO
+                        scope.launch { drawerState.close() }
+                        goVerCanchas()
+                    },
+                    onMisReservas = { // <-- AÑADIDO
+                        scope.launch { drawerState.close() }
+                        goMisReservas()
                     }
                 )
+                // --- FIN DE CAMBIOS ---
             )
         }
     ) {
         Scaffold(
             topBar = {
-                AppTopBar(
-                    onOpenDrawer = { scope.launch { drawerState.open() } },
-                    onHome = goPrincipal,
-                    onProfile = goProfile
-                )
+                if (showBarraYDrawer) {
+                    AppTopBar(
+                        onOpenDrawer = { scope.launch { drawerState.open() } },
+                        onGoLogin = goProfile // (Esto estaba bien de la vez anterior)
+                    )
+                }
             }
         ) { innerPadding ->
             NavHost(
@@ -141,6 +164,7 @@ fun AppNavGraph(navController: NavHostController) {
                 composable(Routess.misReservas.path) {
                     MisReservasScreen(navController = navController)
                 }
+                // 10. VER CANCHAS
                 composable(Routess.verCanchas.path) {
                     VerCanchasScreen(navController = navController)
                 }
@@ -148,4 +172,3 @@ fun AppNavGraph(navController: NavHostController) {
         }
     }
 }
-// ¡La función DetalleReservaScreen con el TODO fue eliminada de aquí!

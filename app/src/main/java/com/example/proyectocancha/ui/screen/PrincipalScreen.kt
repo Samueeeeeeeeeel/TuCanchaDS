@@ -12,7 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.*
+import androidx.compose.material3.* // Mantenemos esta importación
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,124 +34,103 @@ import com.example.proyectocancha.ui.theme.DarkGreen
 import com.example.proyectocancha.ui.theme.LightGreen
 import com.example.proyectocancha.ui.theme.Grey900
 
-// ----------------------------------------------------------------------
-// IMPORTACIÓN DE MODELOS Y DATOS CENTRALIZADOS (¡ESTA ES LA CORRECCIÓN!)
-// ----------------------------------------------------------------------
-
-// DEBES ASEGURARTE DE QUE ESTE PAQUETE SEA EL CORRECTO
+// IMPORTACIÓN DE MODELOS Y DATOS CENTRALIZADOS
 import com.example.proyectocancha.ui.model.Court
 import com.example.proyectocancha.ui.model.dummyCourts
 
 
 // ----------------------------------------------------------------------
-// PANTALLA PRINCIPAL
+// PANTALLA PRINCIPAL (CORREGIDA - SIN SCAFFOLD DUPLICADO)
 // ----------------------------------------------------------------------
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrincipalScreen(navController: NavController) {
 
+    // El nombre de tu variable se mantiene igual
     val CardDarkBg = Color(0xFF333333)
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "TuCancha!",
-                            color = LightGreen,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Grey900)
+    // ELIMINAMOS EL Scaffold y TopAppBar de aquí,
+    // porque ya los pone AppNavGraph.kt
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Grey900)
+            // El padding de la barra superior ya se aplica
+            // desde el NavHost en AppNavGraph.
+            .padding(horizontal = 16.dp), // Mantenemos solo el padding lateral
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+
+        // 1. PESTAÑAS DE ACCIÓN RÁPIDA
+        item {
+            Spacer(modifier = Modifier.height(8.dp)) // Espacio superior
+            QuickActionsTabRow(navController = navController)
+        }
+
+        // 2. TÍTULO DE LA SECCIÓN DE CANCHAS
+        item {
+            Text(
+                text = "Canchas Destacadas",
+                color = Color.White,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold
             )
-        },
-        containerColor = Grey900
-    ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Grey900)
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
+        }
 
-            // 1. PESTAÑAS DE ACCIÓN RÁPIDA (Mi Perfil, Mis Reservas, Ver Todas)
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-                QuickActionsTabRow(navController = navController)
-            }
-
-            // 2. TÍTULO DE LA SECCIÓN DE CANCHAS
-            item {
-                Text(
-                    text = "Canchas Destacadas",
-                    color = Color.White,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            // 3. SECCIÓN 'VER CANCHAS' (Lista horizontal de las 4 canchas)
-            item {
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    // Usa la lista dummyCourts importada
-                    items(dummyCourts) { court ->
-                        CourtSmallCard(court = court) { selectedCourt ->
-                            // Navega a la ruta de detalle de cancha con el ID
-                            navController.navigate(Routess.courtDetail.path + "/${selectedCourt.id}")
-                        }
+        // 3. SECCIÓN 'VER CANCHAS' (Lista horizontal)
+        item {
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                items(dummyCourts) { court ->
+                    CourtSmallCard(court = court) { selectedCourt ->
+                        navController.navigate(Routess.courtDetail.path + "/${selectedCourt.id}")
                     }
                 }
             }
+        }
 
-            // 4. SECCIÓN 'MIS RESERVAS' (Bloque de contenido)
-            item {
-                Text(
-                    text = "Mis Reservas",
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
+        // 4. SECCIÓN 'MIS RESERVAS'
+        item {
+            Text(
+                text = "Mis Reservas",
+                color = Color.White,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = 8.dp)
+            )
 
-                Card(
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .clickable { navController.navigate(Routess.misReservas.path) },
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = CardDarkBg) // Usando tu variable
+            ) {
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                        .clickable { navController.navigate(Routess.misReservas.path) },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = CardDarkBg)
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "No tienes reservas activas. Toca para ver.",
-                            color = Color.Gray,
-                            fontSize = 16.sp
-                        )
-                    }
+                    Text(
+                        text = "No tienes reservas activas. Toca para ver.",
+                        color = Color.Gray,
+                        fontSize = 16.sp
+                    )
                 }
             }
+        }
 
-            // 5. Espacio final
-            item {
-                Spacer(modifier = Modifier.height(32.dp))
-            }
+        // 5. Espacio final
+        item {
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
 
 // ----------------------------------------------------------------------
-// COMPONENTES AUXILIARES (Sin cambios)
+// COMPONENTES AUXILIARES (Sin cambios de nombre)
 // ----------------------------------------------------------------------
 
 @Composable
@@ -160,13 +139,6 @@ fun QuickActionsTabRow(navController: NavController) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // Pestaña 1: Mi Perfil
-        ActionPill(
-            icon = Icons.Filled.AccountCircle,
-            text = "Mi Perfil",
-            onClick = { navController.navigate(Routess.profile.path) },
-            modifier = Modifier.weight(1f)
-        )
         // Pestaña 2: Mis Reservas
         ActionPill(
             icon = Icons.Default.Menu,
@@ -246,7 +218,7 @@ fun CourtSmallCard(court: Court, onClick: (Court) -> Unit) {
 }
 
 // ----------------------------------------------------------------------
-// PREVIEW
+// PREVIEW (Sin cambios de nombre)
 // ----------------------------------------------------------------------
 
 @Preview(showBackground = true)
