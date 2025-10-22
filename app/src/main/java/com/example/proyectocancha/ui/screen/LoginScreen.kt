@@ -21,6 +21,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -32,7 +33,9 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +53,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectocancha.ui.theme.Grey900
 import com.example.proyectocancha.ui.theme.Teal
 import com.example.proyectocancha.ui.viewmodel.AuthViewModel // Importación de tu VM
+import com.example.proyectocancha.ui.viewmodel.LoginUistate
 
 // ----------------------------------------------------------------------
 // 1. FUNCIÓN CONTENEDORA (Conectada al ViewModel)
@@ -220,7 +224,7 @@ private fun LoginScreenUi(
     }
 }
 
-@Preview
+@Preview()
 @Composable
 fun LoginScreenPreview() {
     // Usamos la versión UI para el Preview para no depender del ViewModel
