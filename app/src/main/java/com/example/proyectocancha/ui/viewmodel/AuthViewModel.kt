@@ -49,7 +49,8 @@ private data class DemoUser(                               // Datos que vamos a 
 class AuthViewModel: androidx.lifecycle.ViewModel() {
     companion object{
         private val USERS =mutableListOf(
-            DemoUser(name = "Samuel", email = "a@a.cl", phone = "12345678", password = "Demo123!")
+            DemoUser(name = "Samuel", email = "a@a.cl", phone = "12345678", password = "Demo123!"),
+            DemoUser(name = "Admin",email ="admin@a.cl",phone ="789456123", password = "Admin123!",isAdmin = true)
         )
     }
     // flujo de estadopara observar desde la UI
@@ -96,6 +97,7 @@ class AuthViewModel: androidx.lifecycle.ViewModel() {
                 it.copy(
                     isSubmitting = false,
                     success = ok,
+                    isAdmin = user?.isAdmin ?:false
                     errorMsg = if (!ok) "Credenciales inválidas" else null
                 )
             }

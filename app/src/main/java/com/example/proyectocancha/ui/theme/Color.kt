@@ -35,3 +35,15 @@ val BlueGrey900 = Color(0xFF263238)
 val Teal = Color(0xFF008080)
 
 val Grey900 = Color(0xFF212121)
+
+val MainGreen = Color(0xFF5CB85C)
+
+
+// Fondo de tarjetas y contenedores (un gris oscuro ligeramente más claro que el fondo)
+val DarkGrayCard = Color(0xFF2C2C2C)
+
+// Color de texto para usar sobre MainGreen
+val BlackText = Color(0xFF1A1A1A)
+
+// Color para estados de alerta/cancelación (similar al de tus reservas canceladas)
+val RedAccent = Color(0xFFDC3545)

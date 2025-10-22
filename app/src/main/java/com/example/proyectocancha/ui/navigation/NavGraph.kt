@@ -13,7 +13,6 @@ import androidx.navigation.NavType
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.currentBackStackEntryAsState
-import kotlinx.coroutines.Job
 
 // IMPORTACIONES CORRECTAS DE COMPONENTES Y PANTALLAS
 import com.example.proyectocancha.ui.components.AppTopBar
@@ -40,6 +39,9 @@ fun AppNavGraph(navController: NavHostController) {
     val goLogin: () -> Unit = { navController.navigate(Routess.login.path) }
     val goRegister: () -> Unit = { navController.navigate(Routess.register.path) }
     val goProfile: () -> Unit = { navController.navigate(Routess.profile.path) }
+
+    //ruta para el administrador
+    val goAdmin:()-> Unit = {navController.navigate(Routess.adminPrincipal.path) }
 
     // --- ¡CAMBIOS AQUÍ! ---
     // Añadimos los helpers para las nuevas rutas del drawer
@@ -112,9 +114,17 @@ fun AppNavGraph(navController: NavHostController) {
                 // 1. PANTALLA DE LOGIN
                 composable(Routess.login.path) {
                     LoginScreen(
-                        onLoginOkNavigateHome = {
-                            navController.navigate(Routess.principal.path) {
-                                popUpTo(Routess.login.path) { inclusive = true }
+                        onLoginOkNavigateHome = { userIsAdmin ->
+                            if (userIsAdmin) {
+                                //si es admin navega a la pantalla de admin
+                                navController.navigate(Routess.adminPrincipal.path) {
+                                    popUpTo(Routess.login.path) { inclusive = true }
+                                }
+                            } else {
+                                // si no tiene rol de admin navegar al home
+                                navController.navigate(Routess.principal.path) {
+                                    popUpTo(Routess.login.path) { inclusive = true }
+                                }
                             }
                         },
                         onGoRegister = goRegister
@@ -167,6 +177,10 @@ fun AppNavGraph(navController: NavHostController) {
                 // 10. VER CANCHAS
                 composable(Routess.verCanchas.path) {
                     VerCanchasScreen(navController = navController)
+                }
+                // 11. PANTALLA PRINCIPAL ADMIN
+                composable(Routess.adminPrincipal.path) {
+                    AdminScreen(navController = navController)
                 }
             }
         }

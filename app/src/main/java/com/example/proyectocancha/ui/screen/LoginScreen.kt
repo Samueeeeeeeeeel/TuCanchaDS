@@ -57,7 +57,7 @@ import com.example.proyectocancha.ui.viewmodel.AuthViewModel // Importación de 
 
 @Composable
 fun LoginScreen(
-    onLoginOkNavigateHome: () -> Unit,
+    onLoginOkNavigateHome: (Boolean) -> Unit,
     onGoRegister: () -> Unit
 ) {
     // 1. Obtiene/Crea el ViewModel
@@ -67,10 +67,12 @@ fun LoginScreen(
     val state by vm.login.collectAsStateWithLifecycle()
 
     // 3. Lógica de Navegación tras Éxito
-    if (state.success) {
-        vm.clearLoginResult() // Limpia banderas (success = false, errorMsg = null)
-        onLoginOkNavigateHome() // Navega
-    }
+    LaunchedEffect(state.success) {
+        if (state.success) {
+            onLoginOkNavigateHome(state.isAdmin) // Navega
+            vm.clearLoginResult() // Limpia banderas (success = false, errorMsg = null)
+
+        }
 
     // 4. Delega a la UI presentacional
     LoginScreenUi(
@@ -84,6 +86,7 @@ fun LoginScreen(
         onEmailChange = vm::onLoginEmailChange,
         onPassChange = vm::onLoginPassChange,
         onSubmit = vm::submitLogin,
+        onClearError = vm::clearLoginResult, //Añadimos para limpiar el error global
         onGoRegister = onGoRegister
     )
 }
@@ -104,6 +107,7 @@ private fun LoginScreenUi(
     onEmailChange: (String) -> Unit,
     onPassChange: (String) -> Unit,
     onSubmit: () -> Unit,
+    onClearError: () -> Unit,
     onGoRegister: () -> Unit
 ) {
     val bg = MaterialTheme.colorScheme.inverseOnSurface
@@ -149,7 +153,6 @@ private fun LoginScreenUi(
                 ) }
 
             }
-
 
             Spacer(Modifier.height(16.dp))
 
