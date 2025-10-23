@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -30,6 +31,9 @@ import com.example.proyectocancha.ui.model.Reservation
 import com.example.proyectocancha.ui.theme.*
 import com.example.proyectocancha.ui.viewmodel.AdminViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.rememberNavController
+import com.example.proyectocancha.ui.navigation.AppNavGraph
+import com.example.proyectocancha.ui.navigation.Routess // <-- IMPORTACIÓN AÑADIDA
 
 enum class AdminTab { DASHBOARD, CANCHAS, RESERVAS }
 
@@ -44,10 +48,19 @@ fun AdminScreen(navController: NavController) { // <-- RENOMBRADO A AdminScreen
 
     Scaffold(
         topBar = {
+            // --- AQUÍ ESTÁ LA CORRECCIÓN DE LA LLAMADA ---
             AdminTopBar(
                 title = "TuCancha! Administración",
-                onLogout = { navController.popBackStack() } // Implementar lógica de Logout real
+                onLogout = {
+                    navController.navigate(Routess.login.path) {
+                        // Limpia la pantalla de Admin del stack
+                        popUpTo(Routess.adminPrincipal.path) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
+            // --- FIN DE LA CORRECCIÓN ---
         },
         bottomBar = {
             AdminBottomBar(
@@ -105,6 +118,8 @@ fun AdminScreen(navController: NavController) { // <-- RENOMBRADO A AdminScreen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminTopBar(title: String, onLogout: () -> Unit) {
+    // --- AQUÍ ESTÁ LA CORRECCIÓN DE LA DEFINICIÓN ---
+    // La función vuelve a su estado original, solo recibe parámetros
     TopAppBar(
         title = { Text(title, color = MainGreen, fontWeight = FontWeight.Bold) },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Grey900),
@@ -114,6 +129,7 @@ fun AdminTopBar(title: String, onLogout: () -> Unit) {
             }
         }
     )
+    // --- FIN DE LA CORRECCIÓN ---
 }
 
 @Composable
@@ -415,4 +431,17 @@ fun AddEditCourtDialog(courtToEdit: Court?, onDismiss: () -> Unit, onSave: (Stri
         },
         containerColor = Grey900 // Color de fondo del diálogo
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AdminScreenPreview() {
+    // 1. Usamos el tema de la app
+    ProyectoCanchaTheme {
+        // 2. Creamos un NavController de prueba
+        val navController = rememberNavController()
+
+        // 3. Llamamos a AdminScreen
+        AdminScreen(navController = navController)
+    }
 }
