@@ -55,12 +55,14 @@ import com.example.proyectocancha.ui.theme.Teal
 import com.example.proyectocancha.ui.viewmodel.AuthViewModel // Importación de tu VM
 import com.example.proyectocancha.ui.viewmodel.LoginUistate
 
+
 // ----------------------------------------------------------------------
 // 1. FUNCIÓN CONTENEDORA (Conectada al ViewModel)
 // ----------------------------------------------------------------------
 
 @Composable
 fun LoginScreen(
+    // CAMBIO CLAVE: Ahora acepta un booleano para indicar el rol
     onLoginOkNavigateHome: (Boolean) -> Unit,
     onGoRegister: () -> Unit
 ) {
@@ -70,13 +72,15 @@ fun LoginScreen(
     // 2. Observa el Estado del Login (StateFlow)
     val state by vm.login.collectAsStateWithLifecycle()
 
-    // 3. Lógica de Navegación tras Éxito
+    // 3. Lógica de Navegación tras Éxito usando LaunchedEffect para el rol
     LaunchedEffect(state.success) {
         if (state.success) {
-            onLoginOkNavigateHome(state.isAdmin) // Navega
+            // Llama a la función del NavGraph y pasa el rol de administrador
+            onLoginOkNavigateHome(state.isAdmin)
             vm.clearLoginResult() // Limpia banderas (success = false, errorMsg = null)
-
         }
+    }
+
 
     // 4. Delega a la UI presentacional
     LoginScreenUi(
@@ -90,7 +94,7 @@ fun LoginScreen(
         onEmailChange = vm::onLoginEmailChange,
         onPassChange = vm::onLoginPassChange,
         onSubmit = vm::submitLogin,
-        onClearError = vm::clearLoginResult, //Añadimos para limpiar el error global
+        onClearError = vm::clearLoginResult, // Añadimos el handler para limpiar el error global
         onGoRegister = onGoRegister
     )
 }
@@ -103,15 +107,15 @@ fun LoginScreen(
 private fun LoginScreenUi(
     email: String,
     password: String,
-    emailError: String?, // Se mantiene para el contrato, pero se ignora en la UI
-    passwordError: String?, // Se mantiene para el contrato, pero se ignora en la UI
+    emailError: String?,
+    passwordError: String?,
     canSubmit: Boolean,
     isSubmitting: Boolean,
     errorMsg: String?, // <-- ESTA ES LA VARIABLE CLAVE PARA EL MENSAJE UNIFICADO
     onEmailChange: (String) -> Unit,
     onPassChange: (String) -> Unit,
     onSubmit: () -> Unit,
-    onClearError: () -> Unit,
+    onClearError: () -> Unit, // Handler para cerrar el diálogo
     onGoRegister: () -> Unit
 ) {
     val bg = MaterialTheme.colorScheme.inverseOnSurface
@@ -158,6 +162,7 @@ private fun LoginScreenUi(
 
             }
 
+
             Spacer(Modifier.height(16.dp))
 
             // ---------- CONTRASEÑA ----------
@@ -166,7 +171,8 @@ private fun LoginScreenUi(
                 onValueChange = onPassChange,
                 label = { Text("Contraseña",color = Color.White) },
                 singleLine = true,
-                isError = passwordError != null,
+                // Mantenemos la isError para validación local, si aplica
+                isError = passwordError != null && password.isNotBlank(),
                 visualTransformation = if (showPass) VisualTransformation.None else PasswordVisualTransformation(),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.White,
@@ -183,16 +189,7 @@ private fun LoginScreenUi(
                 },
                 modifier = Modifier.fillMaxWidth()
             )
-            // Eliminamos el bloque 'passwordError?.let { ... }'
-
             Spacer(Modifier.height(16.dp))
-            errorMsg?.let {
-                Text(
-                    text = it, // Muestra el mensaje "EMAIL O CONTRASEÑAS INVÁLIDOS"
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-            }
 
             // ---------- BOTONES ----------
             Button(
@@ -218,13 +215,26 @@ private fun LoginScreenUi(
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))) {
                 Text("Crear cuenta")
             }
-            // Eliminamos el último 'errorMsg?.let' duplicado que estaba aquí.
 
+        }
+
+        // Manejo de Errores Globales (Ej: Credenciales incorrectas)
+        if (errorMsg != null) {
+            AlertDialog(
+                onDismissRequest = onClearError,
+                title = { Text("Error de Autenticación") },
+                text = { Text(errorMsg) },
+                confirmButton = {
+                    TextButton(onClick = onClearError) {
+                        Text("Aceptar")
+                    }
+                }
+            )
         }
     }
 }
 
-@Preview()
+@Preview
 @Composable
 fun LoginScreenPreview() {
     // Usamos la versión UI para el Preview para no depender del ViewModel
@@ -232,6 +242,7 @@ fun LoginScreenPreview() {
         email = "usuario@ejemplo.com", password = "Password123",
         emailError = null, passwordError = null,
         canSubmit = true, isSubmitting = false, errorMsg = null,
-        onEmailChange = {}, onPassChange = {}, onSubmit = {}, onGoRegister = {}
+        onEmailChange = {}, onPassChange = {}, onSubmit = {},
+        onClearError = {}, onGoRegister = {}
     )
 }

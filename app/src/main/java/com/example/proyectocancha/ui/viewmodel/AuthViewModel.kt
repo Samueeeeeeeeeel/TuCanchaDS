@@ -1,12 +1,17 @@
 package com.example.proyectocancha.ui.viewmodel
 
-import kotlinx.coroutines.flow.MutableStateFlow            // Estado observable mutable
-import kotlinx.coroutines.flow.StateFlow                   // Exposición inmutable
-import kotlinx.coroutines.flow.update                      // Helper para actualizar flows
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import com.example.proyectocancha.ui.domain.validation.*
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
+// ----------------------------------------------------------------------
+// 1. ESTADOS DE UI (ACTUALIZADOS)
+// ----------------------------------------------------------------------
 
 data class LoginUistate(
     val email: String = "",
@@ -16,53 +21,61 @@ data class LoginUistate(
     val canSubmit: Boolean = false,
     val isSubmitting: Boolean = false,
     val success: Boolean = false,
+    val isAdmin: Boolean = false, // <-- CAMBIO CLAVE: Rol de administrador
     val errorMsg: String? = null,
 )
 
 data class RegisterUistate(
-    val name: String = "",                                 // 1) Nombre
-    val email: String = "",                                // 2) Email
-    val phone: String = "",                                // 3) Teléfono
-    val password: String = "",                                 // 4) Contraseña
-    val confirm: String = "",                              // 5) Confirmación
+    val name: String = "",
+    val email: String = "",
+    val phone: String = "",
+    val password: String = "",
+    val confirm: String = "",
 
-    val nameError: String? = null,                         // Errores por campo
+    val nameError: String? = null,
     val emailError: String? = null,
     val phoneError: String? = null,
     val passError: String? = null,
     val confirmError: String? = null,
 
-    val isSubmitting: Boolean = false,                     // Flag de carga
-    val canSubmit: Boolean = false,                        // Habilitar botón
-    val success: Boolean = false,                          // Resultado OK
-    val errorMsg: String? = null                           // Error global (ej: duplicado)
+    val isSubmitting: Boolean = false,
+    val canSubmit: Boolean = false,
+    val success: Boolean = false,
+    val errorMsg: String? = null
 )
 
-private data class DemoUser(                               // Datos que vamos a guardar en la colección
-    val name: String,                                      // Nombre
-    val email: String,                                     // Email (lo usamos como “id”)
-    val phone: String,                                     // Teléfono
-    val password: String                                       // Contraseña en texto (solo demo; no producción)
+// ----------------------------------------------------------------------
+// 2. MODELO DE USUARIO DEMO (ACTUALIZADO)
+// ----------------------------------------------------------------------
+
+private data class DemoUser(
+    val name: String,
+    val email: String,
+    val phone: String,
+    val password: String,
+    val isAdmin: Boolean = false // <-- CAMBIO CLAVE: Campo de rol
 )
 
 
-class AuthViewModel: androidx.lifecycle.ViewModel() {
+class AuthViewModel: ViewModel() {
     companion object{
+        // Añadido el campo isAdmin = true para el usuario administrador
         private val USERS =mutableListOf(
             DemoUser(name = "Samuel", email = "a@a.cl", phone = "12345678", password = "Demo123!"),
-            DemoUser(name = "Admin",email ="admin@a.cl",phone ="789456123", password = "Admin123!",isAdmin = true)
+            DemoUser(name = "Admin",email ="admin@a.cl",phone ="789456123", password = "Admin123!", isAdmin = true) // <-- USUARIO ADMIN
         )
     }
-    // flujo de estadopara observar desde la UI
-    private val _login = MutableStateFlow(LoginUistate()) //estado interno(login)
 
-    val login: StateFlow<LoginUistate> = _login         // Exposición inmutable
+    private val _login = MutableStateFlow(LoginUistate())
+    val login: StateFlow<LoginUistate> = _login
 
-    private val _register = MutableStateFlow(RegisterUistate()) //estado interno(register)
+    private val _register = MutableStateFlow(RegisterUistate())
+    val register :StateFlow<RegisterUistate> = _register
 
-    val register :StateFlow<RegisterUistate> = _register // Exposición inmutable
+    // ------------------------------------------------------------------
+    // 3. HANDLERS DE LOGIN
+    // ------------------------------------------------------------------
 
-    // handlres para el login(acciones que puede hacer el usuario)
     fun onLoginEmailChange(value: String){
         _login.update {it.copy(email = value, emailError = validarEmail(value))}
         recomputeLoginCanSubmit()
@@ -84,28 +97,37 @@ class AuthViewModel: androidx.lifecycle.ViewModel() {
         val s = _login.value
         if (!s.canSubmit || s.isSubmitting) return
         viewModelScope.launch {
-            _login.update { it.copy(isSubmitting = true, errorMsg = null, success = false) }
+            // Limpiamos los resultados anteriores y activamos la carga
+            _login.update { it.copy(isSubmitting = true, errorMsg = null, success = false, isAdmin = false) }
             delay(500)
 
-            // Buscamos en la **colección en memoria** un usuario con ese email
-            val user = com.example.proyectocancha.ui.viewmodel.AuthViewModel.Companion.USERS.firstOrNull { it.email.equals(s.email, ignoreCase = true) }
+            // Buscamos al usuario
+            val user = USERS.firstOrNull { it.email.equals(s.email, ignoreCase = true) }
 
-            // ¿Coincide email + contraseña?
+            // Lógica de verificación
             val ok = user != null && user.password == s.password
 
             _login.update {
                 it.copy(
                     isSubmitting = false,
                     success = ok,
-                    isAdmin = user?.isAdmin ?:false
+                    // CORRECCIÓN: Usamos el isAdmin del usuario encontrado (o false por defecto)
+                    isAdmin = user?.isAdmin ?: false,
                     errorMsg = if (!ok) "Credenciales inválidas" else null
                 )
             }
         }
     }
+
     fun clearLoginResult(){
+        // Al limpiar, mantenemos el estado de isAdmin si fue exitoso (aunque la UI navega inmediatamente)
+        // pero reseteamos el éxito y el error.
         _login.update { it.copy(success = false, errorMsg = null) }
     }
+
+    // ------------------------------------------------------------------
+    // 4. HANDLERS DE REGISTRO (SIN CAMBIOS)
+    // ------------------------------------------------------------------
 
     fun onNameChange(value: String) {
         val filtered = value.filter { it.isLetter() || it.isWhitespace() }
@@ -149,7 +171,7 @@ class AuthViewModel: androidx.lifecycle.ViewModel() {
             _register.update { it.copy(isSubmitting = true, errorMsg = null, success = false) }
             delay(700)
 
-            val duplicated = com.example.proyectocancha.ui.viewmodel.AuthViewModel.Companion.USERS.any { it.email.equals(s.email, ignoreCase = true) }
+            val duplicated = USERS.any { it.email.equals(s.email, ignoreCase = true) }
 
             if (duplicated) {
                 _register.update {
@@ -158,13 +180,14 @@ class AuthViewModel: androidx.lifecycle.ViewModel() {
                 return@launch
             }
 
-
-            com.example.proyectocancha.ui.viewmodel.AuthViewModel.Companion.USERS.add(
+            // Al registrar, el usuario NO es admin por defecto
+            USERS.add(
                 DemoUser(
                     name = s.name.trim(),
                     email = s.email.trim(),
                     phone = s.phone.trim(),
-                    password = s.password
+                    password = s.password,
+                    isAdmin = false
                 )
             )
 
@@ -176,5 +199,4 @@ class AuthViewModel: androidx.lifecycle.ViewModel() {
     fun clearRegisterResult() {
         _register.update { it.copy(success = false, errorMsg = null) }
     }
-
 }

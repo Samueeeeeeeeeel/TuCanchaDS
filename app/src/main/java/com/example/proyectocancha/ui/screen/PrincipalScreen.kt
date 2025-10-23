@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.* // Mantenemos esta importación
@@ -27,10 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.proyectocancha.R
 import com.example.proyectocancha.ui.navigation.Routess
 import com.example.proyectocancha.ui.theme.ProyectoCanchaTheme
-import com.example.proyectocancha.ui.theme.DarkGreen
 import com.example.proyectocancha.ui.theme.LightGreen
 import com.example.proyectocancha.ui.theme.Grey900
 
@@ -44,7 +41,7 @@ import com.example.proyectocancha.ui.model.dummyCourts
 // ----------------------------------------------------------------------
 
 @Composable
-fun PrincipalScreen(navController: NavController) {
+fun PrincipalScreen(navController: NavController, paddingValues: PaddingValues) {
 
     // El nombre de tu variable se mantiene igual
     val CardDarkBg = Color(0xFF333333)
@@ -221,10 +218,3 @@ fun CourtSmallCard(court: Court, onClick: (Court) -> Unit) {
 // PREVIEW (Sin cambios de nombre)
 // ----------------------------------------------------------------------
 
-@Preview(showBackground = true)
-@Composable
-fun PrincipalScreenPreview() {
-    ProyectoCanchaTheme {
-        PrincipalScreen(rememberNavController())
-    }
-}

@@ -32,15 +32,16 @@ import com.example.proyectocancha.ui.theme.DarkGreen
 import com.example.proyectocancha.ui.theme.LightGrayBg
 import com.example.proyectocancha.ui.theme.Grey900
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
 
-    // 1. Lógica de Datos: Busca la cancha
+// 1. Lógica de Datos: Busca la cancha
+// NOTA: Se añade price = 0.0 para cumplir con el modelo Court actualizado
     val court = dummyCourts.find { it.id == courtId } ?: Court(
         id = 0,
         name = "Cancha No Encontrada",
+        price = 0.0,
         imageUrl = R.drawable.court_1,
         description = "La cancha seleccionada no existe o no está disponible."
     )
@@ -49,6 +50,7 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
         // 2. Barra Superior (TopBar)
         topBar = {
             TopAppBar(
+                // CORRECCIÓN: Se usa court.name para el título
                 title = { Text(court.name, color = Color.White) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
@@ -68,7 +70,6 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
                 contentAlignment = Alignment.Center
             ) {
                 Button(
-                    // CAMBIO CLAVE: CONEXIÓN A LA PANTALLA DE DETALLE DE RESERVA
                     onClick = {
                         // Navega a la ruta de la nueva pantalla de confirmación
                         navController.navigate(Routess.detalleReserva.path)
@@ -78,7 +79,8 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
                         .fillMaxWidth()
                         .height(50.dp)
                 ) {
-                    Text("Reservar Ahora ($20/hr)", color = Color.White, fontSize = 18.sp)
+                    // CORRECCIÓN: Precio dinámico
+                    Text("Reservar Ahora ($${court.price}/hr)", color = Color.White, fontSize = 18.sp)
                 }
             }
         },
@@ -111,8 +113,9 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.height(8.dp))
+                // CORRECCIÓN: Precio dinámico
                 Text(
-                    text = "Precio por Hora: $20 USD",
+                    text = "Precio por Hora: $${court.price} USD",
                     color = DarkGreen,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold
@@ -156,6 +159,8 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
             }
         }
     }
+
+
 }
 
 @Preview(showBackground = true)

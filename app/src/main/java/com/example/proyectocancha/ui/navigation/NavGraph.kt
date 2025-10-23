@@ -25,7 +25,9 @@ import com.example.proyectocancha.ui.screen.CanchaDetailsScreen
 import com.example.proyectocancha.ui.screen.ProfileScreen
 import com.example.proyectocancha.ui.screen.DetalleReservaScreen
 import com.example.proyectocancha.ui.screen.MisReservasScreen
+import com.example.proyectocancha.ui.screen.ReciboReservaScreen
 import com.example.proyectocancha.ui.screen.VerCanchasScreen
+import com.example.proyectocancha.ui.screen.AdminScreen // IMPORTACIÓN DE LA PANTALLA DE ADMIN
 
 @Composable
 fun AppNavGraph(navController: NavHostController) {
@@ -38,40 +40,28 @@ fun AppNavGraph(navController: NavHostController) {
     val goLogin: () -> Unit = { navController.navigate(Routess.login.path) }
     val goRegister: () -> Unit = { navController.navigate(Routess.register.path) }
     val goProfile: () -> Unit = { navController.navigate(Routess.profile.path) }
+    val goVerCanchas: () -> Unit = { navController.navigate(Routess.verCanchas.path) }
+    val goMisReservas: () -> Unit = { navController.navigate(Routess.misReservas.path) }
 
-    //ruta para el administrador
-    val goAdmin:()-> Unit = {navController.navigate(Routess.adminPrincipal.path) }
-
-    // --- ¡CAMBIOS AQUÍ! ---
-    // Añadimos los helpers para las nuevas rutas del drawer
-    val goVerCanchas: () -> Unit = { navController.navigate(Routess.verCanchas.path) } // <-- AÑADIDO
-    val goMisReservas: () -> Unit = { navController.navigate(Routess.misReservas.path) } // <-- AÑADIDO
-    // --- FIN DE CAMBIOS ---
-
-
-    // --- Lógica para mostrar/ocultar la barra (Esto está perfecto) ---
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
+    // Lógica para mostrar/ocultar barra y drawer
     val showBarraYDrawer = when {
         currentRoute == null -> false
         currentRoute.startsWith(Routess.login.path) -> false
         currentRoute.startsWith(Routess.register.path) -> false
+        currentRoute.startsWith(Routess.courtDetail.path) -> false
+        currentRoute.startsWith(Routess.adminPrincipal.path) -> false // Ocultar barra en AdminScreen
         else -> true
     }
-    // --- FIN DE LA LÓGICA ---
-
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-        gesturesEnabled = showBarraYDrawer, // Perfecto
+        gesturesEnabled = showBarraYDrawer,
         drawerContent = {
             AppDrawer(
-                currentRoute = null,
-
-                // --- ¡CAMBIOS AQUÍ! ---
-                // Actualizamos la llamada a defaultDrawerItems para que coincida
-                // con la nueva firma de la función en AppDrawer.kt
+                currentRoute = currentRoute,
                 items = defaultDrawerItems(
                     onHome = {
                         scope.launch { drawerState.close() }
@@ -79,18 +69,17 @@ fun AppNavGraph(navController: NavHostController) {
                     },
                     onProfile = {
                         scope.launch { drawerState.close() }
-                        goProfile() // Usamos el helper
+                        goProfile()
                     },
-                    onVerCanchas = { // <-- AÑADIDO
+                    onVerCanchas = {
                         scope.launch { drawerState.close() }
                         goVerCanchas()
                     },
-                    onMisReservas = { // <-- AÑADIDO
+                    onMisReservas = {
                         scope.launch { drawerState.close() }
                         goMisReservas()
                     }
                 )
-                // --- FIN DE CAMBIOS ---
             )
         }
     ) {
@@ -99,7 +88,8 @@ fun AppNavGraph(navController: NavHostController) {
                 if (showBarraYDrawer) {
                     AppTopBar(
                         onOpenDrawer = { scope.launch { drawerState.open() } },
-                        onGoLogin = goProfile // (Esto estaba bien de la vez anterior)
+                        // CORRECCIÓN: El parámetro es onLoginClick
+                        onGoLogin = goLogin
                     )
                 }
             }
@@ -107,6 +97,7 @@ fun AppNavGraph(navController: NavHostController) {
             NavHost(
                 navController = navController,
                 startDestination = Routess.login.path,
+                // Aplicar el padding al NavHost
                 modifier = Modifier.padding(innerPadding)
             ) {
 
@@ -115,12 +106,12 @@ fun AppNavGraph(navController: NavHostController) {
                     LoginScreen(
                         onLoginOkNavigateHome = { userIsAdmin ->
                             if (userIsAdmin) {
-                                //si es admin navega a la pantalla de admin
+                                // Redirección a la pantalla de administrador
                                 navController.navigate(Routess.adminPrincipal.path) {
                                     popUpTo(Routess.login.path) { inclusive = true }
                                 }
                             } else {
-                                // si no tiene rol de admin navegar al home
+                                // Redirección a la pantalla principal de usuario
                                 navController.navigate(Routess.principal.path) {
                                     popUpTo(Routess.login.path) { inclusive = true }
                                 }
@@ -130,12 +121,13 @@ fun AppNavGraph(navController: NavHostController) {
                     )
                 }
 
-                // 2. PANTALLA PRINCIPAL
+                // 2. PANTALLA PRINCIPAL (Requiere paddingValues)
                 composable(Routess.principal.path) {
-                    PrincipalScreen(navController = navController)
+                    // CORRECCIÓN: Pasar el paddingValues
+                    PrincipalScreen(navController = navController, paddingValues = innerPadding)
                 }
 
-                // 3. DETALLE DE CANCHA
+                // 3. DETALLE DE CANCHA (No requiere padding, ya tiene su propio Scaffold)
                 composable(
                     route = Routess.courtDetail.path + "/{courtId}",
                     arguments = listOf(navArgument("courtId") { type = NavType.IntType })
@@ -157,27 +149,33 @@ fun AppNavGraph(navController: NavHostController) {
                     )
                 }
 
-                // 6. RUTA 'HOME'
+                // 6. RUTA 'HOME' (Requiere paddingValues)
                 composable(Routess.home.path) {
-                    PrincipalScreen(navController = navController)
+                    // CORRECCIÓN: Pasar el paddingValues
+                    PrincipalScreen(navController = navController, paddingValues = innerPadding)
                 }
 
                 // 7. DETALLE DE RESERVA
                 composable(Routess.detalleReserva.path) {
                     DetalleReservaScreen(navController = navController)
                 }
+
+                // 8. RECIBO DE RESERVA
                 composable(Routess.reciboReserva.path) {
                     ReciboReservaScreen(navController = navController)
                 }
+
                 // 9. MIS RESERVAS
                 composable(Routess.misReservas.path) {
                     MisReservasScreen(navController = navController)
                 }
+
                 // 10. VER CANCHAS
                 composable(Routess.verCanchas.path) {
                     VerCanchasScreen(navController = navController)
                 }
-                // 11. PANTALLA PRINCIPAL ADMIN
+
+                // 11. PANTALLA DE ADMINISTRADOR
                 composable(Routess.adminPrincipal.path) {
                     AdminScreen(navController = navController)
                 }
