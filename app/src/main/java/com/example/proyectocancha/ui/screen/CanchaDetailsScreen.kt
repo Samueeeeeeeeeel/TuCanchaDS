@@ -41,7 +41,7 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
     val court = dummyCourts.find { it.id == courtId } ?: Court(
         id = 0,
         name = "Cancha No Encontrada",
-        price = 0.0,
+        price = 0,
         imageUrl = R.drawable.court_1,
         description = "La cancha seleccionada no existe o no está disponible."
     )

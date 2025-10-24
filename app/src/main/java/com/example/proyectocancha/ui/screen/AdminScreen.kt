@@ -99,11 +99,11 @@ fun AdminScreen(navController: NavController) { // <-- RENOMBRADO A AdminScreen
         AddEditCourtDialog(
             courtToEdit = editingCourt,
             onDismiss = { showDialog = false },
-            onSave = { name, price ->
+            onSave = { name, price -> // price aquí ya es un Int
                 if (editingCourt == null) {
-                    vm.addCourt(name, price)
+                    vm.addCourt(name, price) // Se pasa el Int
                 } else {
-                    vm.editCourt(editingCourt!!.id, name, price)
+                    vm.editCourt(editingCourt!!.id, name, price) // Se pasa el Int
                 }
                 showDialog = false
             }
@@ -169,7 +169,9 @@ fun AdminBottomBar(selectedTab: AdminTab, onTabSelected: (AdminTab) -> Unit) {
 fun DashboardContent(courtList: List<Court>, reservationList: List<Reservation>) {
     val activeCourts = courtList.size
     val totalReservations = reservationList.size
-    val pendingReservations = reservationList.count { it.status == "PENDIENTE" }
+    // CORRECCIÓN: Asegúrate que tu modelo Reservation tenga 'status' y que coincida el String
+    val pendingReservations = reservationList.count { it.status.equals("PENDIENTE", ignoreCase = true) }
+
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text("Resumen Rápido", style = MaterialTheme.typography.titleLarge, color = Color.White, modifier = Modifier.padding(vertical = 8.dp))
@@ -300,6 +302,7 @@ fun CourtManagementItem(court: Court, onEdit: () -> Unit, onDelete: () -> Unit) 
             Column(Modifier.weight(1f)) {
                 Text(court.name, style = MaterialTheme.typography.titleMedium, color = Color.White)
                 Text(
+                    // Asumiendo que court.price es Int, se mostrará correctamente.
                     "Precio: $${court.price} USD/hr",
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.White.copy(alpha = 0.7f)
@@ -340,7 +343,7 @@ fun ReservationItem(reservation: Reservation, onUpdateStatus: (Int, String) -> U
                 )
                 Text(
                     reservation.status,
-                    color = when (reservation.status) {
+                    color = when (reservation.status.uppercase()) { // <-- Usar uppercase para seguridad
                         "CONFIRMADA" -> MainGreen
                         "PENDIENTE" -> Color(0xFFFDD835)
                         "CANCELADA" -> Color(0xFFE57373)
@@ -350,10 +353,11 @@ fun ReservationItem(reservation: Reservation, onUpdateStatus: (Int, String) -> U
                 )
             }
             Spacer(Modifier.height(4.dp))
+            // Asegúrate de que tu modelo Reservation tenga 'userName' y 'time'
             Text("Usuario: ${reservation.userName}", style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.8f))
             Text("Hora: ${reservation.time}", style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.8f))
 
-            if (reservation.status == "PENDIENTE") {
+            if (reservation.status.equals("PENDIENTE", ignoreCase = true)) {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                     horizontalArrangement = Arrangement.End
@@ -376,7 +380,11 @@ fun ReservationItem(reservation: Reservation, onUpdateStatus: (Int, String) -> U
 
 
 @Composable
-fun AddEditCourtDialog(courtToEdit: Court?, onDismiss: () -> Unit, onSave: (String, Double) -> Unit) {
+fun AddEditCourtDialog(
+    courtToEdit: Court?,
+    onDismiss: () -> Unit,
+    onSave: (String, Int) -> Unit // <-- ¡CAMBIO! Espera un Int
+) {
     var name by rememberSaveable { mutableStateOf(courtToEdit?.name ?: "") }
     var priceText by rememberSaveable { mutableStateOf(courtToEdit?.price?.toString() ?: "") }
     val isEditMode = courtToEdit != null
@@ -399,7 +407,8 @@ fun AddEditCourtDialog(courtToEdit: Court?, onDismiss: () -> Unit, onSave: (Stri
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     value = priceText,
-                    onValueChange = { priceText = it.filter { c -> c.isDigit() || c == '.' } },
+                    // <-- ¡CAMBIO! Solo permite dígitos, no el punto "."
+                    onValueChange = { priceText = it.filter { c -> c.isDigit() } },
                     label = { Text("Precio por Hora (USD)", color = Color.White.copy(alpha = 0.6f)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
@@ -413,13 +422,15 @@ fun AddEditCourtDialog(courtToEdit: Court?, onDismiss: () -> Unit, onSave: (Stri
         confirmButton = {
             Button(
                 onClick = {
-                    val price = priceText.toDoubleOrNull()
+                    // <-- ¡CAMBIO! Convierte a Int
+                    val price = priceText.toIntOrNull()
                     if (name.isNotBlank() && price != null && price > 0) {
                         onSave(name, price)
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = MainGreen),
-                enabled = name.isNotBlank() && priceText.toDoubleOrNull() != null
+                // <-- ¡CAMBIO! Valida con Int
+                enabled = name.isNotBlank() && priceText.toIntOrNull() != null
             ) {
                 Text(if (isEditMode) "Guardar Cambios" else "Añadir", color = Color.Black)
             }

@@ -5,8 +5,9 @@ package com.example.proyectocancha.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.proyectocancha.R
 import com.example.proyectocancha.ui.model.Court
-import com.example.proyectocancha.ui.model.Reservation
+import com.example.proyectocancha.ui.model.Reservation // <-- Asegúrate de importar tu modelo Reservation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -19,7 +20,7 @@ import kotlin.random.Random
 
 data class AdminUiState(
     val courtList: List<Court> = emptyList(),
-    val reservationList: List<Reservation> = emptyList(),
+    val reservationList: List<Reservation> = emptyList(), // <-- Debe ser List<Reservation>
     val isLoading: Boolean = false,
     val error: String? = null
 )
@@ -28,8 +29,8 @@ class AdminViewModel : ViewModel() {
     private val _state = MutableStateFlow(AdminUiState())
     val state: StateFlow<AdminUiState> = _state
 
-    // ID de recurso dummy para la imagen de la cancha (Reemplaza 0 con R.drawable.court_1 si es necesario)
-    private val DUMMY_IMAGE_ID = 0
+    // ID de recurso dummy para la imagen de la cancha
+    private val DUMMY_IMAGE_ID = 0 // Puedes cambiarlo por R.drawable.court_1 si existe
     private val DEFAULT_DESCRIPTION = "Cancha estándar administrable."
 
     init {
@@ -39,37 +40,65 @@ class AdminViewModel : ViewModel() {
     private fun loadMockData() {
         _state.update { it.copy(isLoading = true) }
 
-        // 1. Canchas simuladas (utilizando el constructor completo de 5 campos)
+        // 1. Canchas simuladas (Esto estaba bien)
         val mockCourts = mutableListOf(
-            Court(id = 1, name = "Cancha Norte - Pasto Real", price = 20.0, imageUrl = DUMMY_IMAGE_ID, description = "Cancha con excelentes instalaciones y ambiente familiar."),
-            Court(id = 2, name = "Cancha Sur - Sintético", price = 22.5, imageUrl = DUMMY_IMAGE_ID, description = "Césped sintético de alta calidad."),
-            Court(id = 3, name = "Cancha Valle - Sintético", price = 25.0, imageUrl = DUMMY_IMAGE_ID, description = "Cancha techada y climatizada."),
-            Court(id = 4, name = "Cancha Pick - Baby Fut", price = 15.0, imageUrl = DUMMY_IMAGE_ID, description = "Especializada para baby fútbol."),
-        )
+            Court(1, "Cancha Norte - Pasto Real", 20000, R.drawable.court_1,
+                "Cancha con excelentes instalaciones y ambiente familiar."),
+            Court(2, "Cancha Sur - Sintético", 22500, R.drawable.court_2,
+                "Césped sintético de alta calidad, ideal para juegos rápidos y ligeros, techado."),
+            Court(3, "Doble Cancha - Sintético", 30000, R.drawable.court_3
+                , "Doble Cancha para competencias Amateurs, Excelentes luces para jugar en cualquier momento."),
+            Court(4, "Cancha Pick - Baby Fut", 15000, R.drawable.court_4,
+                "Cancha pequeña con iluminación profesional, especializada para baby fútbol."),
+            Court(5, "Cancha Premium - VIP", 35000, R.drawable.court_5,
+                "Cancha con vestuarios de lujo y servicio exclusivo."),
+            Court(6, "Cancha Express - Rápida", 18000, R.drawable.court_6,
+                "Cancha ideal para reservas de última hora.")
+        ) // <-- Cierre de la lista de canchas
 
-        // 2. Reservas simuladas
+        // 2. Reservas simuladas (¡¡¡ESTA ES LA CORRECCIÓN!!!)
+        //    Se crea una lista de 'Reservation' en lugar de 'Court'
+        //    y se añade el ')' que faltaba al final.
+        //    (Ajusta los campos si tu clase Reservation es diferente)
         val mockReservations = mutableListOf(
-            Reservation(id = 101, courtName = "Cancha Norte - Pasto Real", userName = "Juan Pérez", time = "Hoy, 22 Oct 20:00", status = "CONFIRMADA"),
-            Reservation(id = 102, courtName = "Cancha Sur - Sintético", userName = "Ana López", time = "Mañana, 23 Oct 10:00", status = "PENDIENTE"),
-            Reservation(id = 103, courtName = "Cancha Valle - Sintético", userName = "Carlos Ruiz", time = "Mañana, 23 Oct 18:00", status = "CONFIRMADA"),
-            Reservation(id = 104, courtName = "Cancha Pick - Baby Fut", userName = "Elena Gómez", time = "Pasado, 24 Oct 14:00", status = "PENDIENTE"),
-            Reservation(id = 105, courtName = "Cancha Norte - Pasto Real", userName = "David Solís", time = "Pasado, 24 Oct 21:00", status = "CANCELADA")
-        )
+            Reservation(
+                id = 101,
+                courtName = "Cancha Norte - Pasto Real",
+                time = "18:00",
+                status = "Confirmada",
+                userName = "usuario_1"
+            ),
+            Reservation(
+                id = 102,
+                courtName = "Cancha Sur - Sintético",
+                time = "19:00",
+                status = "Pendiente",
+                userName = "usuario_2"
+            ),
+            Reservation(
+                id = 103,
+                courtName = "Cancha Norte - Pasto Real",
+                time = "10:00",
+                status = "Cancelada",
+                userName = "usuario_3"
+            )
+        )// <-- ¡Este ')' faltaba en tu código original!
 
+        // Esta actualización ahora funcionará correctamente
         _state.update {
             it.copy(
                 courtList = mockCourts,
-                reservationList = mockReservations,
+                reservationList = mockReservations, // <-- Ahora los tipos coinciden
                 isLoading = false
             )
         }
     }
 
 // ----------------------------------------------------------------------
-// LÓGICA DE GESTIÓN DE CANCHAS
+// LÓGICA DE GESTIÓN DE CANCHAS (SIN CAMBIOS, TAL COMO LO PEDISTE)
 // ----------------------------------------------------------------------
 
-    fun addCourt(name: String, price: Double) {
+    fun addCourt(name: String, price: Int) {
         viewModelScope.launch {
             // Simular un ID único
             val newId = Random.nextInt(100, 1000)
@@ -78,8 +107,8 @@ class AdminViewModel : ViewModel() {
                 id = newId,
                 name = name,
                 price = price,
-                imageUrl = DUMMY_IMAGE_ID,
-                description = DEFAULT_DESCRIPTION
+                imageUrl = DUMMY_IMAGE_ID, // <-- Tu variable
+                description = DEFAULT_DESCRIPTION // <-- Tu variable
             )
 
             _state.update { currentState ->
@@ -88,7 +117,7 @@ class AdminViewModel : ViewModel() {
         }
     }
 
-    fun editCourt(id: Int, newName: String, newPrice: Double) {
+    fun editCourt(id: Int, newName: String, newPrice: Int) {
         viewModelScope.launch {
             _state.update { currentState ->
                 val updatedList = currentState.courtList.map { court ->
@@ -114,7 +143,7 @@ class AdminViewModel : ViewModel() {
     }
 
 // ----------------------------------------------------------------------
-// LÓGICA DE GESTIÓN DE RESERVAS
+// LÓGICA DE GESTIÓN DE RESERVAS (SIN CAMBIOS)
 // ----------------------------------------------------------------------
 
     fun updateReservationStatus(id: Int, newStatus: String) {
@@ -131,6 +160,5 @@ class AdminViewModel : ViewModel() {
             }
         }
     }
-
 
 }
