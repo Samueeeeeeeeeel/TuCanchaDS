@@ -6,12 +6,15 @@ import kotlinx.coroutines.flow.update
 import com.example.proyectocancha.ui.domain.validation.*
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.ViewModel
+import com.example.uinavegacion.data.repository.UserRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 // ----------------------------------------------------------------------
 // 1. ESTADOS DE UI (ACTUALIZADOS)
 // ----------------------------------------------------------------------
+
+
 
 data class LoginUistate(
     val email: String = "",
@@ -57,15 +60,9 @@ private data class DemoUser(
 )
 
 
-class AuthViewModel: ViewModel() {
-    companion object{
-        // Añadido el campo isAdmin = true para el usuario administrador
-        private val USERS =mutableListOf(
-            DemoUser(name = "Samuel", email = "a@a.cl", phone = "12345678", password = "Demo123!"),
-            DemoUser(name = "Admin",email ="admin@a.cl",phone ="789456123", password = "Admin123!", isAdmin = true) // <-- USUARIO ADMIN
-        )
-    }
-
+class AuthViewModel(
+    private val repository: UserRepository
+): ViewModel(){
     private val _login = MutableStateFlow(LoginUistate())
     val login: StateFlow<LoginUistate> = _login
 
@@ -100,22 +97,26 @@ class AuthViewModel: ViewModel() {
             // Limpiamos los resultados anteriores y activamos la carga
             _login.update { it.copy(isSubmitting = true, errorMsg = null, success = false, isAdmin = false) }
             delay(500)
+            //6.- Se cambia lo anterior por esto ✅ NUEVO: consulta real a la BD vía repositorio
+            val result = repository.login(s.email.trim(), s.pass)
 
-            // Buscamos al usuario
-            val user = USERS.firstOrNull { it.email.equals(s.email, ignoreCase = true) }
-
-            // Lógica de verificación
-            val ok = user != null && user.password == s.password
-
+// Interpreta el resultado y actualiza estado
             _login.update {
-                it.copy(
-                    isSubmitting = false,
-                    success = ok,
-                    // CORRECCIÓN: Usamos el isAdmin del usuario encontrado (o false por defecto)
-                    isAdmin = user?.isAdmin ?: false,
-                    errorMsg = if (!ok) "Credenciales inválidas" else null
-                )
+                if (result.isSuccess) {
+                    it.copy(isSubmitting = false, success = true, errorMsg = null) // OK: éxito
+                } else {
+                    it.copy(isSubmitting = false, success = false,
+                        errorMsg = result.exceptionOrNull()?.message ?: "Error de autenticación")
+                }
             }
+
+
+
+
+
+
+
+
         }
     }
 
