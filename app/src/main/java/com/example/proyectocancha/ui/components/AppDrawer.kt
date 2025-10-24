@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Menu // <-- IMPORTADO (para Mis Reservas)
 import androidx.compose.material.icons.filled.ArrowForward // <-- IMPORTADO (para Ver Canchas)
+import androidx.compose.material.icons.filled.Logout // <-- ¡NUEVO! Importar ícono de Logout
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
@@ -70,12 +71,14 @@ fun defaultDrawerItems(
     onHome: () -> Unit,   // Acción Home
     onProfile: () -> Unit,  // Acción Perfil
     onVerCanchas: () -> Unit, // <-- AÑADIDO
-    onMisReservas: () -> Unit // <-- AÑADIDO
+    onMisReservas: () -> Unit, // <-- AÑADIDO
+    onLogout: () -> Unit     // <-- ¡NUEVO! Acción para cerrar sesión
 ): List<com.example.proyectocancha.ui.components.DrawerItem> = listOf(
     DrawerItem("Home", Icons.Filled.Home, onHome),          // Ítem Home
     DrawerItem("Perfil", Icons.Filled.AccountCircle, onProfile),   // Ítem Perfil
     DrawerItem("Ver Canchas", Icons.Filled.ArrowForward, onVerCanchas), // <-- AÑADIDO
-    DrawerItem("Mis Reservas", Icons.Filled.Menu, onMisReservas)     // <-- AÑADIDO
+    DrawerItem("Mis Reservas", Icons.Filled.Menu, onMisReservas),     // <-- AÑADIDO
+    DrawerItem("Cerrar Sesión", Icons.Filled.Logout, onLogout) // <-- ¡NUEVO! Ítem de Logout
 )
 
 @Preview(showBackground = true)
@@ -89,7 +92,8 @@ fun AppDrawerPreview() {
             onHome = { },
             onProfile = { },
             onVerCanchas = { }, // <-- AÑADIDO
-            onMisReservas = { }  // <-- AÑADIDO
+            onMisReservas = { },  // <-- AÑADIDO
+            onLogout = { }       // <-- ¡NUEVO! Añadido para el preview
         ),
         // Añadimos un fondo al preview para que el texto verde se vea
         modifier = Modifier.background(Color.DarkGray)

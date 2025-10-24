@@ -13,6 +13,7 @@ import androidx.navigation.NavType
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.NavGraph.Companion.findStartDestination // <-- ¡NUEVO! Importar
 
 // IMPORTACIONES CORRECTAS DE COMPONENTES Y PANTALLAS
 import com.example.proyectocancha.ui.components.AppTopBar
@@ -43,6 +44,19 @@ fun AppNavGraph(navController: NavHostController) {
     val goVerCanchas: () -> Unit = { navController.navigate(Routess.verCanchas.path) }
     val goMisReservas: () -> Unit = { navController.navigate(Routess.misReservas.path) }
 
+    // <-- ¡NUEVO! Acción de Logout
+    val goLogout: () -> Unit = {
+        navController.navigate(Routess.login.path) {
+            // Limpia toda la pila de navegación (backstack)
+            popUpTo(navController.graph.findStartDestination().id) {
+                inclusive = true
+            }
+            // Asegura que la pantalla de Login sea una única instancia
+            launchSingleTop = true
+        }
+    }
+
+
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
@@ -62,6 +76,7 @@ fun AppNavGraph(navController: NavHostController) {
         drawerContent = {
             AppDrawer(
                 currentRoute = currentRoute,
+                // <-- ¡MODIFICADO! Se añade onLogout
                 items = defaultDrawerItems(
                     onHome = {
                         scope.launch { drawerState.close() }
@@ -78,6 +93,11 @@ fun AppNavGraph(navController: NavHostController) {
                     onMisReservas = {
                         scope.launch { drawerState.close() }
                         goMisReservas()
+                    },
+                    // <-- ¡NUEVO! Pasar la acción de logout
+                    onLogout = {
+                        scope.launch { drawerState.close() }
+                        goLogout()
                     }
                 )
             )
@@ -89,7 +109,7 @@ fun AppNavGraph(navController: NavHostController) {
                     AppTopBar(
                         onOpenDrawer = { scope.launch { drawerState.open() } },
                         // CORRECCIÓN: El parámetro es onLoginClick
-                        onGoLogin = goLogin
+                        onGoLogin = goProfile // <--- ¡SOLUCIÓN!
                     )
                 }
             }
