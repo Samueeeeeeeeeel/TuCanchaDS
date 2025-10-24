@@ -10,12 +10,6 @@ import com.example.uinavegacion.data.repository.UserRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-// ----------------------------------------------------------------------
-// 1. ESTADOS DE UI (ACTUALIZADOS)
-// ----------------------------------------------------------------------
-
-
-
 data class LoginUistate(
     val email: String = "",
     val password: String = "",
@@ -24,7 +18,7 @@ data class LoginUistate(
     val canSubmit: Boolean = false,
     val isSubmitting: Boolean = false,
     val success: Boolean = false,
-    val isAdmin: Boolean = false, // <-- CAMBIO CLAVE: Rol de administrador
+    val isAdmin: Boolean = false,
     val errorMsg: String? = null,
 )
 
@@ -47,88 +41,68 @@ data class RegisterUistate(
     val errorMsg: String? = null
 )
 
-// ----------------------------------------------------------------------
-// 2. MODELO DE USUARIO DEMO (ACTUALIZADO)
-// ----------------------------------------------------------------------
-
-private data class DemoUser(
-    val name: String,
-    val email: String,
-    val phone: String,
-    val password: String,
-    val isAdmin: Boolean = false // <-- CAMBIO CLAVE: Campo de rol
-)
-
-
 class AuthViewModel(
     private val repository: UserRepository
-): ViewModel(){
+) : ViewModel() {
+
     private val _login = MutableStateFlow(LoginUistate())
     val login: StateFlow<LoginUistate> = _login
 
     private val _register = MutableStateFlow(RegisterUistate())
-    val register :StateFlow<RegisterUistate> = _register
+    val register: StateFlow<RegisterUistate> = _register
 
-    // ------------------------------------------------------------------
-    // 3. HANDLERS DE LOGIN
-    // ------------------------------------------------------------------
+    // ----------------- LOGIN -----------------
 
-    fun onLoginEmailChange(value: String){
-        _login.update {it.copy(email = value, emailError = validarEmail(value))}
+    fun onLoginEmailChange(value: String) {
+        _login.update { it.copy(email = value, emailError = validarEmail(value)) }
         recomputeLoginCanSubmit()
     }
 
-    fun onLoginPassChange(value: String){
-        _login.update {it.copy(password = value )}
+    fun onLoginPassChange(value: String) {
+        _login.update { it.copy(password = value) }
         recomputeLoginCanSubmit()
     }
 
-    private fun recomputeLoginCanSubmit(){
-        val x = _login.value
-        val cans = x.emailError == null && x.email.isNotBlank() &&
-                x.password.isNotBlank()
-        _login.update { it.copy(canSubmit = cans) }
+    private fun recomputeLoginCanSubmit() {
+        val s = _login.value
+        val can = s.emailError == null && s.email.isNotBlank() && s.password.isNotBlank()
+        _login.update { it.copy(canSubmit = can) }
     }
 
     fun submitLogin() {
         val s = _login.value
         if (!s.canSubmit || s.isSubmitting) return
         viewModelScope.launch {
-            // Limpiamos los resultados anteriores y activamos la carga
             _login.update { it.copy(isSubmitting = true, errorMsg = null, success = false, isAdmin = false) }
             delay(500)
-            //6.- Se cambia lo anterior por esto ✅ NUEVO: consulta real a la BD vía repositorio
-            val result = repository.login(s.email.trim(), s.pass)
 
-// Interpreta el resultado y actualiza estado
+            val result = repository.login(s.email.trim(), s.password)
+
             _login.update {
                 if (result.isSuccess) {
-                    it.copy(isSubmitting = false, success = true, errorMsg = null) // OK: éxito
+                    val user = result.getOrNull()
+                    it.copy(
+                        isSubmitting = false,
+                        success = true,
+                        isAdmin = user?.isAdmin == true,
+                        errorMsg = null
+                    )
                 } else {
-                    it.copy(isSubmitting = false, success = false,
-                        errorMsg = result.exceptionOrNull()?.message ?: "Error de autenticación")
+                    it.copy(
+                        isSubmitting = false,
+                        success = false,
+                        errorMsg = result.exceptionOrNull()?.message ?: "Error de autenticación"
+                    )
                 }
             }
-
-
-
-
-
-
-
-
         }
     }
 
-    fun clearLoginResult(){
-        // Al limpiar, mantenemos el estado de isAdmin si fue exitoso (aunque la UI navega inmediatamente)
-        // pero reseteamos el éxito y el error.
+    fun clearLoginResult() {
         _login.update { it.copy(success = false, errorMsg = null) }
     }
 
-    // ------------------------------------------------------------------
-    // 4. HANDLERS DE REGISTRO (SIN CAMBIOS)
-    // ------------------------------------------------------------------
+    // ----------------- REGISTRO -----------------
 
     fun onNameChange(value: String) {
         val filtered = value.filter { it.isLetter() || it.isWhitespace() }
@@ -142,6 +116,7 @@ class AuthViewModel(
         _register.update { it.copy(email = value, emailError = validarEmail(value)) }
         recomputeRegisterCanSubmit()
     }
+
     fun onPhoneChange(value: String) {
         val digitsOnly = value.filter { it.isDigit() }
         _register.update {
@@ -149,15 +124,18 @@ class AuthViewModel(
         }
         recomputeRegisterCanSubmit()
     }
+
     fun onRegisterPassChange(value: String) {
         _register.update { it.copy(password = value, passError = validarClaveFuerte(value)) }
         _register.update { it.copy(confirmError = validarConfirmacion(it.password, it.confirm)) }
         recomputeRegisterCanSubmit()
     }
+
     fun onConfirmChange(value: String) {
         _register.update { it.copy(confirm = value, confirmError = validarConfirmacion(it.password, value)) }
         recomputeRegisterCanSubmit()
     }
+
     private fun recomputeRegisterCanSubmit() {
         val s = _register.value
         val noErrors = listOf(s.nameError, s.emailError, s.phoneError, s.passError, s.confirmError).all { it == null }
@@ -172,31 +150,27 @@ class AuthViewModel(
             _register.update { it.copy(isSubmitting = true, errorMsg = null, success = false) }
             delay(700)
 
-            val duplicated = USERS.any { it.email.equals(s.email, ignoreCase = true) }
-
-            if (duplicated) {
-                _register.update {
-                    it.copy(isSubmitting = false, success = false, errorMsg = "El usuario ya existe")
-                }
-                return@launch
-            }
-
-            // Al registrar, el usuario NO es admin por defecto
-            USERS.add(
-                DemoUser(
-                    name = s.name.trim(),
-                    email = s.email.trim(),
-                    phone = s.phone.trim(),
-                    password = s.password,
-                    isAdmin = false
-                )
+            val result = repository.register(
+                name = s.name.trim(),
+                email = s.email.trim(),
+                phone = s.phone.trim(),
+                password = s.password
             )
 
             _register.update {
-                it.copy(isSubmitting = false, success = true, errorMsg = null)
+                if (result.isSuccess) {
+                    it.copy(isSubmitting = false, success = true, errorMsg = null)
+                } else {
+                    it.copy(
+                        isSubmitting = false,
+                        success = false,
+                        errorMsg = result.exceptionOrNull()?.message ?: "No se pudo registrar"
+                    )
+                }
             }
         }
     }
+
     fun clearRegisterResult() {
         _register.update { it.copy(success = false, errorMsg = null) }
     }
