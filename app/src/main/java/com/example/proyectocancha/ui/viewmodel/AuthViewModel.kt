@@ -174,4 +174,5 @@ class AuthViewModel(
     fun clearRegisterResult() {
         _register.update { it.copy(success = false, errorMsg = null) }
     }
+
 }

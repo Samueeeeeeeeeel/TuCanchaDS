@@ -12,4 +12,5 @@ data class UserEntity(
     val phone: String,
     val password: String,
     val isAdmin: Boolean = false
+
 )
