@@ -1,7 +1,6 @@
 package com.example.proyectocancha.ui.screen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -32,8 +31,7 @@ import com.example.proyectocancha.ui.theme.*
 import com.example.proyectocancha.ui.viewmodel.AdminViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
-import com.example.proyectocancha.ui.navigation.AppNavGraph
-import com.example.proyectocancha.ui.navigation.Routess // <-- IMPORTACIÓN AÑADIDA
+import com.example.proyectocancha.navigation.Routess // <-- IMPORTACIÓN AÑADIDA
 
 enum class AdminTab { DASHBOARD, CANCHAS, RESERVAS }
 

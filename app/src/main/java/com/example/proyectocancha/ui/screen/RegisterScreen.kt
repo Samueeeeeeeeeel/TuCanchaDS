@@ -30,11 +30,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 
-import com.example.proyectocancha.ui.domain.validation.validarEmail
-import com.example.proyectocancha.ui.domain.validation.validarClaveFuerte
-import com.example.proyectocancha.ui.domain.validation.validarConfirmacion
-import com.example.proyectocancha.ui.domain.validation.validarNombreSoloLetras
-import com.example.proyectocancha.ui.domain.validation.validatePhoneisDigitsOnly
+import com.example.proyectocancha.domain.validation.validarEmail
+import com.example.proyectocancha.domain.validation.validarClaveFuerte
+import com.example.proyectocancha.domain.validation.validarConfirmacion
+import com.example.proyectocancha.domain.validation.validarNombreSoloLetras
+import com.example.proyectocancha.domain.validation.validatePhoneisDigitsOnly
 import com.example.proyectocancha.ui.theme.Grey900
 
 @Composable

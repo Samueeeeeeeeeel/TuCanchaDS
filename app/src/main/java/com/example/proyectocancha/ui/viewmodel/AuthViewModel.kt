@@ -6,6 +6,11 @@ import kotlinx.coroutines.flow.update
 import com.example.proyectocancha.ui.domain.validation.*
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.ViewModel
+import com.example.proyectocancha.domain.validation.validarClaveFuerte
+import com.example.proyectocancha.domain.validation.validarConfirmacion
+import com.example.proyectocancha.domain.validation.validarEmail
+import com.example.proyectocancha.domain.validation.validarNombreSoloLetras
+import com.example.proyectocancha.domain.validation.validatePhoneisDigitsOnly
 import com.example.uinavegacion.data.repository.UserRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -132,7 +137,11 @@ class AuthViewModel(
     }
 
     fun onConfirmChange(value: String) {
-        _register.update { it.copy(confirm = value, confirmError = validarConfirmacion(it.password, value)) }
+        _register.update { it.copy(confirm = value, confirmError = validarConfirmacion(
+            it.password,
+            value
+        )
+        ) }
         recomputeRegisterCanSubmit()
     }
 

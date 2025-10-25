@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 // Importaciones de navegación y rutas
-import com.example.proyectocancha.ui.navigation.Routess
+import com.example.proyectocancha.navigation.Routess
 // Importaciones de tus colores de tema
 import com.example.proyectocancha.ui.theme.DarkGreen
 import com.example.proyectocancha.ui.theme.Grey900
