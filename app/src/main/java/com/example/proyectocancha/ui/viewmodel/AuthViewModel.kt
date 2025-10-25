@@ -3,7 +3,7 @@ package com.example.proyectocancha.ui.viewmodel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import com.example.proyectocancha.ui.domain.validation.*
+
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.ViewModel
 import com.example.proyectocancha.domain.validation.validarClaveFuerte
