@@ -14,8 +14,9 @@ import com.example.proyectocancha.navigation.AppNavGraph
 import com.example.proyectocancha.ui.theme.ProyectoCanchaTheme // Asegúrate de tener tu tema
 import com.example.proyectocancha.data.local.database.AppDatabase // Importa tu DB corregida
 import com.example.proyectocancha.data.repository.CourtRepositoryImpl
+import com.example.proyectocancha.data.repository.UserRepository
 import com.example.proyectocancha.ui.viewmodel.AppViewModelFactory
-import com.example.uinavegacion.data.repository.UserRepository
+
 
 class MainActivity : ComponentActivity() {
 
@@ -54,7 +55,7 @@ fun AppRoot(appFactory: AppViewModelFactory) {
     MaterialTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             // 4. Pasamos la Factory al NavGraph
-            AppNavGraph(navController = navController, appFactory = appFactory)
+            AppNavGraph(navController = navController, appFacdsfdfsdftory = appFactory)
         }
     }
 }
