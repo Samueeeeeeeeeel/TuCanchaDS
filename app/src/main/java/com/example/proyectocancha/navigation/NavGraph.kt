@@ -30,7 +30,6 @@ import com.example.proyectocancha.ui.screen.MisReservasScreen
 import com.example.proyectocancha.ui.screen.ReciboReservaScreen
 import com.example.proyectocancha.ui.screen.VerCanchasScreen
 import com.example.proyectocancha.ui.screen.AdminScreen // IMPORTACIÓN DE LA PANTALLA DE ADMIN
-import com.example.proyectocancha.ui.viewmodel.AppViewModelFactory
 import com.example.proyectocancha.ui.viewmodel.CourtDetailViewModel
 import com.example.proyectocancha.data.repository.CourtRepository
 @Composable
