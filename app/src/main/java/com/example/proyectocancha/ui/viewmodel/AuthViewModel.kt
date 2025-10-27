@@ -85,11 +85,9 @@ class AuthViewModel(
 
             _login.update {
                 if (result.isSuccess) {
-                    val user = result.getOrNull()
                     it.copy(
                         isSubmitting = false,
                         success = true,
-                        isAdmin = user?.isAdmin == true,
                         errorMsg = null
                     )
                 } else {
