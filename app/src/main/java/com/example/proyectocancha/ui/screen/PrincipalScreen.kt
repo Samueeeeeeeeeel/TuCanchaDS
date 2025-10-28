@@ -26,25 +26,66 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.proyectocancha.navigation.Routess // ✅ corregido
+import com.example.proyectocancha.navigation.Routess
 import com.example.proyectocancha.ui.theme.ProyectoCanchaTheme
 import com.example.proyectocancha.ui.theme.LightGreen
 import com.example.proyectocancha.ui.theme.Grey900
 import com.example.proyectocancha.ui.model.Court
 import com.example.proyectocancha.ui.model.dummyCourts
+// ¡NUEVOS IMPORTS!
+import com.example.proyectocancha.ui.components.AppTopBar
 
+// ---------------------------------------------------
+// ¡NUEVA FUNCIÓN PrincipalScreen (Contenedora)!
+// ---------------------------------------------------
+@OptIn(ExperimentalMaterial3Api::class) // Necesario para Scaffold
 @Composable
-fun PrincipalScreen(navController: NavController, paddingValues: PaddingValues = PaddingValues()) {
+fun PrincipalScreen(navController: NavController) {
+
+    // Scaffold es la estructura que nos permite poner una TopBar
+    Scaffold(
+        topBar = {
+            // 2. Aquí llamamos a tu AppTopBar
+            AppTopBar(
+                onOpenDrawer = {
+                    // Por ahora, la hamburguesa no hace nada.
+                    // Más adelante, aquí irá la lógica para abrir el Drawer.
+                },
+                onGoLogin = {
+                    // Asumimos que tienes una ruta de perfil
+                    // Si no la tienes, puedes cambiarla a Routess.login.path
+                    navController.navigate(Routess.profile.path)
+                }
+            )
+        }
+    ) { innerPadding ->
+        // 3. Llamamos a tu contenido original (el LazyColumn)
+        //    y le pasamos el 'innerPadding' que nos da el Scaffold.
+        PrincipalScreenContent(
+            navController = navController,
+            paddingValues = innerPadding // <-- ¡CLAVE!
+        )
+    }
+}
+
+
+// ---------------------------------------------------
+// ¡TU FUNCIÓN ORIGINAL, AHORA RENOMBRADA!
+// ---------------------------------------------------
+@Composable
+fun PrincipalScreenContent(navController: NavController, paddingValues: PaddingValues = PaddingValues()) {
     val CardDarkBg = Color(0xFF333333)
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(Grey900)
-            .padding(paddingValues) // ✅ aplicamos padding del Scaffold
+            .padding(paddingValues) // ✅ APLICA EL PADDING DEL SCAFFOLD
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
-    ) {
+    )
+
+    {
         // 1. Pestañas de acción rápida
         item {
             Spacer(modifier = Modifier.height(8.dp))
@@ -111,6 +152,10 @@ fun PrincipalScreen(navController: NavController, paddingValues: PaddingValues =
         }
     }
 }
+
+// ---------------------------------------------------
+// (El resto de tus funciones auxiliares no cambian)
+// ---------------------------------------------------
 
 @Composable
 fun QuickActionsTabRow(navController: NavController) {
@@ -194,10 +239,15 @@ fun CourtSmallCard(court: Court, onClick: (Court) -> Unit) {
     }
 }
 
+
+// ---------------------------------------------------
+// ¡PREVIEW ACTUALIZADO!
+// ---------------------------------------------------
 @Preview(showBackground = true)
 @Composable
 fun PrincipalScreenPreview() {
     ProyectoCanchaTheme {
+        // Ahora el preview llama a la nueva función contenedora
         PrincipalScreen(navController = rememberNavController())
     }
 }
