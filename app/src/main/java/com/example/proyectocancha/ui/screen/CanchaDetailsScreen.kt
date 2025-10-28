@@ -22,12 +22,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.proyectocancha.R // Asegúrate de que R.drawable.court_1 exista
-// Importaciones desde el modelo centralizado
+import com.example.proyectocancha.R
 import com.example.proyectocancha.ui.model.Court
 import com.example.proyectocancha.ui.model.dummyCourts
-import com.example.proyectocancha.ui.navigation.Routess // <-- Importación necesaria para la navegación
-// Importaciones de tus colores de tema
+import com.example.proyectocancha.navigation.Routess // ✅ corregido
 import com.example.proyectocancha.ui.theme.DarkGreen
 import com.example.proyectocancha.ui.theme.LightGrayBg
 import com.example.proyectocancha.ui.theme.Grey900
@@ -36,8 +34,7 @@ import com.example.proyectocancha.ui.theme.Grey900
 @Composable
 fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
 
-// 1. Lógica de Datos: Busca la cancha
-// NOTA: Se añade price = 0.0 para cumplir con el modelo Court actualizado
+    // 1. Buscar cancha
     val court = dummyCourts.find { it.id == courtId } ?: Court(
         id = 0,
         name = "Cancha No Encontrada",
@@ -47,20 +44,23 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
     )
 
     Scaffold(
-        // 2. Barra Superior (TopBar)
+        // 2. Barra Superior
         topBar = {
             TopAppBar(
-                // CORRECCIÓN: Se usa court.name para el título
                 title = { Text(court.name, color = Color.White) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Color.White)
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = Color.White
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Grey900)
             )
         },
-        // 3. Botón Fijo de Reserva (Bottom Bar)
+        // 3. Botón de Reserva
         bottomBar = {
             Box(
                 modifier = Modifier
@@ -71,7 +71,6 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
             ) {
                 Button(
                     onClick = {
-                        // Navega a la ruta de la nueva pantalla de confirmación
                         navController.navigate(Routess.detalleReserva.path)
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = DarkGreen),
@@ -79,22 +78,25 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
                         .fillMaxWidth()
                         .height(50.dp)
                 ) {
-                    // CORRECCIÓN: Precio dinámico
-                    Text("Reservar Ahora ($${court.price}/hr)", color = Color.White, fontSize = 18.sp)
+                    Text(
+                        "Reservar Ahora ($${court.price}/hr)",
+                        color = Color.White,
+                        fontSize = 18.sp
+                    )
                 }
             }
         },
         containerColor = Grey900
     ) { paddingValues ->
 
-        // 4. Contenido Principal Deslizable
+        // 4. Contenido
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
-            // A. Imagen de la Cancha
+            // Imagen
             Image(
                 painter = painterResource(id = court.imageUrl),
                 contentDescription = court.name,
@@ -104,7 +106,7 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
                     .height(250.dp)
             )
 
-            // B. Detalles e Información
+            // Detalles
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 20.dp)) {
                 Text(
                     text = court.name,
@@ -113,7 +115,6 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.height(8.dp))
-                // CORRECCIÓN: Precio dinámico
                 Text(
                     text = "Precio por Hora: $${court.price} USD",
                     color = DarkGreen,
@@ -134,7 +135,7 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
                 )
                 Spacer(Modifier.height(24.dp))
 
-                // C. Bloque de Disponibilidad (Placeholder)
+                // Disponibilidad (placeholder)
                 Text(
                     text = "Seleccionar Fecha y Hora",
                     color = Color.White,
@@ -159,8 +160,6 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
             }
         }
     }
-
-
 }
 
 @Preview(showBackground = true)

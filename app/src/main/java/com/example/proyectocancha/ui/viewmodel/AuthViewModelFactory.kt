@@ -1,9 +1,8 @@
-package com.example.uinavegacion.ui.viewmodel
+package com.example.proyectocancha.ui.viewmodel
 
 import androidx.lifecycle.ViewModel                              // Tipo base ViewModel
 import androidx.lifecycle.ViewModelProvider                      // Factory de ViewModels
 import com.example.proyectocancha.data.repository.UserRepository
-import com.example.proyectocancha.ui.viewmodel.AuthViewModel
 
 
 // Factory simple para crear AuthViewModel con su UserRepository.

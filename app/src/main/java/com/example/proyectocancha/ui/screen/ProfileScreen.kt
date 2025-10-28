@@ -24,44 +24,36 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.proyectocancha.ui.navigation.Routess
-// IMPORTAMOS TUS COLORES
+import com.example.proyectocancha.navigation.Routess // ✅ corregido
 import com.example.proyectocancha.ui.theme.Grey900
 import com.example.proyectocancha.ui.theme.LightGreen
-import com.example.proyectocancha.ui.theme.DarkGreen
+import com.example.proyectocancha.ui.theme.ProyectoCanchaTheme
 
 @Composable
 fun ProfileScreen(
     navController: NavHostController
 ) {
-    // --- Colores (Según tu proyecto) ---
-    val mainBg = Grey900 // Fondo de la pantalla
-    val cardBg = Color(0xFF333333) // Gris más claro para las tarjetas
+    val mainBg = Grey900
+    val cardBg = Color(0xFF333333)
     val textColor = Color.White
-    val accentGreen = LightGreen
-    val darkTextOnGreen = Grey900
     val mutedTextColor = Color.Gray
     val errorColor = Color(0xFFF44336)
 
-    // --- Datos de Usuario (Ficticios) ---
+    // Datos ficticios
     val userName = "Juan Pérez"
     val userEmail = "juan.perez@example.com"
     val userPhone = "+56 9 8765 4321"
-    val userBirthdate = "15/05/1990"
 
-    // --- Acciones de Navegación ---
-    val onEditProfile: () -> Unit = { /* TODO: Implementar */ }
-    val onChangePassword: () -> Unit = { /* TODO: Implementar */ }
+    // Acciones
+    val onEditProfile: () -> Unit = { /* TODO */ }
+    val onChangePassword: () -> Unit = { /* TODO */ }
     val onLogout: () -> Unit = {
         navController.navigate(Routess.login.path) {
             popUpTo(Routess.principal.path) { inclusive = true }
         }
     }
-    val onSeeCourts: () -> Unit = { navController.navigate(Routess.verCanchas.path) }
-    val onReserve: () -> Unit = { navController.navigate(Routess.verCanchas.path) }
-    val onNotifications: () -> Unit = { /* TODO: Implementar */ }
-    val onPaymentMethods: () -> Unit = { /* TODO: Implementar */ }
-
+    val onNotifications: () -> Unit = { /* TODO */ }
+    val onPaymentMethods: () -> Unit = { /* TODO */ }
 
     LazyColumn(
         modifier = Modifier
@@ -71,45 +63,41 @@ fun ProfileScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-
-        // --- SECCIÓN DE PERFIL DE USUARIO (EN UNA CAJA) ---
+        // Información personal
         item {
-            Card( // <-- AÑADIDA LA CAJA
+            Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(containerColor = cardBg)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                    horizontalAlignment = Alignment.Start // <-- Alineado a la izquierda
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.Start
                 ) {
-                    Text( // <-- Título añadido
+                    Text(
                         text = "Información Personal",
                         color = textColor,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
-
-                    // Nombre
                     Text(
                         text = userName,
                         color = textColor,
-                        fontSize = 20.sp, // Un poco más grande
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-
-                    // Correo, Teléfono, Fecha de Nacimiento
-                    Text(text = "Correo: $userEmail", color = mutedTextColor, fontSize = 14.sp)
-                    Spacer(modifier = Modifier.height(4.dp)) // <-- Spacer añadido
-                    Text(text = "Teléfono: $userPhone", color = mutedTextColor, fontSize = 14.sp)
-                    Spacer(modifier = Modifier.height(4.dp)) // <-- Spacer añadido
+                    Text("Correo: $userEmail", color = mutedTextColor, fontSize = 14.sp)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text("Teléfono: $userPhone", color = mutedTextColor, fontSize = 14.sp)
                 }
             }
         }
 
-        // --- CONFIGURACIÓN ---
+        // Configuración
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -124,52 +112,33 @@ fun ProfileScreen(
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
-                    SettingItem(
-                        icon = Icons.Filled.Notifications,
-                        label = "Notificaciones",
-                        onClick = onNotifications
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    SettingItem(
-                        icon = Icons.Filled.Payment,
-                        label = "Métodos de Pago",
-                        onClick = onPaymentMethods
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    SettingItem(
-                        icon = Icons.Filled.AccountCircle,
-                        label = "Editar Perfil",
-                        onClick = onEditProfile
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    SettingItem(
-                        icon = Icons.Filled.Person,
-                        label = "Cambiar Contraseña",
-                        onClick = onChangePassword
-                    )
+                    SettingItem(Icons.Filled.Notifications, "Notificaciones", onNotifications)
+                    Spacer(Modifier.height(8.dp))
+                    SettingItem(Icons.Filled.Payment, "Métodos de Pago", onPaymentMethods)
+                    Spacer(Modifier.height(8.dp))
+                    SettingItem(Icons.Filled.AccountCircle, "Editar Perfil", onEditProfile)
+                    Spacer(Modifier.height(8.dp))
+                    SettingItem(Icons.Filled.Person, "Cambiar Contraseña", onChangePassword)
                 }
             }
         }
 
-        // --- BOTONES "VER CANCHAS" Y "RESERVAR" ---
-
-
-        // --- BOTÓN CERRAR SESIÓN ---
+        // Botón cerrar sesión
         item {
             OutlinedButton(
                 onClick = onLogout,
-                modifier = Modifier.fillMaxWidth().height(50.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = errorColor),
                 border = BorderStroke(1.dp, errorColor),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text(text = "Cerrar sesión", fontSize = 16.sp)
+                Text("Cerrar sesión", fontSize = 16.sp)
             }
         }
     }
 }
-
-// --- COMPONENTES AUXILIARES ---
 
 @Composable
 private fun SettingItem(icon: ImageVector, label: String, onClick: () -> Unit) {
@@ -182,28 +151,18 @@ private fun SettingItem(icon: ImageVector, label: String, onClick: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = icon,
-                contentDescription = label,
-                tint = Color.White,
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(text = label, color = Color.White, fontSize = 16.sp)
+            Icon(icon, contentDescription = label, tint = Color.White, modifier = Modifier.size(24.dp))
+            Spacer(Modifier.width(12.dp))
+            Text(label, color = Color.White, fontSize = 16.sp)
         }
-        Icon(
-            imageVector = Icons.Filled.KeyboardArrowRight,
-            contentDescription = "Ir a $label",
-            tint = Color.Gray
-        )
+        Icon(Icons.Filled.KeyboardArrowRight, contentDescription = "Ir a $label", tint = Color.Gray)
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview() {
-    Box(modifier = Modifier.background(Grey900)) {
+    ProyectoCanchaTheme {
         ProfileScreen(navController = rememberNavController())
     }
 }

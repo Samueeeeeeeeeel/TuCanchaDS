@@ -6,12 +6,12 @@ import kotlinx.coroutines.flow.update
 
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.ViewModel
+import com.example.proyectocancha.data.repository.UserRepository
 import com.example.proyectocancha.domain.validation.validarClaveFuerte
 import com.example.proyectocancha.domain.validation.validarConfirmacion
 import com.example.proyectocancha.domain.validation.validarEmail
 import com.example.proyectocancha.domain.validation.validarNombreSoloLetras
 import com.example.proyectocancha.domain.validation.validatePhoneisDigitsOnly
-import com.example.uinavegacion.data.repository.UserRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -85,10 +85,12 @@ class AuthViewModel(
 
             _login.update {
                 if (result.isSuccess) {
+                    val user = result.getOrNull()
                     it.copy(
                         isSubmitting = false,
                         success = true,
-                        errorMsg = null
+                        errorMsg = null,
+                        isAdmin = user?.isAdmin ?: false // ✅ ahora propagamos el rol
                     )
                 } else {
                     it.copy(
@@ -135,11 +137,12 @@ class AuthViewModel(
     }
 
     fun onConfirmChange(value: String) {
-        _register.update { it.copy(confirm = value, confirmError = validarConfirmacion(
-            it.password,
-            value
-        )
-        ) }
+        _register.update {
+            it.copy(
+                confirm = value,
+                confirmError = validarConfirmacion(it.password, value)
+            )
+        }
         recomputeRegisterCanSubmit()
     }
 
@@ -161,7 +164,8 @@ class AuthViewModel(
                 name = s.name.trim(),
                 email = s.email.trim(),
                 phone = s.phone.trim(),
-                password = s.password
+                password = s.password,
+                isAdmin = false // ✅ explícito, aunque por defecto ya es false
             )
 
             _register.update {
@@ -181,5 +185,4 @@ class AuthViewModel(
     fun clearRegisterResult() {
         _register.update { it.copy(success = false, errorMsg = null) }
     }
-
 }

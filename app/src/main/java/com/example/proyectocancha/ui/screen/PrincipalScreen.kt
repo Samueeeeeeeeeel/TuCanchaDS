@@ -11,7 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.* // Mantenemos esta importación
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,46 +26,32 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.proyectocancha.ui.navigation.Routess
+import com.example.proyectocancha.navigation.Routess // ✅ corregido
 import com.example.proyectocancha.ui.theme.ProyectoCanchaTheme
 import com.example.proyectocancha.ui.theme.LightGreen
 import com.example.proyectocancha.ui.theme.Grey900
-
-// IMPORTACIÓN DE MODELOS Y DATOS CENTRALIZADOS
 import com.example.proyectocancha.ui.model.Court
 import com.example.proyectocancha.ui.model.dummyCourts
 
-
-// ----------------------------------------------------------------------
-// PANTALLA PRINCIPAL (CORREGIDA - SIN SCAFFOLD DUPLICADO)
-// ----------------------------------------------------------------------
-
 @Composable
-fun PrincipalScreen(navController: NavController, paddingValues: PaddingValues) {
-
-    // El nombre de tu variable se mantiene igual
+fun PrincipalScreen(navController: NavController, paddingValues: PaddingValues = PaddingValues()) {
     val CardDarkBg = Color(0xFF333333)
-
-    // ELIMINAMOS EL Scaffold y TopAppBar de aquí,
-    // porque ya los pone AppNavGraph.kt
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(Grey900)
-            // El padding de la barra superior ya se aplica
-            // desde el NavHost en AppNavGraph.
-            .padding(horizontal = 16.dp), // Mantenemos solo el padding lateral
+            .padding(paddingValues) // ✅ aplicamos padding del Scaffold
+            .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-
-        // 1. PESTAÑAS DE ACCIÓN RÁPIDA
+        // 1. Pestañas de acción rápida
         item {
-            Spacer(modifier = Modifier.height(8.dp)) // Espacio superior
+            Spacer(modifier = Modifier.height(8.dp))
             QuickActionsTabRow(navController = navController)
         }
 
-        // 2. TÍTULO DE LA SECCIÓN DE CANCHAS
+        // 2. Título de sección
         item {
             Text(
                 text = "Canchas Destacadas",
@@ -75,18 +61,18 @@ fun PrincipalScreen(navController: NavController, paddingValues: PaddingValues) 
             )
         }
 
-        // 3. SECCIÓN 'VER CANCHAS' (Lista horizontal)
+        // 3. Lista horizontal de canchas
         item {
             LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 items(dummyCourts) { court ->
                     CourtSmallCard(court = court) { selectedCourt ->
-                        navController.navigate(Routess.courtDetail.path + "/${selectedCourt.id}")
+                        navController.navigate("${Routess.courtDetail.path}/${selectedCourt.id}")
                     }
                 }
             }
         }
 
-        // 4. SECCIÓN 'MIS RESERVAS'
+        // 4. Mis reservas
         item {
             Text(
                 text = "Mis Reservas",
@@ -102,7 +88,7 @@ fun PrincipalScreen(navController: NavController, paddingValues: PaddingValues) 
                     .height(100.dp)
                     .clickable { navController.navigate(Routess.misReservas.path) },
                 shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = CardDarkBg) // Usando tu variable
+                colors = CardDefaults.cardColors(containerColor = CardDarkBg)
             ) {
                 Box(
                     modifier = Modifier
@@ -126,24 +112,18 @@ fun PrincipalScreen(navController: NavController, paddingValues: PaddingValues) 
     }
 }
 
-// ----------------------------------------------------------------------
-// COMPONENTES AUXILIARES (Sin cambios de nombre)
-// ----------------------------------------------------------------------
-
 @Composable
 fun QuickActionsTabRow(navController: NavController) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // Pestaña 2: Mis Reservas
         ActionPill(
             icon = Icons.Default.Menu,
             text = "Mis Reservas",
             onClick = { navController.navigate(Routess.misReservas.path) },
             modifier = Modifier.weight(1f)
         )
-        // Pestaña 3: Ver Canchas
         ActionPill(
             icon = Icons.Default.ArrowForward,
             text = "Ver Canchas",
@@ -214,7 +194,10 @@ fun CourtSmallCard(court: Court, onClick: (Court) -> Unit) {
     }
 }
 
-// ----------------------------------------------------------------------
-// PREVIEW (Sin cambios de nombre)
-// ----------------------------------------------------------------------
-
+@Preview(showBackground = true)
+@Composable
+fun PrincipalScreenPreview() {
+    ProyectoCanchaTheme {
+        PrincipalScreen(navController = rememberNavController())
+    }
+}

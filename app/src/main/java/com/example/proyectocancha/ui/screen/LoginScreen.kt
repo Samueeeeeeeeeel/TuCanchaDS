@@ -9,15 +9,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -29,7 +29,6 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -40,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -50,39 +50,34 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.platform.LocalContext
 import com.example.proyectocancha.ui.theme.Grey900
 import com.example.proyectocancha.ui.theme.Teal
-import com.example.proyectocancha.ui.viewmodel.AuthViewModel // Importación de tu VM
+import com.example.proyectocancha.ui.viewmodel.AuthViewModel
+import com.example.proyectocancha.ui.viewmodel.AuthViewModelFactory
 import com.example.proyectocancha.ui.viewmodel.LoginUistate
-
-
-// ----------------------------------------------------------------------
-// 1. FUNCIÓN CONTENEDORA (Conectada al ViewModel)
-// ----------------------------------------------------------------------
+import com.example.proyectocancha.data.local.database.AppDatabase
+import com.example.proyectocancha.data.repository.UserRepository
 
 @Composable
 fun LoginScreen(
-    // CAMBIO CLAVE: Ahora acepta un booleano para indicar el rol
     onLoginOkNavigateHome: (Boolean) -> Unit,
     onGoRegister: () -> Unit
 ) {
-    // 1. Obtiene/Crea el ViewModel
-    val vm: AuthViewModel = viewModel()
+    val context = LocalContext.current
+    val db = remember { AppDatabase.getInstance(context) }
+    val repository = remember { UserRepository(db.userDao()) }
+    val vm: AuthViewModel = viewModel(factory = AuthViewModelFactory(repository))
 
-    // 2. Observa el Estado del Login (StateFlow)
     val state by vm.login.collectAsStateWithLifecycle()
 
-    // 3. Lógica de Navegación tras Éxito usando LaunchedEffect para el rol
     LaunchedEffect(state.success) {
         if (state.success) {
-            // Llama a la función del NavGraph y pasa el rol de administrador
             onLoginOkNavigateHome(state.isAdmin)
-            vm.clearLoginResult() // Limpia banderas (success = false, errorMsg = null)
+            vm.clearLoginResult()
         }
     }
 
-
-    // 4. Delega a la UI presentacional
     LoginScreenUi(
         email = state.email,
         password = state.password,
@@ -90,18 +85,14 @@ fun LoginScreen(
         passwordError = state.passwordError,
         canSubmit = state.canSubmit,
         isSubmitting = state.isSubmitting,
-        errorMsg = state.errorMsg, // ERROR UNIFICADO DE CREDENCIALES
+        errorMsg = state.errorMsg,
         onEmailChange = vm::onLoginEmailChange,
         onPassChange = vm::onLoginPassChange,
         onSubmit = vm::submitLogin,
-        onClearError = vm::clearLoginResult, // Añadimos el handler para limpiar el error global
+        onClearError = vm::clearLoginResult,
         onGoRegister = onGoRegister
     )
 }
-
-// ----------------------------------------------------------------------
-// 2. UI PRESENTACIONAL (Recibe todos los datos como parámetros)
-// ----------------------------------------------------------------------
 
 @Composable
 private fun LoginScreenUi(
@@ -111,11 +102,11 @@ private fun LoginScreenUi(
     passwordError: String?,
     canSubmit: Boolean,
     isSubmitting: Boolean,
-    errorMsg: String?, // <-- ESTA ES LA VARIABLE CLAVE PARA EL MENSAJE UNIFICADO
+    errorMsg: String?,
     onEmailChange: (String) -> Unit,
     onPassChange: (String) -> Unit,
     onSubmit: () -> Unit,
-    onClearError: () -> Unit, // Handler para cerrar el diálogo
+    onClearError: () -> Unit,
     onGoRegister: () -> Unit
 ) {
     val bg = MaterialTheme.colorScheme.inverseOnSurface
@@ -134,7 +125,6 @@ private fun LoginScreenUi(
             Text("LOGIN", style = MaterialTheme.typography.headlineSmall, color = Color.White)
             Spacer(Modifier.height(16.dp))
 
-            // ---------- EMAIL ----------
             OutlinedTextField(
                 value = email,
                 onValueChange = onEmailChange,
@@ -153,25 +143,23 @@ private fun LoginScreenUi(
                 visible = emailError != null,
                 enter = fadeIn() + expandVertically(),
                 exit = fadeOut() + shrinkVertically()
-            ) {emailError?.let {
-                Text(
-                    text = it,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall
-                ) }
-
+            ) {
+                emailError?.let {
+                    Text(
+                        text = it,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
-
 
             Spacer(Modifier.height(16.dp))
 
-            // ---------- CONTRASEÑA ----------
             OutlinedTextField(
                 value = password,
                 onValueChange = onPassChange,
-                label = { Text("Contraseña",color = Color.White) },
+                label = { Text("Contraseña", color = Color.White) },
                 singleLine = true,
-                // Mantenemos la isError para validación local, si aplica
                 isError = passwordError != null && password.isNotBlank(),
                 visualTransformation = if (showPass) VisualTransformation.None else PasswordVisualTransformation(),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -191,34 +179,32 @@ private fun LoginScreenUi(
             )
             Spacer(Modifier.height(16.dp))
 
-            // ---------- BOTONES ----------
             Button(
                 onClick = onSubmit,
                 enabled = canSubmit && !isSubmitting,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             ) {
                 if (isSubmitting) {
                     CircularProgressIndicator(strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Validando...",color = Color.White)
+                    Text("Validando...", color = Color.White)
                 } else {
                     Text("Iniciar Sesión")
                 }
-
             }
 
             Spacer(Modifier.height(12.dp))
 
-            ElevatedButton(onClick = onGoRegister, modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))) {
+            ElevatedButton(
+                onClick = onGoRegister,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+            ) {
                 Text("Crear cuenta")
             }
-
         }
 
-        // Manejo de Errores Globales (Ej: Credenciales incorrectas)
         if (errorMsg != null) {
             AlertDialog(
                 onDismissRequest = onClearError,
@@ -237,12 +223,18 @@ private fun LoginScreenUi(
 @Preview
 @Composable
 fun LoginScreenPreview() {
-    // Usamos la versión UI para el Preview para no depender del ViewModel
     LoginScreenUi(
-        email = "usuario@ejemplo.com", password = "Password123",
-        emailError = null, passwordError = null,
-        canSubmit = true, isSubmitting = false, errorMsg = null,
-        onEmailChange = {}, onPassChange = {}, onSubmit = {},
-        onClearError = {}, onGoRegister = {}
+        email = "usuario@ejemplo.com",
+        password = "Password123",
+        emailError = null,
+        passwordError = null,
+        canSubmit = true,
+        isSubmitting = false,
+        errorMsg = null,
+        onEmailChange = {},
+        onPassChange = {},
+        onSubmit = {},
+        onClearError = {},
+        onGoRegister = {}
     )
 }

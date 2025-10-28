@@ -1,48 +1,50 @@
 package com.example.proyectocancha.ui.screen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-
-
-import com.example.proyectocancha.domain.validation.validarEmail
-import com.example.proyectocancha.domain.validation.validarClaveFuerte
-import com.example.proyectocancha.domain.validation.validarConfirmacion
-import com.example.proyectocancha.domain.validation.validarNombreSoloLetras
-import com.example.proyectocancha.domain.validation.validatePhoneisDigitsOnly
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectocancha.ui.theme.Grey900
+import com.example.proyectocancha.ui.viewmodel.AuthViewModel
+import com.example.proyectocancha.ui.viewmodel.AuthViewModelFactory
+import com.example.proyectocancha.ui.viewmodel.RegisterUistate
+import com.example.proyectocancha.data.repository.UserRepository
+import com.example.proyectocancha.data.local.database.AppDatabase
 
 @Composable
 fun RegisterScreen(
     onRegisteredOk: () -> Unit,
     onGoLogin: () -> Unit
 ) {
-    val bg = MaterialTheme.colorScheme.inverseOnSurface
+    val context = LocalContext.current
+    val db = remember { AppDatabase.getInstance(context) }
+    val repository = remember { UserRepository(db.userDao()) }
+    val viewModel: AuthViewModel = viewModel(
+        factory = AuthViewModelFactory(repository)
+    )
+
+    val state: RegisterUistate by viewModel.register.collectAsStateWithLifecycle()
+
+    LaunchedEffect(state.success) {
+        if (state.success) {
+            onRegisteredOk()
+            viewModel.clearRegisterResult()
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -50,167 +52,130 @@ fun RegisterScreen(
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
-        // 1. MANEJO DEL ESTADO DE LOS CAMPOS
-        var nombre by remember { mutableStateOf("") }
-        var telefono by remember { mutableStateOf("") }
-        var email by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
-        var confirmPassword by remember { mutableStateOf("") }
-
-        // 2. MANEJO DE ERRORES DE VALIDACIÓN
-        var errorNombre by remember { mutableStateOf<String?>(null) }
-        var errorTelefono by remember { mutableStateOf<String?>(null) }
-        var errorEmail by remember { mutableStateOf<String?>(null) }
-        var errorPassword by remember { mutableStateOf<String?>(null) }
-        var errorConfirmPassword by remember { mutableStateOf<String?>(null) }
-
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            // Permite hacer scroll si el contenido es muy largo
             modifier = Modifier.verticalScroll(rememberScrollState())
         ) {
             Text(
                 "Crear una Cuenta",
-                style = MaterialTheme.typography.headlineSmall,color = Color.White
+                style = MaterialTheme.typography.headlineSmall,
+                color = Color.White
             )
             Spacer(Modifier.height(32.dp))
 
-            // CAMPO: Nombre (Validación de solo letras)
             OutlinedTextField(
-                value = nombre,
-                onValueChange = { nombre = it; errorNombre = null },
-                label = { Text("Nombre Completo",color = Color.White) },
+                value = state.name,
+                onValueChange = { viewModel.onNameChange(it) },
+                label = { Text("Nombre Completo", color = Color.White) },
                 singleLine = true,
-                isError = errorNombre != null,
+                isError = state.nameError != null,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.White,
                     unfocusedTextColor = Color.White,
                     errorTextColor = Color.White
                 ),
-                modifier = Modifier.fillMaxWidth(),
-            )
-            errorNombre?.let {
-                Text(text = it, color = MaterialTheme.colorScheme.error)
-            }
-            Spacer(Modifier.height(16.dp))
-
-            // CAMPO: Teléfono (Validación de solo dígitos)
-            OutlinedTextField(
-                value = telefono,
-                onValueChange = { telefono = it; errorTelefono = null },
-                label = { Text("Teléfono",color = Color.White) },
-                singleLine = true,
-                isError = errorTelefono != null,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                    errorTextColor = Color.White
-                ),
-                // --- ELIMINADO: keyboardOptions = androidx.compose.ui.text.input.KeyboardOptions(keyboardType = KeyboardType.Phone),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 modifier = Modifier.fillMaxWidth()
             )
-            errorTelefono?.let {
-                Text(text = it, color = MaterialTheme.colorScheme.error)
-            }
+            state.nameError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             Spacer(Modifier.height(16.dp))
 
-            // CAMPO: Email (Validación de formato)
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it; errorEmail = null },
-                label = { Text("Correo Electrónico",color = Color.White) },
+                value = state.phone,
+                onValueChange = { viewModel.onPhoneChange(it) },
+                label = { Text("Teléfono", color = Color.White) },
                 singleLine = true,
-                isError = errorEmail != null,
+                isError = state.phoneError != null,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.White,
                     unfocusedTextColor = Color.White,
                     errorTextColor = Color.White
                 ),
-                // --- ELIMINADO: keyboardOptions = androidx.compose.ui.text.input.KeyboardOptions(keyboardType = KeyboardType.Email),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 modifier = Modifier.fillMaxWidth()
             )
-            errorEmail?.let {
-                Text(text = it, color = MaterialTheme.colorScheme.error)
-            }
+            state.phoneError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             Spacer(Modifier.height(16.dp))
 
-            // CAMPO: Contraseña (Validación de fuerza)
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it; errorPassword = null; errorConfirmPassword = null },
-                label = { Text("Contraseña",color = Color.White) },
+                value = state.email,
+                onValueChange = { viewModel.onRegisterEmailChange(it) },
+                label = { Text("Correo Electrónico", color = Color.White) },
                 singleLine = true,
-                isError = errorPassword != null,
+                isError = state.emailError != null,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    errorTextColor = Color.White
+                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                modifier = Modifier.fillMaxWidth()
+            )
+            state.emailError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            Spacer(Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = state.password,
+                onValueChange = { viewModel.onRegisterPassChange(it) },
+                label = { Text("Contraseña", color = Color.White) },
+                singleLine = true,
+                isError = state.passError != null,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.White,
                     unfocusedTextColor = Color.White,
                     errorTextColor = Color.White
                 ),
                 visualTransformation = PasswordVisualTransformation(),
-                // --- ELIMINADO: keyboardOptions = androidx.compose.ui.text.input.KeyboardOptions(keyboardType = KeyboardType.Password),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 modifier = Modifier.fillMaxWidth()
             )
-            errorPassword?.let {
-                Text(it, color = MaterialTheme.colorScheme.error)
-            }
+            state.passError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             Spacer(Modifier.height(16.dp))
 
-            // CAMPO: Confirmar Contraseña (Validación de igualdad)
             OutlinedTextField(
-                value = confirmPassword,
-                onValueChange = { confirmPassword = it; errorConfirmPassword = null },
-                label = { Text("Confirmar Contraseña",color = Color.White) },
+                value = state.confirm,
+                onValueChange = { viewModel.onConfirmChange(it) },
+                label = { Text("Confirmar Contraseña", color = Color.White) },
                 singleLine = true,
-                isError = errorConfirmPassword != null,
+                isError = state.confirmError != null,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.White,
                     unfocusedTextColor = Color.White,
                     errorTextColor = Color.White
                 ),
                 visualTransformation = PasswordVisualTransformation(),
-                // --- ELIMINADO: keyboardOptions = androidx.compose.ui.text.input.KeyboardOptions(keyboardType = KeyboardType.Password),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 modifier = Modifier.fillMaxWidth()
             )
-            errorConfirmPassword?.let {
-                Text(it, color = MaterialTheme.colorScheme.error)
-            }
+            state.confirmError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             Spacer(Modifier.height(32.dp))
 
-            // BOTÓN PRINCIPAL: REGISTRARSE
             Button(
-                onClick = {
-                    // Ejecutar TODAS las validaciones
-                    errorNombre = validarNombreSoloLetras(nombre)
-                    errorTelefono = validatePhoneisDigitsOnly(telefono)
-                    errorEmail = validarEmail(email)
-                    errorPassword = validarClaveFuerte(password)
-                    errorConfirmPassword = validarConfirmacion(password, confirmPassword)
-
-                    // Si todas las validaciones son nulas (correctas), navega
-                    if (errorNombre == null && errorTelefono == null && errorEmail == null && errorPassword == null && errorConfirmPassword == null) {
-                        onRegisteredOk()
-                    }
-                },
+                onClick = { viewModel.submitRegister() },
+                enabled = state.canSubmit && !state.isSubmitting,
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))// Azul fuerte
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
             ) {
-                Text("CREAR CUENTA")
+                Text(if (state.isSubmitting) "Creando..." else "CREAR CUENTA")
             }
 
             Spacer(Modifier.height(12.dp))
 
-            // BOTÓN SECUNDARIO: IR A LOGIN
             OutlinedButton(
                 onClick = onGoLogin,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Ya tengo una cuenta, iniciar sesión",color = Color.White)
+                Text("Ya tengo una cuenta, iniciar sesión", color = Color.White)
             }
+
             Spacer(Modifier.height(24.dp))
+
+            state.errorMsg?.let {
+                Text(text = it, color = MaterialTheme.colorScheme.error)
+            }
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable

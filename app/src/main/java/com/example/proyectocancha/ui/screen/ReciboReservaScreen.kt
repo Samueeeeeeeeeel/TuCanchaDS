@@ -18,19 +18,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-// Importaciones de tus colores de tema
 import com.example.proyectocancha.ui.theme.DarkGreen
 import com.example.proyectocancha.ui.theme.Grey900
-// Importación de rutas (necesaria para la navegación)
-import com.example.proyectocancha.ui.navigation.Routess // Asegúrate de que esta importación existe
-
+import com.example.proyectocancha.navigation.Routess // ✅ corregido
+import androidx.compose.foundation.BorderStroke
+import com.example.proyectocancha.ui.theme.ProyectoCanchaTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReciboReservaScreen(navController: NavHostController) {
-
-    // --- DATOS FINALES DE EJEMPLO ---
-    // Estas variables deben existir para que ReceiptCard funcione
     val courtName = "Cancha Norte - Pasto Real"
     val bookingDay = "Miércoles, 25 de Octubre"
     val bookingTime = "20:00 - 21:00 (1 hora)"
@@ -39,7 +35,6 @@ fun ReciboReservaScreen(navController: NavHostController) {
     val total = 22.50
     val receiptId = "TXN-7984-ABC12345"
     val userName = "Javier Pérez"
-
 
     Scaffold(
         topBar = {
@@ -51,18 +46,15 @@ fun ReciboReservaScreen(navController: NavHostController) {
         bottomBar = {
             ReciboBottomBar(
                 onMyBookingsClicked = {
-                    // Navega a la nueva pantalla de mis reservas
                     navController.navigate(Routess.misReservas.path)
                 },
                 onFinishClicked = {
-                    // Vuelve a la pantalla principal
                     navController.popBackStack(route = Routess.principal.path, inclusive = false)
                 }
             )
         },
         containerColor = Grey900
     ) { paddingValues ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -71,12 +63,8 @@ fun ReciboReservaScreen(navController: NavHostController) {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             SuccessHeader()
-
             Spacer(Modifier.height(24.dp))
-
-            // LA LLAMADA A LA FUNCIÓN
             ReceiptCard(
                 courtName = courtName,
                 day = bookingDay,
@@ -87,15 +75,10 @@ fun ReciboReservaScreen(navController: NavHostController) {
                 total = total,
                 receiptId = receiptId
             )
-
             Spacer(Modifier.height(24.dp))
         }
     }
 }
-
-// ----------------------------------------------------------------------
-// DEFINICIÓN DE COMPONENTES AUXILIARES
-// ----------------------------------------------------------------------
 
 @Composable
 fun SuccessHeader() {
@@ -139,30 +122,26 @@ fun ReceiptCard(
         colors = CardDefaults.cardColors(containerColor = Color(0xFF333333))
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
-            // Sección de Detalles de la Reserva
-            ReceiptSectionHeader(title = "Detalles de la Boleta", color = DarkGreen)
-            ReceiptRow(label = "Transacción ID", value = receiptId, isBold = true, color = DarkGreen)
-            ReceiptRow(label = "Cliente", value = userName)
+            ReceiptSectionHeader("Detalles de la Boleta", DarkGreen)
+            ReceiptRow("Transacción ID", receiptId, isBold = true, color = DarkGreen)
+            ReceiptRow("Cliente", userName)
 
             Divider(Modifier.padding(vertical = 10.dp), color = Color.Gray.copy(alpha = 0.5f))
 
-            // Sección de la Cancha y Hora
-            ReceiptSectionHeader(title = "Cancha Reservada", color = Color.White)
-            ReceiptRow(label = "Cancha", value = courtName, isBold = true)
-            ReceiptRow(label = "Día", value = day)
-            ReceiptRow(label = "Hora", value = time)
+            ReceiptSectionHeader("Cancha Reservada", Color.White)
+            ReceiptRow("Cancha", courtName, isBold = true)
+            ReceiptRow("Día", day)
+            ReceiptRow("Hora", time)
 
             Divider(Modifier.padding(vertical = 10.dp), color = Color.Gray.copy(alpha = 0.5f))
 
-            // Sección de Resumen de Pago
-            ReceiptSectionHeader(title = "Resumen de Pago", color = Color.White)
-            ReceiptRow(label = "Subtotal", value = "$${"%.2f".format(subtotal)}")
-            ReceiptRow(label = "Comisión (2.5%)", value = "$${"%.2f".format(fee)}")
+            ReceiptSectionHeader("Resumen de Pago", Color.White)
+            ReceiptRow("Subtotal", "$${"%.2f".format(subtotal)}")
+            ReceiptRow("Comisión (2.5%)", "$${"%.2f".format(fee)}")
 
             Divider(Modifier.padding(vertical = 10.dp), color = Color.Gray.copy(alpha = 0.5f))
 
-            // Total
-            ReceiptRow(label = "TOTAL PAGADO", value = "$${"%.2f".format(total)}", isTotal = true)
+            ReceiptRow("TOTAL PAGADO", "$${"%.2f".format(total)}", isTotal = true)
         }
     }
 }
@@ -179,7 +158,13 @@ fun ReceiptSectionHeader(title: String, color: Color) {
 }
 
 @Composable
-fun ReceiptRow(label: String, value: String, isBold: Boolean = false, isTotal: Boolean = false, color: Color = Color.White) {
+fun ReceiptRow(
+    label: String,
+    value: String,
+    isBold: Boolean = false,
+    isTotal: Boolean = false,
+    color: Color = Color.White
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -209,7 +194,6 @@ fun ReciboBottomBar(onMyBookingsClicked: () -> Unit, onFinishClicked: () -> Unit
             .background(Grey900)
             .padding(16.dp)
     ) {
-        // Botón 1: Ir a Mis Reservas (Prioritario)
         Button(
             onClick = onMyBookingsClicked,
             colors = ButtonDefaults.buttonColors(containerColor = DarkGreen),
@@ -220,11 +204,9 @@ fun ReciboBottomBar(onMyBookingsClicked: () -> Unit, onFinishClicked: () -> Unit
             Text("Ver Mis Reservas", color = Color.White, fontSize = 18.sp)
         }
         Spacer(Modifier.height(8.dp))
-
-        // Botón 2: Volver al Inicio (Secundario)
         OutlinedButton(
             onClick = onFinishClicked,
-            border = ButtonDefaults.outlinedButtonBorder.copy(brush = androidx.compose.ui.graphics.SolidColor(Color.Gray)),
+            border = BorderStroke(1.dp, Color.Gray), // ✅ corregido
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
@@ -234,9 +216,10 @@ fun ReciboBottomBar(onMyBookingsClicked: () -> Unit, onFinishClicked: () -> Unit
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun ReciboReservaScreenPreview() {
-    ReciboReservaScreen(rememberNavController())
+    ProyectoCanchaTheme {
+        ReciboReservaScreen(rememberNavController())
+    }
 }
