@@ -8,13 +8,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import com.example.proyectocancha.data.local.database.AppDatabase
 import com.example.proyectocancha.data.repository.UserRepository
 import com.example.proyectocancha.navigation.AppNavGraph
 import com.example.proyectocancha.ui.viewmodel.AuthViewModel
 import com.example.proyectocancha.ui.viewmodel.AuthViewModelFactory
+import com.example.proyectocancha.utilities.seedCourtsIfEmpty
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,44 +27,34 @@ class MainActivity : ComponentActivity() {
         setContent {
             AppRoot()
         }
+
+        // Recomendado: pre-poblar canchas al arrancar (se ejecuta una sola vez aquí)
+        val db = AppDatabase.getInstance(applicationContext)
+        lifecycleScope.launch(Dispatchers.IO) {
+            seedCourtsIfEmpty(db)
+        }
     }
 }
-@Composable // Indica que esta función dibuja UI
-fun AppRoot() { // Raíz de la app para separar responsabilidades (se conserva)
-    // ====== NUEVO: construcción de dependencias (Composition Root) ======
+
+@Composable
+fun AppRoot() {
+    // ====== Construcción de dependencias (Composition Root) ======
     val context = LocalContext.current.applicationContext
-    // ^ Obtenemos el applicationContext para construir la base de datos de Room.
-
     val db = AppDatabase.getInstance(context)
-    // ^ Singleton de Room. No crea múltiples instancias.
-
     val userDao = db.userDao()
-    // ^ Obtenemos el DAO de usuarios desde la DB.
-
     val userRepository = UserRepository(userDao)
-    // ^ Repositorio que encapsula la lógica de login/registro contra Room.
-
     val authViewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory(userRepository)
     )
-    // ^ Creamos el ViewModel con factory para inyectar el repositorio.
-    //   Esto reemplaza cualquier uso anterior de listas en memoria (USERS).
 
-    // ====== TU NAVEGACIÓN ORIGINAL ======
-    val navController = rememberNavController() // Controlador de navegación (igual que antes)
-    MaterialTheme { // Provee colores/tipografías Material 3 (igual que antes)
-        Surface(color = MaterialTheme.colorScheme.background) { // Fondo general (igual que antes)
-
-            // ====== MOD: pasamos el AuthViewModel a tu NavGraph ======
-            // Si tu AppNavGraph ya recibía el VM o lo creaba adentro, lo mejor ahora es PASARLO
-            // para que toda la app use la MISMA instancia que acabamos de inyectar.
+    // ====== Navegación y UI ======
+    val navController = rememberNavController()
+    MaterialTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
             AppNavGraph(
                 navController = navController,
-                authViewModel = authViewModel // <-- NUEVO parámetro
+                authViewModel = authViewModel
             )
-            // NOTA: Si tu AppNavGraph no tiene este parámetro aún, basta con agregarlo:
-            // fun AppNavGraph(navController: NavHostController, authViewModel: AuthViewModel) { ... }
-            // y luego pasar ese authViewModel a las pantallas Login/Register donde se use.
         }
     }
 }
