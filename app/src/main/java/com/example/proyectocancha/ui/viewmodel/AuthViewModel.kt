@@ -15,6 +15,7 @@ import com.example.proyectocancha.domain.validation.validatePhoneisDigitsOnly
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+// Tu data class de estado. Fíjate que tiene 'isAdmin'
 data class LoginUistate(
     val email: String = "",
     val password: String = "",
@@ -23,7 +24,7 @@ data class LoginUistate(
     val canSubmit: Boolean = false,
     val isSubmitting: Boolean = false,
     val success: Boolean = false,
-    val isAdmin: Boolean = false,
+    val isAdmin: Boolean = false, // <-- CLAVE
     val errorMsg: String? = null,
 )
 
@@ -33,13 +34,11 @@ data class RegisterUistate(
     val phone: String = "",
     val password: String = "",
     val confirm: String = "",
-
     val nameError: String? = null,
     val emailError: String? = null,
     val phoneError: String? = null,
     val passError: String? = null,
     val confirmError: String? = null,
-
     val isSubmitting: Boolean = false,
     val canSubmit: Boolean = false,
     val success: Boolean = false,
@@ -81,16 +80,19 @@ class AuthViewModel(
             _login.update { it.copy(isSubmitting = true, errorMsg = null, success = false, isAdmin = false) }
             delay(500)
 
+            // Llama al repositorio
             val result = repository.login(s.email.trim(), s.password)
 
             _login.update {
                 if (result.isSuccess) {
                     val user = result.getOrNull()
+                    // ✅ ¡AQUÍ ESTÁ LA LÓGICA!
+                    // Guarda si el usuario es admin en el estado.
                     it.copy(
                         isSubmitting = false,
                         success = true,
                         errorMsg = null,
-                        isAdmin = user?.isAdmin ?: false // ✅ ahora propagamos el rol
+                        isAdmin = user?.isAdmin ?: false
                     )
                 } else {
                     it.copy(
@@ -108,7 +110,7 @@ class AuthViewModel(
     }
 
     // ----------------- REGISTRO -----------------
-
+    // (Tu lógica de registro va aquí, no la modifico)
     fun onNameChange(value: String) {
         val filtered = value.filter { it.isLetter() || it.isWhitespace() }
         _register.update {
@@ -165,7 +167,7 @@ class AuthViewModel(
                 email = s.email.trim(),
                 phone = s.phone.trim(),
                 password = s.password,
-                isAdmin = false // ✅ explícito, aunque por defecto ya es false
+                isAdmin = false
             )
 
             _register.update {

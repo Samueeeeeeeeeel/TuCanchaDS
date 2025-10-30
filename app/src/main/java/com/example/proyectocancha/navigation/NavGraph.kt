@@ -47,6 +47,9 @@ fun AppNavGraph(
         composable(Routess.principal.path) {
             PrincipalScreen(navController = navController)
         }
+        composable(Routess.admin.path) {
+            AdminScreen(navController = navController)
+        }
 
         // PROFILE
         composable(Routess.profile.path) {

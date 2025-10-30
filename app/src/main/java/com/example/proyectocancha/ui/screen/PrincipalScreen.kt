@@ -13,6 +13,15 @@ import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+// --- ¡NUEVOS IMPORTS PARA EL DRAWER! ---
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.rememberDrawerState
+import com.example.proyectocancha.ui.components.AppDrawer
+import com.example.proyectocancha.ui.components.defaultDrawerItems
+import kotlinx.coroutines.launch
+// --- FIN NUEVOS IMPORTS ---
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,45 +41,90 @@ import com.example.proyectocancha.ui.theme.LightGreen
 import com.example.proyectocancha.ui.theme.Grey900
 import com.example.proyectocancha.ui.model.Court
 import com.example.proyectocancha.ui.model.dummyCourts
-// ¡NUEVOS IMPORTS!
 import com.example.proyectocancha.ui.components.AppTopBar
 
 // ---------------------------------------------------
-// ¡NUEVA FUNCIÓN PrincipalScreen (Contenedora)!
+// ¡FUNCIÓN PrincipalScreen MODIFICADA PARA EL DRAWER!
 // ---------------------------------------------------
-@OptIn(ExperimentalMaterial3Api::class) // Necesario para Scaffold
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrincipalScreen(navController: NavController) {
 
-    // Scaffold es la estructura que nos permite poner una TopBar
-    Scaffold(
-        topBar = {
-            // 2. Aquí llamamos a tu AppTopBar
-            AppTopBar(
-                onOpenDrawer = {
-                    // Por ahora, la hamburguesa no hace nada.
-                    // Más adelante, aquí irá la lógica para abrir el Drawer.
-                },
-                onGoLogin = {
-                    // Asumimos que tienes una ruta de perfil
-                    // Si no la tienes, puedes cambiarla a Routess.login.path
-                    navController.navigate(Routess.profile.path)
-                }
+    // --- ¡NUEVO! Estado y Scope para el Drawer ---
+    // 1. 'drawerState' controla si está abierto o cerrado.
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    // 2. 'scope' nos permite abrir/cerrar el drawer con una corutina.
+    val scope = rememberCoroutineScope()
+
+    // --- ¡NUEVO! Definimos las acciones de los ítems del drawer ---
+    // 3. Creamos la lista de ítems que le pasaremos a tu AppDrawer
+    val drawerItems = defaultDrawerItems(
+        onHome = {
+            // Ya está en Home, solo cierra el drawer
+            scope.launch { drawerState.close() }
+        },
+        onProfile = {
+            navController.navigate(Routess.profile.path)
+            scope.launch { drawerState.close() }
+        },
+        onVerCanchas = {
+            navController.navigate(Routess.verCanchas.path)
+            scope.launch { drawerState.close() }
+        },
+        onMisReservas = {
+            navController.navigate(Routess.misReservas.path)
+            scope.launch { drawerState.close() }
+        },
+        onLogout = {
+            navController.navigate(Routess.login.path) {
+                // Limpia la pila de navegación para que no pueda volver atrás
+                popUpTo(Routess.principal.path) { inclusive = true }
+            }
+            // No es necesario cerrar el drawer aquí, ya que la pantalla se destruirá
+        }
+    )
+
+    // --- ¡CAMBIO! Envolvemos tu Scaffold en el ModalNavigationDrawer ---
+    ModalNavigationDrawer(
+        drawerState = drawerState, // 4. Pasamos el estado
+        drawerContent = {
+            // 5. Aquí va el contenido del menú (tu Composable)
+            AppDrawer(
+                currentRoute = null, // Puedes mejorarlo luego
+                items = drawerItems
             )
         }
-    ) { innerPadding ->
-        // 3. Llamamos a tu contenido original (el LazyColumn)
-        //    y le pasamos el 'innerPadding' que nos da el Scaffold.
-        PrincipalScreenContent(
-            navController = navController,
-            paddingValues = innerPadding // <-- ¡CLAVE!
-        )
+    ) {
+        // 6. Tu Scaffold original va aquí, como contenido principal
+        Scaffold(
+            topBar = {
+                AppTopBar(
+                    onOpenDrawer = {
+                        // --- ¡CAMBIO! La hamburguesa ahora abre el drawer ---
+                        scope.launch {
+                            drawerState.open()
+                        }
+                    },
+                    onGoLogin = {
+                        // Esto sigue igual, va al perfil
+                        navController.navigate(Routess.profile.path)
+                    }
+                )
+            }
+        ) { innerPadding ->
+            // Tu contenido original no cambia, solo recibe el padding
+            PrincipalScreenContent(
+                navController = navController,
+                paddingValues = innerPadding
+            )
+        }
     }
 }
 
 
 // ---------------------------------------------------
-// ¡TU FUNCIÓN ORIGINAL, AHORA RENOMBRADA!
+// ¡TU FUNCIÓN DE CONTENIDO ORIGINAL NO CAMBIA!
+// (Solo asegúrate de que esté aquí)
 // ---------------------------------------------------
 @Composable
 fun PrincipalScreenContent(navController: NavController, paddingValues: PaddingValues = PaddingValues()) {
@@ -242,12 +296,12 @@ fun CourtSmallCard(court: Court, onClick: (Court) -> Unit) {
 
 // ---------------------------------------------------
 // ¡PREVIEW ACTUALIZADO!
+// (Sigue igual, llamando a PrincipalScreen)
 // ---------------------------------------------------
 @Preview(showBackground = true)
 @Composable
 fun PrincipalScreenPreview() {
     ProyectoCanchaTheme {
-        // Ahora el preview llama a la nueva función contenedora
         PrincipalScreen(navController = rememberNavController())
     }
 }

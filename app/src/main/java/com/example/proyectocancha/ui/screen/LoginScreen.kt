@@ -1,5 +1,6 @@
 package com.example.proyectocancha.ui.screen
 
+import android.util.Log // 👈 --- ¡IMPORTANTE PARA DEPURAR!
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -61,6 +62,8 @@ import com.example.proyectocancha.data.repository.UserRepository
 
 @Composable
 fun LoginScreen(
+    // Esta pantalla NO decide a dónde ir.
+    // Solo "avisa" que el login fue OK y si es admin o no.
     onLoginOkNavigateHome: (Boolean) -> Unit,
     onGoRegister: () -> Unit
 ) {
@@ -71,8 +74,15 @@ fun LoginScreen(
 
     val state by vm.login.collectAsStateWithLifecycle()
 
+    // --- ESTE ES EL CÓDIGO CLAVE DE ESTA PANTALLA ---
     LaunchedEffect(state.success) {
         if (state.success) {
+
+            // ❗️ AÑADIMOS ESTE LOG PARA VER QUÉ ESTÁ PASANDO
+            Log.d("LOGIN_CHECK", "Login exitoso. Es admin? -> ${state.isAdmin}")
+
+            // Llama a la función que le pasó el NavHost,
+            // enviándole el valor de state.isAdmin
             onLoginOkNavigateHome(state.isAdmin)
             vm.clearLoginResult()
         }
@@ -218,23 +228,4 @@ private fun LoginScreenUi(
             )
         }
     }
-}
-
-@Preview
-@Composable
-fun LoginScreenPreview() {
-    LoginScreenUi(
-        email = "usuario@ejemplo.com",
-        password = "Password123",
-        emailError = null,
-        passwordError = null,
-        canSubmit = true,
-        isSubmitting = false,
-        errorMsg = null,
-        onEmailChange = {},
-        onPassChange = {},
-        onSubmit = {},
-        onClearError = {},
-        onGoRegister = {}
-    )
 }
