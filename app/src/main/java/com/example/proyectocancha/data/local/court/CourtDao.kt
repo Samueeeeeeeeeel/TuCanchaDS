@@ -15,4 +15,8 @@ interface CourtDao {
 
     @Query("SELECT * FROM courts ORDER BY name ASC")
     suspend fun getAll(): List<CourtEntity>
+
+    // --- ¡NUEVO! Función para obtener una cancha por su ID ---
+    @Query("SELECT * FROM courts WHERE id = :courtId")
+    suspend fun getById(courtId: Int): CourtEntity?
 }

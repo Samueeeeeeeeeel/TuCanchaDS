@@ -1,29 +1,32 @@
 package com.example.proyectocancha.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.proyectocancha.ui.screen.*
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectocancha.data.local.database.AppDatabase
+import com.example.proyectocancha.data.repository.UserRepository
 import com.example.proyectocancha.ui.viewmodel.AuthViewModel
+import com.example.proyectocancha.ui.viewmodel.AuthViewModelFactory
 
 @Composable
-fun AppNavGraph(
-    navController: NavHostController,
-    authViewModel: AuthViewModel,
-    modifier: Modifier = Modifier
-) {
-    NavHost(
-        navController = navController,
-        startDestination = Routess.login.path,
-        modifier = modifier
-    ) {
-        // LOGIN
+fun AppNavGraph(navController: NavHostController) {
+    val context = LocalContext.current
+    val db = remember { AppDatabase.getInstance(context) }
+    val repository = remember { UserRepository(db.userDao()) }
+    val authFactory = remember { AuthViewModelFactory(repository) }
+    val authViewModel: AuthViewModel = viewModel(factory = authFactory)
+
+    NavHost(navController = navController, startDestination = Routess.login.path) {
         composable(Routess.login.path) {
             LoginScreen(
-                onLoginOkNavigateHome = { _ ->
-                    navController.navigate(Routess.principal.path) {
+                onLoginOkNavigateHome = { isAdmin ->
+                    val route = if (isAdmin) Routess.admin.path else Routess.principal.path
+                    navController.navigate(route) {
                         popUpTo(Routess.login.path) { inclusive = true }
                     }
                 },
@@ -31,53 +34,42 @@ fun AppNavGraph(
             )
         }
 
-        // REGISTER
         composable(Routess.register.path) {
             RegisterScreen(
-                onRegisteredOk = {
-                    navController.navigate(Routess.login.path) {
-                        popUpTo(Routess.register.path) { inclusive = true }
-                    }
-                },
+                onRegisteredOk = { navController.navigate(Routess.login.path) },
                 onGoLogin = { navController.popBackStack() }
             )
         }
 
-        // PRINCIPAL
         composable(Routess.principal.path) {
             PrincipalScreen(navController = navController)
         }
+
         composable(Routess.admin.path) {
-            AdminScreen(navController = navController)
+            AdminScreen(navController = navController) // <-- AHORA SÍ
         }
 
-        // PROFILE
         composable(Routess.profile.path) {
             ProfileScreen(navController = navController)
         }
 
-        // VER CANCHAS
         composable(Routess.verCanchas.path) {
             VerCanchasScreen(navController = navController)
         }
 
-        // DETALLE CANCHA (argumento courtId)
         composable("${Routess.courtDetail.path}/{courtId}") { backStackEntry ->
             val courtId = backStackEntry.arguments?.getString("courtId")?.toIntOrNull() ?: 0
             CanchaDetailsScreen(navController = navController, courtId = courtId)
         }
 
-        // DETALLE RESERVA
         composable(Routess.detalleReserva.path) {
             DetalleReservaScreen(navController = navController)
         }
 
-        // RECIBO RESERVA
         composable(Routess.reciboReserva.path) {
             ReciboReservaScreen(navController = navController)
         }
 
-        // MIS RESERVAS
         composable(Routess.misReservas.path) {
             MisReservasScreen(navController = navController)
         }
