@@ -1,5 +1,6 @@
 package com.example.proyectocancha.ui.screen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -8,56 +9,51 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.proyectocancha.data.local.database.AppDatabase
+import com.example.proyectocancha.data.repository.BookingRepository
+import com.example.proyectocancha.navigation.Routess
 import com.example.proyectocancha.ui.theme.DarkGreen
 import com.example.proyectocancha.ui.theme.Grey900
-import com.example.proyectocancha.navigation.Routess
-import androidx.compose.foundation.BorderStroke
 import com.example.proyectocancha.ui.theme.ProyectoCanchaTheme
-
-// 🔄 NUEVO: usamos BookingManager para guardar la reserva
-import com.example.proyectocancha.data.local.booking.Booking
-import com.example.proyectocancha.data.local.booking.BookingManager
+import com.example.proyectocancha.ui.viewmodel.BookingViewModel
+import com.example.proyectocancha.ui.viewmodel.BookingViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReciboReservaScreen(navController: NavHostController) {
 
-    // Datos que estás mostrando en la boleta (de momento fijos)
-    val courtName = "Cancha Norte - Pasto Real"
-    val bookingDay = "Miércoles, 25 de Octubre"
-    val bookingTime = "20:00 - 21:00 (1 hora)"
-    val subtotal = 20.00
-    val fee = 2.50
-    val total = 22.50
-    val receiptId = "TXN-7984-ABC12345"
-    val userName = "Javier Pérez"
+    val context = LocalContext.current
+    val db = remember { AppDatabase.getInstance(context) }
+    val bookingRepo = remember { BookingRepository(db.bookingDao()) }
+    val bookingViewModel: BookingViewModel =
+        viewModel(factory = BookingViewModelFactory(bookingRepo))
 
-    // 🔄 NUEVO: asegurarnos de agregar la reserva SOLO una vez
-    LaunchedEffect(Unit) {
-        // Creamos un id nuevo basado en el máximo actual
-        val newId = (BookingManager.bookings.maxOfOrNull { it.id } ?: 0) + 1
+    val uiState by bookingViewModel.state.collectAsStateWithLifecycle()
+    val lastBooking = uiState.lastBooking
 
-        BookingManager.addBooking(
-            Booking(
-                id = newId,
-                courtName = courtName,
-                date = bookingDay,
-                time = bookingTime,
-                total = total,
-                status = "Activa"
-            )
-        )
-    }
+    val courtName = lastBooking?.courtName ?: "Cancha no disponible"
+    val bookingDay = lastBooking?.day ?: "Fecha no disponible"
+    val bookingTime = lastBooking?.time ?: "Horario no disponible"
+    val subtotal = lastBooking?.subtotal ?: 0.0
+    val fee = lastBooking?.fee ?: 0.0
+    val total = lastBooking?.total ?: 0.0
+    val receiptId = lastBooking?.id?.toString() ?: "N/A"
+    val userName = "Cliente"
 
     Scaffold(
         topBar = {
@@ -169,7 +165,7 @@ fun ReceiptCard(
 
             ReceiptSectionHeader("Resumen de Pago", Color.White)
             ReceiptRow("Subtotal", "$${"%.2f".format(subtotal)}")
-            ReceiptRow("Comisión (2.5%)", "$${"%.2f".format(fee)}")
+            ReceiptRow("Comisión (10%)", "$${"%.2f".format(fee)}")
 
             Divider(
                 Modifier.padding(vertical = 10.dp),

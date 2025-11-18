@@ -1,7 +1,7 @@
 package com.example.proyectocancha.data.repository
 
 import com.example.proyectocancha.data.local.user.UserEntity
-import com.example.uinavegacion.data.local.user.UserDao
+import com.example.proyectocancha.data.local.user.UserDao
 
 // Repositorio: orquesta reglas de negocio para login/registro sobre el DAO.
 class UserRepository(

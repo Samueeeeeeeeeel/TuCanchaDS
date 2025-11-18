@@ -25,7 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.proyectocancha.R
 import com.example.proyectocancha.ui.model.Court
 import com.example.proyectocancha.ui.model.dummyCourts
-import com.example.proyectocancha.navigation.Routess // ✅ corregido
+import com.example.proyectocancha.navigation.Routess
 import com.example.proyectocancha.ui.theme.DarkGreen
 import com.example.proyectocancha.ui.theme.LightGrayBg
 import com.example.proyectocancha.ui.theme.Grey900
@@ -34,7 +34,6 @@ import com.example.proyectocancha.ui.theme.Grey900
 @Composable
 fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
 
-    // 1. Buscar cancha
     val court = dummyCourts.find { it.id == courtId } ?: Court(
         id = 0,
         name = "Cancha No Encontrada",
@@ -44,7 +43,6 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
     )
 
     Scaffold(
-        // 2. Barra Superior
         topBar = {
             TopAppBar(
                 title = { Text(court.name, color = Color.White) },
@@ -60,7 +58,6 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Grey900)
             )
         },
-        // 3. Botón de Reserva
         bottomBar = {
             Box(
                 modifier = Modifier
@@ -71,7 +68,10 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
             ) {
                 Button(
                     onClick = {
-                        navController.navigate(Routess.detalleReserva.path)
+                        // 👉 Navegamos a DetalleReserva con courtId y pricePerHour
+                        navController.navigate(
+                            "${Routess.detalleReserva.path}/${court.id}/${court.price}"
+                        )
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = DarkGreen),
                     modifier = Modifier
@@ -89,14 +89,12 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
         containerColor = Grey900
     ) { paddingValues ->
 
-        // 4. Contenido
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Imagen
             Image(
                 painter = painterResource(id = court.imageUrl),
                 contentDescription = court.name,
@@ -106,7 +104,6 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
                     .height(250.dp)
             )
 
-            // Detalles
             Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 20.dp)) {
                 Text(
                     text = court.name,
@@ -116,7 +113,7 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    text = "Precio por Hora: $${court.price} USD",
+                    text = "Precio por Hora: $${court.price} CLP",
                     color = DarkGreen,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold
@@ -135,7 +132,6 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
                 )
                 Spacer(Modifier.height(24.dp))
 
-                // Disponibilidad (placeholder)
                 Text(
                     text = "Seleccionar Fecha y Hora",
                     color = Color.White,
@@ -153,7 +149,7 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Calendario / Selector de Slots (TODO)",
+                        text = "Calendario / Selector de Slots (se usa en la siguiente pantalla)",
                         color = Color.Gray
                     )
                 }

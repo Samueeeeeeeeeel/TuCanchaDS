@@ -19,23 +19,35 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.proyectocancha.data.local.booking.BookingEntity
+import com.example.proyectocancha.data.local.database.AppDatabase
+import com.example.proyectocancha.data.repository.BookingRepository
 import com.example.proyectocancha.navigation.Routess
 import com.example.proyectocancha.ui.theme.DarkGreen
 import com.example.proyectocancha.ui.theme.Grey900
-import com.example.proyectocancha.data.local.booking.Booking
-import com.example.proyectocancha.data.local.booking.BookingManager
+import com.example.proyectocancha.ui.viewmodel.BookingViewModel
+import com.example.proyectocancha.ui.viewmodel.BookingViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MisReservasScreen(navController: NavHostController) {
 
-    // ✅ Lista compartida en toda la app (no se reinicia al navegar)
-    val bookings: List<Booking> = BookingManager.bookings
+    val context = LocalContext.current
+    val db = remember { AppDatabase.getInstance(context) }
+    val bookingRepo = remember { BookingRepository(db.bookingDao()) }
+    val bookingViewModel: BookingViewModel = viewModel(
+        factory = BookingViewModelFactory(bookingRepo)
+    )
 
-    // ✅ Reserva que el usuario está intentando cancelar (muestra el diálogo)
-    var bookingToCancel by remember { mutableStateOf<Booking?>(null) }
+    val uiState by bookingViewModel.state.collectAsStateWithLifecycle()
+
+    // Para el diálogo de confirmación
+    var bookingToCancel by remember { mutableStateOf<BookingEntity?>(null) }
 
     Scaffold(
         topBar = {
@@ -62,14 +74,21 @@ fun MisReservasScreen(navController: NavHostController) {
         },
         containerColor = Grey900
     ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
+
+        if (uiState.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = DarkGreen)
+            }
+        } else {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(paddingValues)
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -82,64 +101,66 @@ fun MisReservasScreen(navController: NavHostController) {
                         modifier = Modifier.padding(bottom = 8.dp, top = 8.dp)
                     )
                 }
-                items(bookings, key = { it.id }) { booking ->
-                    BookingCard(
-                        booking = booking,
-                        onCardClick = {
-                            // Aquí podrías navegar a detalles si quieres
-                        },
-                        onCancelClick = {
-                            // 👉 Aquí NO cancelamos aún. Mostramos el diálogo:
-                            bookingToCancel = booking
-                        }
-                    )
-                }
-                item {
-                    Spacer(modifier = Modifier.height(66.dp))
-                }
-            }
 
-            // ---------------- DIÁLOGO DE CONFIRMACIÓN ----------------
-            bookingToCancel?.let { selected ->
-                AlertDialog(
-                    onDismissRequest = { bookingToCancel = null },
-                    title = { Text("Cancelar reserva") },
-                    text = {
+                if (uiState.bookings.isEmpty()) {
+                    item {
                         Text(
-                            "¿Seguro que deseas cancelar la reserva de:\n\n" +
-                                    "${selected.courtName}\n" +
-                                    "${selected.date} | ${selected.time}?"
+                            text = "No tienes reservas registradas.",
+                            color = Color.Gray,
+                            modifier = Modifier.padding(top = 16.dp)
                         )
-                    },
-                    confirmButton = {
-                        TextButton(
-                            onClick = {
-                                // ✅ Ahora sí se cancela de verdad
-                                BookingManager.cancelBooking(selected.id)
-                                bookingToCancel = null
-                            }
-                        ) {
-                            Text("Sí, cancelar", color = Color.Red)
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { bookingToCancel = null }) {
-                            Text("No, volver")
-                        }
                     }
-                )
+                } else {
+                    items(uiState.bookings) { booking ->
+                        BookingCard(
+                            booking = booking,
+                            onCardClick = {
+                                // Aquí podrías navegar a un detalle de reserva si quisieras
+                            },
+                            onCancelClick = {
+                                if (booking.status == "Activa") {
+                                    bookingToCancel = booking
+                                }
+                            }
+                        )
+                    }
+                }
+
+                item { Spacer(Modifier.height(66.dp)) }
             }
         }
     }
-}
 
-// ----------------------------------------------------------------------
-// COMPONENTES AUXILIARES
-// ----------------------------------------------------------------------
+    // Diálogo de confirmación de cancelación
+    bookingToCancel?.let { booking ->
+        AlertDialog(
+            onDismissRequest = { bookingToCancel = null },
+            title = { Text("Cancelar reserva") },
+            text = {
+                Text("¿Seguro que quieres cancelar la reserva de \"${booking.courtName}\"?")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        bookingViewModel.cancelBooking(booking.id)
+                        bookingToCancel = null
+                    }
+                ) {
+                    Text("Sí, cancelar", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { bookingToCancel = null }) {
+                    Text("No", color = Color.Gray)
+                }
+            }
+        )
+    }
+}
 
 @Composable
 fun BookingCard(
-    booking: Booking,
+    booking: BookingEntity,
     onCardClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
@@ -150,7 +171,6 @@ fun BookingCard(
         "Cancelada" -> Color.Red
         else -> Color.LightGray
     }
-
     val isCancellable = booking.status == "Activa"
 
     Card(
@@ -180,7 +200,6 @@ fun BookingCard(
                         modifier = Modifier.size(32.dp)
                     )
                     Spacer(Modifier.width(16.dp))
-
                     Column {
                         Text(
                             text = booking.courtName,
@@ -189,13 +208,12 @@ fun BookingCard(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "${booking.date} | ${booking.time}",
+                            text = "${booking.day} | ${booking.time}",
                             color = Color.LightGray,
                             fontSize = 14.sp
                         )
                     }
                 }
-
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
                         text = booking.status,
@@ -217,12 +235,12 @@ fun BookingCard(
                 Spacer(Modifier.height(12.dp))
                 OutlinedButton(
                     onClick = onCancelClick,
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
                     border = ButtonDefaults.outlinedButtonBorder.copy(
                         brush = androidx.compose.ui.graphics.SolidColor(
                             Color.Red.copy(alpha = 0.5f)
                         )
                     ),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(38.dp)

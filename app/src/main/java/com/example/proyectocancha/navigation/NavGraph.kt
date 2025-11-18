@@ -4,74 +4,114 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.proyectocancha.ui.screen.*
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.proyectocancha.data.local.database.AppDatabase
-import com.example.proyectocancha.data.repository.UserRepository
-import com.example.proyectocancha.ui.viewmodel.AuthViewModel
-import com.example.proyectocancha.ui.viewmodel.AuthViewModelFactory
+import androidx.navigation.navArgument
+import androidx.navigation.NavType
+import com.example.proyectocancha.ui.screen.AdminScreen
+import com.example.proyectocancha.ui.screen.CanchaDetailsScreen
+import com.example.proyectocancha.ui.screen.DetalleReservaScreen
+import com.example.proyectocancha.ui.screen.LoginScreen
+import com.example.proyectocancha.ui.screen.MisReservasScreen
+import com.example.proyectocancha.ui.screen.PrincipalScreen
+import com.example.proyectocancha.ui.screen.ProfileScreen
+import com.example.proyectocancha.ui.screen.ReciboReservaScreen
+import com.example.proyectocancha.ui.screen.RegisterScreen
+import com.example.proyectocancha.ui.screen.VerCanchasScreen
 
 @Composable
 fun AppNavGraph(navController: NavHostController) {
-    val context = LocalContext.current
-    val db = remember { AppDatabase.getInstance(context) }
-    val repository = remember { UserRepository(db.userDao()) }
-    val authFactory = remember { AuthViewModelFactory(repository) }
-    val authViewModel: AuthViewModel = viewModel(factory = authFactory)
 
-    NavHost(navController = navController, startDestination = Routess.login.path) {
+    NavHost(
+        navController = navController,
+        startDestination = Routess.login.path
+    ) {
+
+        // LOGIN
         composable(Routess.login.path) {
             LoginScreen(
                 onLoginOkNavigateHome = { isAdmin ->
-                    val route = if (isAdmin) Routess.admin.path else Routess.principal.path
-                    navController.navigate(route) {
+                    // si quieres que el admin vaya a otra pantalla, cámbialo aquí
+                    navController.navigate(Routess.principal.path) {
                         popUpTo(Routess.login.path) { inclusive = true }
                     }
                 },
-                onGoRegister = { navController.navigate(Routess.register.path) }
+                onGoRegister = {
+                    navController.navigate(Routess.register.path)
+                }
             )
         }
 
+        // REGISTRO
         composable(Routess.register.path) {
             RegisterScreen(
-                onRegisteredOk = { navController.navigate(Routess.login.path) },
-                onGoLogin = { navController.popBackStack() }
+                onRegisteredOk = {
+                    navController.popBackStack()
+                },
+                onGoLogin = {
+                    navController.popBackStack()
+                }
             )
         }
 
+        // HOME PRINCIPAL
         composable(Routess.principal.path) {
             PrincipalScreen(navController = navController)
         }
 
-        composable(Routess.admin.path) {
-            AdminScreen(navController = navController) // <-- AHORA SÍ
-        }
-
-        composable(Routess.profile.path) {
-            ProfileScreen(navController = navController)
-        }
-
+        // VER TODAS LAS CANCHAS
         composable(Routess.verCanchas.path) {
             VerCanchasScreen(navController = navController)
         }
 
-        composable("${Routess.courtDetail.path}/{courtId}") { backStackEntry ->
-            val courtId = backStackEntry.arguments?.getString("courtId")?.toIntOrNull() ?: 0
-            CanchaDetailsScreen(navController = navController, courtId = courtId)
+        // DETALLE DE CANCHA (recibe courtId)
+        composable(
+            route = "${Routess.courtDetail.path}/{courtId}",
+            arguments = listOf(
+                navArgument("courtId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val courtId = backStackEntry.arguments?.getInt("courtId") ?: 0
+            CanchaDetailsScreen(
+                navController = navController,
+                courtId = courtId
+            )
         }
 
-        composable(Routess.detalleReserva.path) {
-            DetalleReservaScreen(navController = navController)
+        // DETALLE DE RESERVA (recibe courtId y pricePerHour)
+        composable(
+            route = "${Routess.detalleReserva.path}/{courtId}/{pricePerHour}",
+            arguments = listOf(
+                navArgument("courtId") { type = NavType.IntType },
+                navArgument("pricePerHour") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val courtId = backStackEntry.arguments?.getInt("courtId") ?: 0
+            val pricePerHour = backStackEntry.arguments?.getInt("pricePerHour") ?: 0
+
+            DetalleReservaScreen(
+                navController = navController,
+                courtId = courtId,
+                pricePerHour = pricePerHour
+            )
         }
 
+        // RECIBO
         composable(Routess.reciboReserva.path) {
             ReciboReservaScreen(navController = navController)
         }
 
+        // MIS RESERVAS
         composable(Routess.misReservas.path) {
             MisReservasScreen(navController = navController)
+        }
+
+        // PERFIL
+        composable(Routess.profile.path) {
+            ProfileScreen(navController = navController)
+        }
+
+        // PANEL ADMIN (si no lo usas aún, igual compila)
+        composable(Routess.admin.path) {
+            AdminScreen(navController = navController)
         }
     }
 }

@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -13,13 +12,9 @@ import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.rememberDrawerState
-import com.example.proyectocancha.ui.components.AppDrawer
-import com.example.proyectocancha.ui.components.defaultDrawerItems
-import kotlinx.coroutines.launch
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,25 +26,44 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.launch
+import com.example.proyectocancha.data.local.database.AppDatabase
+import com.example.proyectocancha.data.repository.BookingRepository
 import com.example.proyectocancha.navigation.Routess
-import com.example.proyectocancha.ui.theme.ProyectoCanchaTheme
-import com.example.proyectocancha.ui.theme.LightGreen
-import com.example.proyectocancha.ui.theme.Grey900
+import com.example.proyectocancha.ui.components.AppDrawer
+import com.example.proyectocancha.ui.components.AppTopBar
+import com.example.proyectocancha.ui.components.defaultDrawerItems
 import com.example.proyectocancha.ui.model.Court
 import com.example.proyectocancha.ui.model.dummyCourts
-import com.example.proyectocancha.ui.components.AppTopBar
-
-// 🔄 NUEVO: para leer cantidad de reservas activas
-import com.example.proyectocancha.data.local.booking.BookingManager
+import com.example.proyectocancha.ui.theme.Grey900
+import com.example.proyectocancha.ui.theme.LightGreen
+import com.example.proyectocancha.ui.theme.ProyectoCanchaTheme
+import com.example.proyectocancha.ui.viewmodel.BookingViewModel
+import com.example.proyectocancha.ui.viewmodel.BookingViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrincipalScreen(navController: NavController) {
 
+    // Drawer
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
+    // BookingViewModel para contar reservas activas
+    val context = LocalContext.current
+    val db = remember { AppDatabase.getInstance(context) }
+    val bookingRepo = remember { BookingRepository(db.bookingDao()) }
+    val bookingViewModel: BookingViewModel = viewModel(
+        factory = BookingViewModelFactory(bookingRepo)
+    )
+    val bookingState by bookingViewModel.state.collectAsStateWithLifecycle()
+    val activeCount = bookingState.activeCount
 
     val drawerItems = defaultDrawerItems(
         onHome = {
@@ -97,7 +111,8 @@ fun PrincipalScreen(navController: NavController) {
         ) { innerPadding ->
             PrincipalScreenContent(
                 navController = navController,
-                paddingValues = innerPadding
+                paddingValues = innerPadding,
+                activeBookings = activeCount
             )
         }
     }
@@ -106,22 +121,10 @@ fun PrincipalScreen(navController: NavController) {
 @Composable
 fun PrincipalScreenContent(
     navController: NavController,
-    paddingValues: PaddingValues = PaddingValues()
+    paddingValues: PaddingValues = PaddingValues(),
+    activeBookings: Int
 ) {
     val CardDarkBg = Color(0xFF333333)
-
-    // 🔄 LEEMOS SIEMPRE LAS RESERVAS ACTIVAS DEL BookingManager
-    val activeCount = BookingManager.bookings.count { it.status == "Activa" }
-
-    // Texto dinámico según cantidad de reservas
-    val reservasText = when {
-        activeCount == 0 ->
-            "No tienes reservas activas. Toca para ver."
-        activeCount == 1 ->
-            "Tienes 1 reserva activa. Toca para ver."
-        else ->
-            "Tienes $activeCount reservas activas. Toca para ver."
-    }
 
     LazyColumn(
         modifier = Modifier
@@ -131,34 +134,42 @@ fun PrincipalScreenContent(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        // 1. Pestañas de acción rápida
+        // --- TÍTULOS ---
         item {
             Spacer(modifier = Modifier.height(8.dp))
-            QuickActionsTabRow(navController = navController)
-        }
 
-        // 2. Título de sección
-        item {
             Text(
-                text = "Canchas Destacadas",
+                text = "Bienvenido",
                 color = Color.White,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold
             )
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Explora y reserva tu cancha favorita",
+                color = Color.Gray,
+                fontSize = 16.sp
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Recomendadas",
+                color = Color.White,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
 
-        // 3. Lista horizontal de canchas
-        item {
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                items(dummyCourts) { court ->
-                    CourtSmallCard(court = court) { selectedCourt ->
-                        navController.navigate("${Routess.courtDetail.path}/${selectedCourt.id}")
-                    }
-                }
+        // --- SOLO DOS CANCHAS: NORTE y SUR ---
+        items(dummyCourts.take(2)) { court ->
+            CourtCard(court = court) {
+                navController.navigate("${Routess.courtDetail.path}/${court.id}")
             }
         }
 
-        // 4. Mis reservas
+        // --- MIS RESERVAS (LO MISMO QUE TENÍAS) ---
         item {
             Text(
                 text = "Mis Reservas",
@@ -167,6 +178,12 @@ fun PrincipalScreenContent(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(top = 8.dp)
             )
+
+            val textReservas = when {
+                activeBookings <= 0 -> "No tienes reservas activas. Toca para ver."
+                activeBookings == 1 -> "Tienes 1 reserva activa. Toca para ver."
+                else -> "Tienes $activeBookings reservas activas. Toca para ver."
+            }
 
             Card(
                 modifier = Modifier
@@ -183,7 +200,7 @@ fun PrincipalScreenContent(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = reservasText,   // 🔄 TEXTO DINÁMICO
+                        text = textReservas,
                         color = Color.Gray,
                         fontSize = 16.sp
                     )
@@ -191,72 +208,21 @@ fun PrincipalScreenContent(
             }
         }
 
-        // 5. Espacio final
         item {
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
 
-// ---------------------------------------------------
-
 @Composable
-fun QuickActionsTabRow(navController: NavController) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        ActionPill(
-            icon = Icons.Default.Menu,
-            text = "Mis Reservas",
-            onClick = { navController.navigate(Routess.misReservas.path) },
-            modifier = Modifier.weight(1f)
-        )
-        ActionPill(
-            icon = Icons.Default.ArrowForward,
-            text = "Ver Canchas",
-            onClick = { navController.navigate(Routess.verCanchas.path) },
-            modifier = Modifier.weight(1f)
-        )
-    }
-}
-
-@Composable
-fun ActionPill(
-    icon: ImageVector,
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier
-            .height(80.dp)
-            .padding(horizontal = 4.dp)
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = LightGreen)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Icon(icon, contentDescription = text, tint = Color.White)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-        }
-    }
-}
-
-@Composable
-fun CourtSmallCard(court: Court, onClick: (Court) -> Unit) {
+fun CourtCard(court: Court, onClick: (Court) -> Unit) {
     Card(
         modifier = Modifier
-            .width(180.dp)
-            .height(160.dp)
+            .fillMaxWidth()
+            .height(230.dp)
             .clickable { onClick(court) },
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Grey900)
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF333333))
     ) {
         Column {
             Image(
@@ -265,22 +231,22 @@ fun CourtSmallCard(court: Court, onClick: (Court) -> Unit) {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(100.dp)
-                    .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                    .height(150.dp)
             )
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp)
-                    .background(LightGreen)
-                    .padding(8.dp),
-                contentAlignment = Alignment.Center
+            Column(
+                modifier = Modifier.padding(12.dp)
             ) {
                 Text(
                     text = court.name,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp
+                    color = LightGreen,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = court.description,
+                    color = Color.Gray,
+                    fontSize = 14.sp,
+                    maxLines = 2
                 )
             }
         }

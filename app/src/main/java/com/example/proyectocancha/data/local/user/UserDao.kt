@@ -1,11 +1,10 @@
-package com.example.uinavegacion.data.local.user
+package com.example.proyectocancha.data.local.user
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.proyectocancha.data.local.user.UserEntity
 
 @Dao
 interface UserDao {

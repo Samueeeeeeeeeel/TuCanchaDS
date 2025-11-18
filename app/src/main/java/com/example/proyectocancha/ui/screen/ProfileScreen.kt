@@ -1,12 +1,13 @@
+// ProfileScreen.kt
 package com.example.proyectocancha.ui.screen
 
 // --- NUEVO: Imports para la cámara y permisos ---
 import android.Manifest
 import android.graphics.Bitmap
-import android.graphics.ImageDecoder // --- NUEVO ---
-import android.net.Uri // --- NUEVO ---
-import android.os.Build // --- NUEVO ---
-import android.provider.MediaStore // --- NUEVO ---
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
@@ -23,10 +24,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Payment
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,7 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext // --- NUEVO ---
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,7 +46,12 @@ import com.example.proyectocancha.ui.theme.ProyectoCanchaTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.proyectocancha.data.local.database.AppDatabase
+import com.example.proyectocancha.data.repository.UserRepository
+import com.example.proyectocancha.ui.viewmodel.ProfileViewModel
+import com.example.proyectocancha.ui.viewmodel.ProfileViewModelFactory
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -63,28 +65,30 @@ fun ProfileScreen(
     val errorColor = Color(0xFFF44336)
     val accentColor = LightGreen
 
-    // --- NUEVO: Contexto y estado para el diálogo ---
+    // --- VIEWMODEL PARA OBTENER DATOS REALES DEL USUARIO ---
     val context = LocalContext.current
-    var showImagePicker by remember { mutableStateOf(false) }
-    // --- FIN NUEVO ---
+    val db = remember { AppDatabase.getInstance(context) }
+    val userRepository = remember { UserRepository(db.userDao()) }
+    val profileViewModel: ProfileViewModel = viewModel(
+        factory = ProfileViewModelFactory(userRepository)
+    )
+    val uiState by profileViewModel.state.collectAsStateWithLifecycle()
+    // --------------------------------------------------------
 
-    // --- ESTADO PARA LA IMAGEN ---
+
+    // --- ESTADOS PARA FOTO / CÁMARA / GALERÍA ---
+    var showImagePicker by remember { mutableStateOf(false) }
     var bitmap: Bitmap? by remember { mutableStateOf(null) }
 
-    // --- LAUNCHER CÁMARA ---
     val launcherCamara = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview(),
-        onResult = { nuevoBitmap ->
-            bitmap = nuevoBitmap
-        }
+        onResult = { nuevoBitmap -> bitmap = nuevoBitmap }
     )
 
-    // --- NUEVO: LAUNCHER GALERÍA ---
     val launcherGaleria = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? ->
             uri?.let {
-                // Convertimos la Uri a Bitmap para que sea compatible con el estado
                 bitmap = if (Build.VERSION.SDK_INT < 28) {
                     @Suppress("DEPRECATION")
                     MediaStore.Images.Media.getBitmap(context.contentResolver, it)
@@ -96,13 +100,8 @@ fun ProfileScreen(
         }
     )
 
-    // --- PERMISO CÁMARA ---
-    val permisoCamara = rememberPermissionState(
-        permission = Manifest.permission.CAMERA
-    )
+    val permisoCamara = rememberPermissionState(permission = Manifest.permission.CAMERA)
 
-    // --- NUEVO: PERMISO GALERÍA ---
-    // Pide el permiso correcto según la versión de Android
     val permisoGaleria = rememberPermissionState(
         permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             Manifest.permission.READ_MEDIA_IMAGES
@@ -111,18 +110,12 @@ fun ProfileScreen(
         }
     )
 
-    // Datos ficticios
-    val userName = "Juan Pérez"
-    val userEmail = "juan.perez@example.com"
-    val userPhone = "+56 9 8765 4321"
-
-    // Acciones
+    // Acción de logout (solo navega y limpia el backstack)
     val onLogout: () -> Unit = {
         navController.navigate(Routess.login.path) {
             popUpTo(Routess.principal.path) { inclusive = true }
         }
     }
-
 
     Scaffold(
         containerColor = mainBg,
@@ -147,7 +140,7 @@ fun ProfileScreen(
         }
     ) { innerPadding ->
 
-        // --- NUEVO: Diálogo de selección ---
+        // DIÁLOGO PARA ELEGIR CÁMARA O GALERÍA
         if (showImagePicker) {
             AlertDialog(
                 onDismissRequest = { showImagePicker = false },
@@ -158,7 +151,6 @@ fun ProfileScreen(
                         Spacer(Modifier.height(16.dp))
                         TextButton(
                             onClick = {
-                                // 1. Lógica de Cámara
                                 if (permisoCamara.status.isGranted) {
                                     launcherCamara.launch()
                                 } else {
@@ -172,9 +164,8 @@ fun ProfileScreen(
                         }
                         TextButton(
                             onClick = {
-                                // 2. Lógica de Galería
                                 if (permisoGaleria.status.isGranted) {
-                                    launcherGaleria.launch("image/*") // Lanza el selector de galería
+                                    launcherGaleria.launch("image/*")
                                 } else {
                                     permisoGaleria.launchPermissionRequest()
                                 }
@@ -193,7 +184,6 @@ fun ProfileScreen(
                 }
             )
         }
-        // --- FIN Diálogo ---
 
         LazyColumn(
             modifier = Modifier
@@ -203,83 +193,106 @@ fun ProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // Información personal
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = cardBg)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
 
-                        // Contenedor de la foto de perfil
-                        Box(
+            // ---------- TARJETA CON DATOS DEL USUARIO ----------
+            item {
+                if (uiState.isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = accentColor)
+                    }
+                } else {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = cardBg)
+                    ) {
+                        Column(
                             modifier = Modifier
-                                .size(100.dp)
-                                .clip(CircleShape)
-                                .background(Grey900)
+                                .padding(16.dp)
+                                .fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            if (bitmap != null) {
-                                Image(
-                                    bitmap = bitmap!!.asImageBitmap(),
-                                    contentDescription = "Foto de perfil",
-                                    modifier = Modifier.fillMaxSize()
+
+                            // Foto de perfil
+                            Box(
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clip(CircleShape)
+                                    .background(Grey900)
+                            ) {
+                                if (bitmap != null) {
+                                    Image(
+                                        bitmap = bitmap!!.asImageBitmap(),
+                                        contentDescription = "Foto de perfil",
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                } else {
+                                    Icon(
+                                        imageVector = Icons.Default.AccountCircle,
+                                        contentDescription = "Foto de perfil",
+                                        tint = mutedTextColor,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(8.dp)
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // Información real del usuario
+                            if (uiState.email.isBlank()) {
+                                Text(
+                                    text = "No hay un usuario autenticado",
+                                    color = textColor,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 16.sp
                                 )
                             } else {
-                                Icon(
-                                    imageVector = Icons.Default.AccountCircle,
-                                    contentDescription = "Foto de perfil",
-                                    tint = mutedTextColor,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp)
+                                Text(
+                                    text = "Información Personal",
+                                    color = textColor,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 16.sp
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = uiState.nombre,
+                                    color = textColor,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Spacer(Modifier.height(8.dp))
+                                Text(
+                                    text = "Correo: ${uiState.email}",
+                                    color = mutedTextColor,
+                                    fontSize = 14.sp
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = "Teléfono: ${uiState.telefono}",
+                                    color = mutedTextColor,
+                                    fontSize = 14.sp
                                 )
                             }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // Botón cambiar foto
+                            TextButton(onClick = { showImagePicker = true }) {
+                                Text("Cambiar Foto", color = accentColor)
+                            }
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // ... (Resto de los Text con info de usuario)
-                        Text(
-                            text = "Información Personal",
-                            color = textColor,
-                            // ...
-                        )
-                        Text(
-                            text = userName,
-                            color = textColor,
-                            // ...
-                        )
-                        // ...
-                        Text(
-                            "Correo: $userEmail",
-                            // ...
-                        )
-                        // ...
-                        Text(
-                            "Teléfono: $userPhone",
-                            // ...
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        // --- CAMBIO: Botón para cambiar la foto ---
-                        // Ahora abre el diálogo en lugar de la cámara directamente
-                        TextButton(onClick = {
-                            showImagePicker = true
-                        }) {
-                            Text("Cambiar Foto", color = accentColor)
-                        }
-                        // --- FIN CAMBIO ---
                     }
                 }
             }
 
-            // Botón cerrar sesión
+            // ---------- BOTÓN CERRAR SESIÓN ----------
             item {
                 OutlinedButton(
                     onClick = onLogout,
@@ -297,11 +310,20 @@ fun ProfileScreen(
     }
 }
 
-
-// (Tu función SettingItem y Preview se mantienen igual)
+// Placeholder para SettingItem (si más adelante lo necesitas)
 @Composable
 private fun SettingItem(icon: ImageVector, label: String, onClick: () -> Unit) {
-    // ...
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 12.dp, horizontal = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(icon, contentDescription = label, tint = Color.White)
+        Spacer(Modifier.width(16.dp))
+        Text(text = label, color = Color.White)
+    }
 }
 
 @Preview(showBackground = true)

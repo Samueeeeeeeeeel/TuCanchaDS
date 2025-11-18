@@ -13,8 +13,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
 import com.example.proyectocancha.data.local.booking.BookingDao;
 import com.example.proyectocancha.data.local.booking.BookingDao_Impl;
-import com.example.uinavegacion.data.local.user.UserDao;
-import com.example.uinavegacion.data.local.user.UserDao_Impl;
+import com.example.proyectocancha.data.local.court.CourtDao;
+import com.example.proyectocancha.data.local.court.CourtDao_Impl;
+import com.example.proyectocancha.data.local.user.UserDao;
+import com.example.proyectocancha.data.local.user.UserDao_Impl;
 import java.lang.Class;
 import java.lang.Override;
 import java.lang.String;
@@ -35,6 +37,8 @@ public final class AppDatabase_Impl extends AppDatabase {
 
   private volatile BookingDao _bookingDao;
 
+  private volatile CourtDao _courtDao;
+
   @Override
   @NonNull
   protected SupportSQLiteOpenHelper createOpenHelper(@NonNull final DatabaseConfiguration config) {
@@ -43,15 +47,17 @@ public final class AppDatabase_Impl extends AppDatabase {
       public void createAllTables(@NonNull final SupportSQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS `users` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `email` TEXT NOT NULL, `phone` TEXT NOT NULL, `password` TEXT NOT NULL, `isAdmin` INTEGER NOT NULL)");
         db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_users_email` ON `users` (`email`)");
-        db.execSQL("CREATE TABLE IF NOT EXISTS `bookings` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userEmail` TEXT NOT NULL, `courtName` TEXT NOT NULL, `date` TEXT NOT NULL, `time` TEXT NOT NULL, `total` REAL NOT NULL, `status` TEXT NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `bookings` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userId` INTEGER NOT NULL, `courtName` TEXT NOT NULL, `day` TEXT NOT NULL, `time` TEXT NOT NULL, `subtotal` REAL NOT NULL, `fee` REAL NOT NULL, `total` REAL NOT NULL, `status` TEXT NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `courts` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `price` REAL NOT NULL, `imageUrl` TEXT NOT NULL, `description` TEXT NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '149a61d10cf6e526f35c3de84398b0ba')");
+        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cd40aa5a041e243cfd3444482cd7427d')");
       }
 
       @Override
       public void dropAllTables(@NonNull final SupportSQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS `users`");
         db.execSQL("DROP TABLE IF EXISTS `bookings`");
+        db.execSQL("DROP TABLE IF EXISTS `courts`");
         final List<? extends RoomDatabase.Callback> _callbacks = mCallbacks;
         if (_callbacks != null) {
           for (RoomDatabase.Callback _callback : _callbacks) {
@@ -112,12 +118,14 @@ public final class AppDatabase_Impl extends AppDatabase {
                   + " Expected:\n" + _infoUsers + "\n"
                   + " Found:\n" + _existingUsers);
         }
-        final HashMap<String, TableInfo.Column> _columnsBookings = new HashMap<String, TableInfo.Column>(7);
+        final HashMap<String, TableInfo.Column> _columnsBookings = new HashMap<String, TableInfo.Column>(9);
         _columnsBookings.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
-        _columnsBookings.put("userEmail", new TableInfo.Column("userEmail", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsBookings.put("userId", new TableInfo.Column("userId", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsBookings.put("courtName", new TableInfo.Column("courtName", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
-        _columnsBookings.put("date", new TableInfo.Column("date", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsBookings.put("day", new TableInfo.Column("day", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsBookings.put("time", new TableInfo.Column("time", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsBookings.put("subtotal", new TableInfo.Column("subtotal", "REAL", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsBookings.put("fee", new TableInfo.Column("fee", "REAL", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsBookings.put("total", new TableInfo.Column("total", "REAL", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsBookings.put("status", new TableInfo.Column("status", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         final HashSet<TableInfo.ForeignKey> _foreignKeysBookings = new HashSet<TableInfo.ForeignKey>(0);
@@ -129,9 +137,24 @@ public final class AppDatabase_Impl extends AppDatabase {
                   + " Expected:\n" + _infoBookings + "\n"
                   + " Found:\n" + _existingBookings);
         }
+        final HashMap<String, TableInfo.Column> _columnsCourts = new HashMap<String, TableInfo.Column>(5);
+        _columnsCourts.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsCourts.put("name", new TableInfo.Column("name", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsCourts.put("price", new TableInfo.Column("price", "REAL", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsCourts.put("imageUrl", new TableInfo.Column("imageUrl", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsCourts.put("description", new TableInfo.Column("description", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final HashSet<TableInfo.ForeignKey> _foreignKeysCourts = new HashSet<TableInfo.ForeignKey>(0);
+        final HashSet<TableInfo.Index> _indicesCourts = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoCourts = new TableInfo("courts", _columnsCourts, _foreignKeysCourts, _indicesCourts);
+        final TableInfo _existingCourts = TableInfo.read(db, "courts");
+        if (!_infoCourts.equals(_existingCourts)) {
+          return new RoomOpenHelper.ValidationResult(false, "courts(com.example.proyectocancha.data.local.court.CourtEntity).\n"
+                  + " Expected:\n" + _infoCourts + "\n"
+                  + " Found:\n" + _existingCourts);
+        }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "149a61d10cf6e526f35c3de84398b0ba", "8da47f722d42ba7ef9b29ee29adb9586");
+    }, "cd40aa5a041e243cfd3444482cd7427d", "c3682e1e9470dcbc4730d56c08b3b9d3");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(config.context).name(config.name).callback(_openCallback).build();
     final SupportSQLiteOpenHelper _helper = config.sqliteOpenHelperFactory.create(_sqliteConfig);
     return _helper;
@@ -142,7 +165,7 @@ public final class AppDatabase_Impl extends AppDatabase {
   protected InvalidationTracker createInvalidationTracker() {
     final HashMap<String, String> _shadowTablesMap = new HashMap<String, String>(0);
     final HashMap<String, Set<String>> _viewTables = new HashMap<String, Set<String>>(0);
-    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "users","bookings");
+    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "users","bookings","courts");
   }
 
   @Override
@@ -153,6 +176,7 @@ public final class AppDatabase_Impl extends AppDatabase {
       super.beginTransaction();
       _db.execSQL("DELETE FROM `users`");
       _db.execSQL("DELETE FROM `bookings`");
+      _db.execSQL("DELETE FROM `courts`");
       super.setTransactionSuccessful();
     } finally {
       super.endTransaction();
@@ -169,6 +193,7 @@ public final class AppDatabase_Impl extends AppDatabase {
     final HashMap<Class<?>, List<Class<?>>> _typeConvertersMap = new HashMap<Class<?>, List<Class<?>>>();
     _typeConvertersMap.put(UserDao.class, UserDao_Impl.getRequiredConverters());
     _typeConvertersMap.put(BookingDao.class, BookingDao_Impl.getRequiredConverters());
+    _typeConvertersMap.put(CourtDao.class, CourtDao_Impl.getRequiredConverters());
     return _typeConvertersMap;
   }
 
@@ -211,6 +236,20 @@ public final class AppDatabase_Impl extends AppDatabase {
           _bookingDao = new BookingDao_Impl(this);
         }
         return _bookingDao;
+      }
+    }
+  }
+
+  @Override
+  public CourtDao courtDao() {
+    if (_courtDao != null) {
+      return _courtDao;
+    } else {
+      synchronized(this) {
+        if(_courtDao == null) {
+          _courtDao = new CourtDao_Impl(this);
+        }
+        return _courtDao;
       }
     }
   }
