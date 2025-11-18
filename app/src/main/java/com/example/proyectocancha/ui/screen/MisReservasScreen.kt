@@ -10,7 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,96 +21,113 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-// Importaciones de rutas (necesaria para la navegación al inicio)
 import com.example.proyectocancha.navigation.Routess
-// Importaciones de tus colores de tema
 import com.example.proyectocancha.ui.theme.DarkGreen
 import com.example.proyectocancha.ui.theme.Grey900
-
-
-// ----------------------------------------------------------------------
-// MODELO DE DATOS
-// ----------------------------------------------------------------------
-
-data class Booking(
-    val id: Int,
-    val courtName: String,
-    val date: String,
-    val time: String,
-    val total: Double,
-    val status: String // "Activa", "Completada", "Cancelada"
-)
-
-val dummyBookings = listOf(
-    Booking(1, "Cancha Norte - Pasto Real", "Hoy, 17 Oct", "20:00 - 21:00", 22.50, "Activa"),
-    Booking(2, "Cancha Sur - Sintético", "Sab, 28 Oct", "10:00 - 11:00", 22.50, "Activa"),
-    Booking(3, "Cancha Pick - Baby Fut", "Dom, 1 Oct", "18:00 - 19:00", 15.00, "Completada"),
-    Booking(4, "Cancha Centro - Tierra", "Lun, 30 Sep", "21:00 - 22:00", 20.00, "Cancelada"),
-)
-
-
-// ----------------------------------------------------------------------
-// PANTALLA PRINCIPAL
-// ----------------------------------------------------------------------
+import com.example.proyectocancha.data.local.booking.Booking
+import com.example.proyectocancha.data.local.booking.BookingManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MisReservasScreen(navController: NavHostController) {
+
+    // ✅ Lista compartida en toda la app (no se reinicia al navegar)
+    val bookings: List<Booking> = BookingManager.bookings
+
+    // ✅ Reserva que el usuario está intentando cancelar (muestra el diálogo)
+    var bookingToCancel by remember { mutableStateOf<Booking?>(null) }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Mis Reservas", color = Color.White) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Color.White)
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = Color.White
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Grey900)
             )
         },
-        // Botón fijo en la parte inferior: Volver al Inicio
         bottomBar = {
             MisReservasBottomBar {
-                // Navega a la pantalla principal
                 navController.navigate(Routess.principal.path) {
-                    // Limpia la pila para que 'atrás' no vuelva a las reservas
                     popUpTo(Routess.principal.path) { inclusive = true }
                 }
             }
         },
         containerColor = Grey900
     ) { paddingValues ->
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item {
-                Text(
-                    text = "Reservas Activas y Pasadas",
-                    color = Color.White,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 8.dp, top = 8.dp)
-                )
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                item {
+                    Text(
+                        text = "Reservas Activas y Pasadas",
+                        color = Color.White,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 8.dp, top = 8.dp)
+                    )
+                }
+                items(bookings, key = { it.id }) { booking ->
+                    BookingCard(
+                        booking = booking,
+                        onCardClick = {
+                            // Aquí podrías navegar a detalles si quieres
+                        },
+                        onCancelClick = {
+                            // 👉 Aquí NO cancelamos aún. Mostramos el diálogo:
+                            bookingToCancel = booking
+                        }
+                    )
+                }
+                item {
+                    Spacer(modifier = Modifier.height(66.dp))
+                }
             }
-            items(dummyBookings) { booking ->
-                BookingCard(
-                    booking = booking,
-                    onCardClick = {
-                        // TODO: Navegar a los detalles de la reserva específica
-                        println("Ver detalles de la reserva ID: ${booking.id}")
+
+            // ---------------- DIÁLOGO DE CONFIRMACIÓN ----------------
+            bookingToCancel?.let { selected ->
+                AlertDialog(
+                    onDismissRequest = { bookingToCancel = null },
+                    title = { Text("Cancelar reserva") },
+                    text = {
+                        Text(
+                            "¿Seguro que deseas cancelar la reserva de:\n\n" +
+                                    "${selected.courtName}\n" +
+                                    "${selected.date} | ${selected.time}?"
+                        )
                     },
-                    onCancelClick = {
-                        // TODO: Implementar lógica de cancelación (mostrar diálogo, llamar API)
-                        println("Solicitar cancelación de la reserva ID: ${booking.id}")
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                // ✅ Ahora sí se cancela de verdad
+                                BookingManager.cancelBooking(selected.id)
+                                bookingToCancel = null
+                            }
+                        ) {
+                            Text("Sí, cancelar", color = Color.Red)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { bookingToCancel = null }) {
+                            Text("No, volver")
+                        }
                     }
                 )
-            }
-            item {
-                Spacer(modifier = Modifier.height(66.dp)) // Espacio extra para el BottomBar
             }
         }
     }
@@ -121,8 +138,12 @@ fun MisReservasScreen(navController: NavHostController) {
 // ----------------------------------------------------------------------
 
 @Composable
-fun BookingCard(booking: Booking, onCardClick: () -> Unit, onCancelClick: () -> Unit) {
-    val cardBg = Color(0xFF333333) // Gris oscuro para la tarjeta
+fun BookingCard(
+    booking: Booking,
+    onCardClick: () -> Unit,
+    onCancelClick: () -> Unit
+) {
+    val cardBg = Color(0xFF333333)
     val statusColor = when (booking.status) {
         "Activa" -> DarkGreen
         "Completada" -> Color.Gray
@@ -140,7 +161,7 @@ fun BookingCard(booking: Booking, onCardClick: () -> Unit, onCancelClick: () -> 
     ) {
         Column(
             modifier = Modifier
-                .clickable(onClick = onCardClick) // Tarjeta clickable
+                .clickable(onClick = onCardClick)
                 .padding(16.dp)
         ) {
             Row(
@@ -148,8 +169,10 @@ fun BookingCard(booking: Booking, onCardClick: () -> Unit, onCancelClick: () -> 
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Columna de Ícono e Información Principal
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
+                ) {
                     Icon(
                         imageVector = Icons.Default.Info,
                         contentDescription = "Estado",
@@ -173,7 +196,6 @@ fun BookingCard(booking: Booking, onCardClick: () -> Unit, onCancelClick: () -> 
                     }
                 }
 
-                // Columna de Precio y Estado
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
                         text = booking.status,
@@ -191,16 +213,25 @@ fun BookingCard(booking: Booking, onCardClick: () -> Unit, onCancelClick: () -> 
                 }
             }
 
-            // Botón de Cancelar (solo si está activa)
             if (isCancellable) {
                 Spacer(Modifier.height(12.dp))
                 OutlinedButton(
                     onClick = onCancelClick,
-                    border = ButtonDefaults.outlinedButtonBorder.copy(brush = androidx.compose.ui.graphics.SolidColor(Color.Red.copy(alpha = 0.5f))),
+                    border = ButtonDefaults.outlinedButtonBorder.copy(
+                        brush = androidx.compose.ui.graphics.SolidColor(
+                            Color.Red.copy(alpha = 0.5f)
+                        )
+                    ),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
-                    modifier = Modifier.fillMaxWidth().height(38.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(38.dp)
                 ) {
-                    Text("CANCELAR RESERVA", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                    Text(
+                        "CANCELAR RESERVA",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             }
         }
@@ -227,10 +258,8 @@ fun MisReservasBottomBar(onHomeClicked: () -> Unit) {
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun MisReservasScreenPreview() {
-    // Es crucial que Routess esté accesible para el preview si se necesita.
     MisReservasScreen(rememberNavController())
 }

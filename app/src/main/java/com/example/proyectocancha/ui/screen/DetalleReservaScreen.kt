@@ -11,6 +11,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,18 +21,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-// Importaciones de navegación y rutas
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.proyectocancha.navigation.Routess
-// Importaciones de tus colores de tema
 import com.example.proyectocancha.ui.theme.DarkGreen
 import com.example.proyectocancha.ui.theme.Grey900
-
+import com.example.proyectocancha.data.local.database.AppDatabase
+import com.example.proyectocancha.data.local.booking.BookingEntity
+import com.example.proyectocancha.data.local.user.AuthManager
+import com.example.proyectocancha.data.repository.BookingRepository
+import com.example.proyectocancha.ui.viewmodel.BookingViewModel
+import com.example.proyectocancha.ui.viewmodel.BookingViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetalleReservaScreen(navController: NavHostController) { // Nombre de la función principal
+fun DetalleReservaScreen(navController: NavHostController) {
 
-    // --- DATOS FIJOS DE EJEMPLO para el resumen ---
+    // Datos ficticios de ejemplo (de momento)
     val courtName = "Cancha Norte - Pasto Real"
     val bookingDay = "Miércoles, 25 de Octubre"
     val bookingTime = "20:00 - 21:00 (1 hora)"
@@ -39,6 +46,13 @@ fun DetalleReservaScreen(navController: NavHostController) { // Nombre de la fun
     val fee = 2.50
     val total = subtotal + fee
 
+    // ---- BookingViewModel ----
+    val context = LocalContext.current
+    val db = remember { AppDatabase.getInstance(context) }
+    val bookingRepo = remember { BookingRepository(db.bookingDao()) }
+    val bookingVm: BookingViewModel = viewModel(
+        factory = BookingViewModelFactory(bookingRepo)
+    )
 
     Scaffold(
         topBar = {
@@ -46,18 +60,38 @@ fun DetalleReservaScreen(navController: NavHostController) { // Nombre de la fun
                 title = { Text("Detalle de Reserva", color = Color.White) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Color.White)
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = Color.White
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Grey900)
             )
         },
-        // Botones de acción en la parte inferior
         bottomBar = {
             DetalleReservaBottomBar(
-                navController = navController, // <-- ¡NAVCONTROLLER PASADO!
-                onBackClicked = { navController.popBackStack() },
-                totalPrice = total
+                totalPrice = total,
+                onConfirmClicked = {
+                    val user = AuthManager.currentUser.value
+                    if (user != null) {
+                        val booking = BookingEntity(
+                            userEmail = user.email,
+                            courtName = courtName,
+                            date = bookingDay,
+                            time = bookingTime,
+                            total = total,
+                            status = "Activa"
+                        )
+                        bookingVm.createBooking(booking)
+                        navController.navigate(Routess.reciboReserva.path)
+                    } else {
+                        // Si no hay usuario, lo mandamos a login
+                        navController.navigate(Routess.login.path)
+                    }
+                },
+                onBackClicked = { navController.popBackStack() }
             )
         },
         containerColor = Grey900
@@ -80,7 +114,6 @@ fun DetalleReservaScreen(navController: NavHostController) { // Nombre de la fun
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // Tarjeta de Resumen de la Reserva
             ResumenDeReservaCard(
                 courtName = courtName,
                 day = bookingDay,
@@ -89,22 +122,19 @@ fun DetalleReservaScreen(navController: NavHostController) { // Nombre de la fun
 
             Spacer(Modifier.height(24.dp))
 
-            // Resumen de Precios
             ResumenDePrecio(subtotal = subtotal, fee = fee, total = total)
         }
     }
 }
 
-// ----------------------------------------------------------------------
-// COMPONENTES AUXILIARES
-// ----------------------------------------------------------------------
+// --- COMPONENTES AUXILIARES (sin cambios de lógica importante) ---
 
 @Composable
 fun ResumenDeReservaCard(courtName: String, day: String, time: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF333333)) // Gris oscuro
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF333333))
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
@@ -149,7 +179,7 @@ fun ResumenDePrecio(subtotal: Double, fee: Double, total: Double) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF333333)) // Gris oscuro
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF333333))
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             FilaDeResumen(label = "Subtotal (1 hr)", value = "$${"%.2f".format(subtotal)}")
@@ -180,7 +210,11 @@ fun ResumenDePrecio(subtotal: Double, fee: Double, total: Double) {
 }
 
 @Composable
-fun DetalleReservaBottomBar(navController: NavHostController, onBackClicked: () -> Unit, totalPrice: Double) { // <-- ¡NAVCONTROLLER EN LA FIRMA!
+fun DetalleReservaBottomBar(
+    totalPrice: Double,
+    onConfirmClicked: () -> Unit,
+    onBackClicked: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -188,11 +222,7 @@ fun DetalleReservaBottomBar(navController: NavHostController, onBackClicked: () 
             .padding(16.dp)
     ) {
         Button(
-            // CAMBIO CLAVE: Navegación al ReciboReservaScreen
-            onClick = {
-                // Simula pago exitoso y navega a la siguiente pantalla
-                navController.navigate(Routess.reciboReserva.path)
-            },
+            onClick = onConfirmClicked,
             colors = ButtonDefaults.buttonColors(containerColor = DarkGreen),
             modifier = Modifier
                 .fillMaxWidth()
@@ -201,7 +231,11 @@ fun DetalleReservaBottomBar(navController: NavHostController, onBackClicked: () 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Done, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("PAGAR Y CONFIRMAR ($${"%.2f".format(totalPrice)})", color = Color.White, fontSize = 16.sp)
+                Text(
+                    "PAGAR Y CONFIRMAR ($${"%.2f".format(totalPrice)})",
+                    color = Color.White,
+                    fontSize = 16.sp
+                )
             }
         }
         Spacer(Modifier.height(8.dp))
@@ -216,10 +250,6 @@ fun DetalleReservaBottomBar(navController: NavHostController, onBackClicked: () 
         }
     }
 }
-
-// ----------------------------------------------------------------------
-// PREVIEW
-// ----------------------------------------------------------------------
 
 @Preview(showBackground = true)
 @Composable

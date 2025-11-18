@@ -43,6 +43,16 @@ class UserRepository(
         return Result.success(id)
     }
 
+    // ----------------- UPDATE USUARIO (para perfil) -----------------
+    suspend fun updateUser(user: UserEntity): Result<Int> {
+        return try {
+            val rows = userDao.update(user)
+            Result.success(rows)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     // ----------------- UTILIDADES -----------------
     suspend fun getAllUsers(): List<UserEntity> = userDao.getAll()
 

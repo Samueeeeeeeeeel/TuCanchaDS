@@ -8,7 +8,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,13 +20,19 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.proyectocancha.ui.theme.DarkGreen
 import com.example.proyectocancha.ui.theme.Grey900
-import com.example.proyectocancha.navigation.Routess // ✅ corregido
+import com.example.proyectocancha.navigation.Routess
 import androidx.compose.foundation.BorderStroke
 import com.example.proyectocancha.ui.theme.ProyectoCanchaTheme
+
+// 🔄 NUEVO: usamos BookingManager para guardar la reserva
+import com.example.proyectocancha.data.local.booking.Booking
+import com.example.proyectocancha.data.local.booking.BookingManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReciboReservaScreen(navController: NavHostController) {
+
+    // Datos que estás mostrando en la boleta (de momento fijos)
     val courtName = "Cancha Norte - Pasto Real"
     val bookingDay = "Miércoles, 25 de Octubre"
     val bookingTime = "20:00 - 21:00 (1 hora)"
@@ -35,6 +41,23 @@ fun ReciboReservaScreen(navController: NavHostController) {
     val total = 22.50
     val receiptId = "TXN-7984-ABC12345"
     val userName = "Javier Pérez"
+
+    // 🔄 NUEVO: asegurarnos de agregar la reserva SOLO una vez
+    LaunchedEffect(Unit) {
+        // Creamos un id nuevo basado en el máximo actual
+        val newId = (BookingManager.bookings.maxOfOrNull { it.id } ?: 0) + 1
+
+        BookingManager.addBooking(
+            Booking(
+                id = newId,
+                courtName = courtName,
+                date = bookingDay,
+                time = bookingTime,
+                total = total,
+                status = "Activa"
+            )
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -49,7 +72,10 @@ fun ReciboReservaScreen(navController: NavHostController) {
                     navController.navigate(Routess.misReservas.path)
                 },
                 onFinishClicked = {
-                    navController.popBackStack(route = Routess.principal.path, inclusive = false)
+                    navController.popBackStack(
+                        route = Routess.principal.path,
+                        inclusive = false
+                    )
                 }
             )
         },
@@ -126,22 +152,35 @@ fun ReceiptCard(
             ReceiptRow("Transacción ID", receiptId, isBold = true, color = DarkGreen)
             ReceiptRow("Cliente", userName)
 
-            Divider(Modifier.padding(vertical = 10.dp), color = Color.Gray.copy(alpha = 0.5f))
+            Divider(
+                Modifier.padding(vertical = 10.dp),
+                color = Color.Gray.copy(alpha = 0.5f)
+            )
 
             ReceiptSectionHeader("Cancha Reservada", Color.White)
             ReceiptRow("Cancha", courtName, isBold = true)
             ReceiptRow("Día", day)
             ReceiptRow("Hora", time)
 
-            Divider(Modifier.padding(vertical = 10.dp), color = Color.Gray.copy(alpha = 0.5f))
+            Divider(
+                Modifier.padding(vertical = 10.dp),
+                color = Color.Gray.copy(alpha = 0.5f)
+            )
 
             ReceiptSectionHeader("Resumen de Pago", Color.White)
             ReceiptRow("Subtotal", "$${"%.2f".format(subtotal)}")
             ReceiptRow("Comisión (2.5%)", "$${"%.2f".format(fee)}")
 
-            Divider(Modifier.padding(vertical = 10.dp), color = Color.Gray.copy(alpha = 0.5f))
+            Divider(
+                Modifier.padding(vertical = 10.dp),
+                color = Color.Gray.copy(alpha = 0.5f)
+            )
 
-            ReceiptRow("TOTAL PAGADO", "$${"%.2f".format(total)}", isTotal = true)
+            ReceiptRow(
+                "TOTAL PAGADO",
+                "$${"%.2f".format(total)}",
+                isTotal = true
+            )
         }
     }
 }
@@ -206,7 +245,7 @@ fun ReciboBottomBar(onMyBookingsClicked: () -> Unit, onFinishClicked: () -> Unit
         Spacer(Modifier.height(8.dp))
         OutlinedButton(
             onClick = onFinishClicked,
-            border = BorderStroke(1.dp, Color.Gray), // ✅ corregido
+            border = BorderStroke(1.dp, Color.Gray),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)

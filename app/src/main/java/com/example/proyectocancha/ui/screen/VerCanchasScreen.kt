@@ -1,6 +1,5 @@
 package com.example.proyectocancha.ui.screen
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,22 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.proyectocancha.R // Asegúrate de que R.drawable.court_1 exista
 import com.example.proyectocancha.navigation.Routess
+import com.example.proyectocancha.ui.model.Court
+import com.example.proyectocancha.ui.model.dummyCourts
 import com.example.proyectocancha.ui.theme.Grey900
 import com.example.proyectocancha.ui.theme.LightGreen
-
-// Nota: Asumimos que los modelos Court y dummyCourts son accesibles aquí,
-// o se redefinen si están solo en PrincipalScreen. Aquí los redefino para la independencia:
-data class Court(val id: Int, val name: String, val imageUrl: Int, val description: String)
-val dummyCourts = listOf(
-    Court(1, "Cancha Norte - Pasto Real", R.drawable.court_1, "Cancha con excelentes instalaciones"),
-    Court(2, "Cancha Sur - Sintético", R.drawable.court_1, "Césped sintético de alta calidad"),
-    Court(3, "Cancha Valle - Sintético", R.drawable.court_1, "Cancha techada climatizada"),
-    Court(4, "Cancha Pick - Baby Fut", R.drawable.court_1, "Cancha con iluminación profesional"),
-    Court(5, "Cancha Central", R.drawable.court_1, "Ideal para torneos."),
-    Court(6, "Cancha Río", R.drawable.court_1, "Junto al río con vista panorámica.")
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,7 +36,11 @@ fun VerCanchasScreen(navController: NavHostController) {
                 title = { Text("Todas las Canchas", color = Color.White) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Color.White)
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = Color.White
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Grey900)

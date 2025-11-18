@@ -1,9 +1,10 @@
-package com.example.uinavegacion.data.local.user // (o donde esté tu archivo)
+package com.example.uinavegacion.data.local.user
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.example.proyectocancha.data.local.user.UserEntity
 
 @Dao
@@ -13,7 +14,6 @@ interface UserDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(user: UserEntity): Long
 
-    // ✅ ESTA ES LA FUNCIÓN CLAVE que usa el repositorio
     // Devuelve un usuario por email (o null si no existe).
     @Query("SELECT * FROM users WHERE email = :email LIMIT 1")
     suspend fun getByEmail(email: String): UserEntity?
@@ -25,4 +25,8 @@ interface UserDao {
     // Lista completa
     @Query("SELECT * FROM users ORDER BY id ASC")
     suspend fun getAll(): List<UserEntity>
+
+    // Actualiza un usuario existente
+    @Update
+    suspend fun update(user: UserEntity): Int
 }

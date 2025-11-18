@@ -6,19 +6,22 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.proyectocancha.data.local.user.UserEntity
+import com.example.proyectocancha.data.local.booking.BookingEntity
 import com.example.uinavegacion.data.local.user.UserDao
+import com.example.proyectocancha.data.local.booking.BookingDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = [UserEntity::class],
-    version = 1,
-    exportSchema = false // más simple, no genera archivos de esquema
+    entities = [UserEntity::class, BookingEntity::class],
+    version = 2,                         // ⬅️ SUBIMOS VERSIÓN
+    exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
+    abstract fun bookingDao(): BookingDao   // ⬅️ NUEVO
 
     companion object {
         @Volatile
@@ -35,7 +38,6 @@ abstract class AppDatabase : RoomDatabase() {
                     .addCallback(object : RoomDatabase.Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
-                            // Precarga de usuarios iniciales
                             CoroutineScope(Dispatchers.IO).launch {
                                 INSTANCE?.userDao()?.let { dao ->
                                     val seed = listOf(
@@ -44,7 +46,7 @@ abstract class AppDatabase : RoomDatabase() {
                                             email = "admin@duoc.cl",
                                             phone = "+56911111111",
                                             password = "Admin123!",
-                                            isAdmin = true // ⚡ importante
+                                            isAdmin = true
                                         ),
                                         UserEntity(
                                             name = "Víctor Rosendo",
@@ -61,7 +63,7 @@ abstract class AppDatabase : RoomDatabase() {
                             }
                         }
                     })
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration() // si cambió el schema, borra y recrea
                     .build()
 
                 INSTANCE = instance
