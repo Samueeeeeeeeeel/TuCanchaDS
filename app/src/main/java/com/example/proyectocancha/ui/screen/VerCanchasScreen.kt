@@ -1,5 +1,6 @@
 package com.example.proyectocancha.ui.screen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,6 +29,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.example.proyectocancha.data.local.court.CourtEntity
 import com.example.proyectocancha.data.local.court.CourtRepository
 import com.example.proyectocancha.data.local.database.AppDatabase
@@ -107,11 +111,28 @@ fun FullWidthCourtCard(court: CourtEntity, onClick: (CourtEntity) -> Unit) {
         colors = CardDefaults.cardColors(containerColor = Color(0xFF333333))
     ) {
         Column {
+            val painter = rememberAsyncImagePainter(model = court.imageUrl.ifEmpty { null })
             Box(
-                modifier = Modifier.fillMaxWidth().height(130.dp).background(Color.DarkGray),
+                // --- ¡MODIFICADOR CORREGIDO! Se elimina el .background ---
+                modifier = Modifier.fillMaxWidth().height(130.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Image, "Imagen de la cancha", tint = Color.LightGray, modifier = Modifier.size(50.dp))
+                when (painter.state) {
+                    is AsyncImagePainter.State.Loading -> {
+                        CircularProgressIndicator()
+                    }
+                    is AsyncImagePainter.State.Error -> {
+                        Icon(Icons.Default.Image, "Error al cargar imagen", tint = Color.LightGray)
+                    }
+                    else -> {
+                        Image(
+                            painter = painter,
+                            contentDescription = court.name,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
             }
             Column(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp)

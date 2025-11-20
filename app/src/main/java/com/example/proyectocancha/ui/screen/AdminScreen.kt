@@ -1,5 +1,10 @@
 package com.example.proyectocancha.ui.screen
 
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,15 +18,19 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.proyectocancha.data.local.court.CourtEntity
 import com.example.proyectocancha.data.local.court.CourtRepository
 import com.example.proyectocancha.data.local.database.AppDatabase
@@ -50,7 +59,7 @@ fun AdminScreen(navController: NavController) {
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    var selectedContent by remember { mutableStateOf("users") }
+    var selectedContent by remember { mutableStateOf("canchas") }
 
     var showCourtDialog by remember { mutableStateOf(false) }
     var courtToEdit by remember { mutableStateOf<CourtEntity?>(null) }
@@ -80,10 +89,7 @@ fun AdminScreen(navController: NavController) {
         DeleteConfirmationDialog(
             itemType = "cancha",
             itemName = it.name,
-            onConfirm = {
-                vm.deleteCourt(it)
-                courtToDelete = null
-            },
+            onConfirm = { vm.deleteCourt(it); courtToDelete = null },
             onDismiss = { courtToDelete = null }
         )
     }
@@ -92,7 +98,7 @@ fun AdminScreen(navController: NavController) {
         drawerState = drawerState,
         drawerContent = {
             AdminDrawerContent(
-                selectedContent = selectedContent,
+                selectedContent,
                 onUsersClicked = { selectedContent = "users"; scope.launch { drawerState.close() } },
                 onCanchasClicked = { selectedContent = "canchas"; scope.launch { drawerState.close() } },
                 onLogoutClicked = { navController.navigate(Routes.login.path) { popUpTo(Routes.admin.path) { inclusive = true } } }
@@ -128,6 +134,105 @@ fun AdminScreen(navController: NavController) {
             }
         }
     }
+}
+
+@Composable
+fun CourtList(courts: List<CourtEntity>, onEdit: (CourtEntity) -> Unit, onDelete: (CourtEntity) -> Unit, modifier: Modifier = Modifier, cardColor: Color, textColor: Color) {
+    LazyColumn(modifier = modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        items(courts, key = { it.id }) {
+            CourtCard(it, onEdit = { onEdit(it) }, onDelete = { onDelete(it) }, cardColor = cardColor, textColor = textColor)
+        }
+    }
+}
+
+@Composable
+fun CourtCard(court: CourtEntity, onEdit: () -> Unit, onDelete: () -> Unit, cardColor: Color, textColor: Color) {
+    val clpFormatter = remember { NumberFormat.getCurrencyInstance(Locale("es", "CL")) }
+    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = cardColor)) {
+        Column {
+            if (court.imageUrl.isNotEmpty()) {
+                Image(
+                    painter = rememberAsyncImagePainter(model = court.imageUrl),
+                    contentDescription = court.name,
+                    modifier = Modifier.fillMaxWidth().height(150.dp),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Box(modifier = Modifier.fillMaxWidth().height(150.dp).background(Color.DarkGray), contentAlignment = Alignment.Center) {
+                    Icon(Icons.Default.Image, contentDescription = "Sin imagen", tint = Color.LightGray, modifier = Modifier.size(60.dp))
+                }
+            }
+            Row(modifier = Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                Column(Modifier.weight(1f)) {
+                    Text(court.name, fontWeight = FontWeight.Bold, color = textColor, fontSize = 18.sp)
+                    Text("Precio: ${clpFormatter.format(court.price)}", color = textColor.copy(alpha = 0.8f))
+                }
+                Row {
+                    IconButton(onClick = onEdit) { Icon(Icons.Default.Edit, "Editar", tint = Color.Cyan) }
+                    IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, "Eliminar", tint = Color.Red) }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AddEditCourtDialog(courtToEdit: CourtEntity?, onDismiss: () -> Unit, onSave: (CourtEntity) -> Unit) {
+    var name by remember { mutableStateOf(courtToEdit?.name ?: "") }
+    var price by remember { mutableStateOf(courtToEdit?.price?.toInt()?.toString() ?: "") }
+    var description by remember { mutableStateOf(courtToEdit?.description ?: "") }
+    var imageUrl by remember { mutableStateOf(courtToEdit?.imageUrl ?: "") }
+
+    val context = LocalContext.current
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        uri?.let {
+            context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            imageUrl = it.toString()
+        }
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(if (courtToEdit == null) "Añadir Cancha" else "Editar Cancha") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Nombre") })
+                OutlinedTextField(
+                    value = price,
+                    onValueChange = { if (it.all { char -> char.isDigit() }) price = it },
+                    label = { Text("Precio (CLP)") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+                OutlinedTextField(value = description, onValueChange = { description = it }, label = { Text("Descripción") })
+
+                Spacer(Modifier.height(8.dp))
+                Button(onClick = { imagePickerLauncher.launch(arrayOf("image/*")) }) {
+                    Text("Seleccionar Imagen")
+                }
+                if (imageUrl.isNotEmpty()) {
+                    Image(
+                        painter = rememberAsyncImagePainter(model = imageUrl),
+                        contentDescription = "Imagen seleccionada",
+                        modifier = Modifier.fillMaxWidth().height(100.dp).clip(RoundedCornerShape(8.dp))
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = {
+                val priceDouble = price.toDoubleOrNull() ?: 0.0
+                val updatedCourt = courtToEdit?.copy(name = name, price = priceDouble, description = description, imageUrl = imageUrl) ?: CourtEntity(name = name, price = priceDouble, description = description, imageUrl = imageUrl)
+                onSave(updatedCourt)
+                onDismiss()
+            }) { Text("Guardar") }
+        },
+        dismissButton = { 
+            TextButton(onClick = onDismiss) { Text("Cancelar") } 
+        }
+    )
 }
 
 @Composable
@@ -177,71 +282,6 @@ fun UserCard(user: UserEntity, onAdminToggle: () -> Unit, modifier: Modifier = M
             }
         }
     }
-}
-
-@Composable
-fun CourtList(courts: List<CourtEntity>, onEdit: (CourtEntity) -> Unit, onDelete: (CourtEntity) -> Unit, modifier: Modifier = Modifier, cardColor: Color, textColor: Color) {
-    LazyColumn(modifier = modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(courts, key = { it.id }) { court ->
-            CourtCard(court, onEdit = { onEdit(court) }, onDelete = { onDelete(court) }, cardColor = cardColor, textColor = textColor)
-        }
-    }
-}
-
-@Composable
-fun CourtCard(court: CourtEntity, onEdit: () -> Unit, onDelete: () -> Unit, cardColor: Color, textColor: Color) {
-    val clpFormatter = remember { NumberFormat.getCurrencyInstance(Locale("es", "CL")) }
-    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = cardColor)) {
-        Row(modifier = Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-            Column(Modifier.weight(1f)) {
-                Text(court.name, fontWeight = FontWeight.Bold, color = textColor)
-                Text("Precio: ${clpFormatter.format(court.price)}", color = textColor.copy(alpha = 0.7f))
-                Text(court.description, style = MaterialTheme.typography.bodySmall, color = textColor.copy(alpha = 0.5f))
-            }
-            Row {
-                IconButton(onClick = onEdit) { Icon(Icons.Default.Edit, "Editar", tint = Color.Cyan) }
-                IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, "Eliminar", tint = Color.Red) }
-            }
-        }
-    }
-}
-
-@Composable
-fun AddEditCourtDialog(courtToEdit: CourtEntity?, onDismiss: () -> Unit, onSave: (CourtEntity) -> Unit) {
-    var name by remember { mutableStateOf(courtToEdit?.name ?: "") }
-    var price by remember { mutableStateOf(courtToEdit?.price?.toInt()?.toString() ?: "") }
-    var description by remember { mutableStateOf(courtToEdit?.description ?: "") }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(if (courtToEdit == null) "Añadir Cancha" else "Editar Cancha") },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Nombre") })
-                OutlinedTextField(
-                    value = price,
-                    onValueChange = { newPrice ->
-                        // Filtra para que solo los dígitos sean aceptados
-                        if (newPrice.all { it.isDigit() }) {
-                            price = newPrice
-                        }
-                    },
-                    label = { Text("Precio (CLP)") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-                OutlinedTextField(value = description, onValueChange = { description = it }, label = { Text("Descripción") })
-            }
-        },
-        confirmButton = {
-            Button(onClick = {
-                val priceDouble = price.toDoubleOrNull() ?: 0.0
-                val updatedCourt = courtToEdit?.copy(name = name, price = priceDouble, description = description) ?: CourtEntity(name = name, price = priceDouble, description = description, imageUrl = "")
-                onSave(updatedCourt)
-                onDismiss()
-            }) { Text("Guardar") }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } }
-    )
 }
 
 @Composable

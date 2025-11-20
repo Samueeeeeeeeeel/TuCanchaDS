@@ -70,7 +70,6 @@ fun LoginScreen(
 
     LaunchedEffect(state.success) {
         if (state.success) {
-            // --- CAMBIO CLAVE: Guardamos el usuario en el AuthManager ---
             state.user?.let { user ->
                 AuthManager.login(user)
                 Log.d("LOGIN_SUCCESS", "Usuario '${user.name}' guardado en AuthManager.")
@@ -113,7 +112,6 @@ private fun LoginScreenUi(
     onClearError: () -> Unit,
     onGoRegister: () -> Unit
 ) {
-    val bg = MaterialTheme.colorScheme.inverseOnSurface
     var showPass by remember { mutableStateOf(false) }
 
     Box(
@@ -164,7 +162,7 @@ private fun LoginScreenUi(
                 onValueChange = onPassChange,
                 label = { Text("Contraseña", color = Color.White) },
                 singleLine = true,
-                isError = passwordError != null && password.isNotBlank(),
+                isError = passwordError != null, // Corregido: el error se muestra si no es nulo
                 visualTransformation = if (showPass) VisualTransformation.None else PasswordVisualTransformation(),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.White,
@@ -181,6 +179,21 @@ private fun LoginScreenUi(
                 },
                 modifier = Modifier.fillMaxWidth()
             )
+            // --- ¡BLOQUE DE ERROR AÑADIDO! ---
+            AnimatedVisibility(
+                visible = passwordError != null,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
+                passwordError?.let {
+                    Text(
+                        text = it,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+
             Spacer(Modifier.height(16.dp))
 
             Button(

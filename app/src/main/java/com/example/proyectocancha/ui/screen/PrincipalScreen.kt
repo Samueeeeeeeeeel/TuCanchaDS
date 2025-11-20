@@ -29,6 +29,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.example.proyectocancha.data.local.court.CourtEntity
 import com.example.proyectocancha.data.local.court.CourtRepository
 import com.example.proyectocancha.data.local.database.AppDatabase
@@ -46,22 +48,17 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrincipalScreen(navController: NavController) {
-
-    // Contexto y Base de Datos
     val context = LocalContext.current
     val db = remember { AppDatabase.getInstance(context) }
 
-    // --- CanchaViewModel para la lista de canchas ---
     val courtRepo = remember { CourtRepository(db.courtDao()) }
     val canchaVm: CanchaViewModel = viewModel(factory = CanchaViewModelFactory(courtRepo))
     val canchaState by canchaVm.state.collectAsStateWithLifecycle()
 
-    // Carga las canchas cuando la pantalla se inicia
     LaunchedEffect(Unit) {
         canchaVm.loadAllCourts()
     }
 
-    // --- UI (Drawer, TopBar, etc.) ---
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val drawerItems = defaultDrawerItems(
@@ -92,7 +89,7 @@ fun PrincipalScreen(navController: NavController) {
                 PrincipalScreenContent(
                     navController = navController,
                     paddingValues = innerPadding,
-                    courts = canchaState.courtList // Pasamos las canchas de la BD
+                    courts = canchaState.courtList
                 )
             }
         }
@@ -103,16 +100,12 @@ fun PrincipalScreen(navController: NavController) {
 fun PrincipalScreenContent(
     navController: NavController,
     paddingValues: PaddingValues = PaddingValues(),
-    courts: List<CourtEntity> // <-- Recibe CourtEntity
+    courts: List<CourtEntity>
 ) {
     val CardDarkBg = Color(0xFF333333)
 
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Grey900)
-            .padding(paddingValues)
-            .padding(horizontal = 16.dp),
+        modifier = Modifier.fillMaxSize().background(Grey900).padding(paddingValues).padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         item {
@@ -124,9 +117,8 @@ fun PrincipalScreenContent(
             Text("Recomendadas", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
         }
 
-        // Muestra las canchas obtenidas de la base de datos
         items(courts.take(2)) { court ->
-            CourtCard(court = court) { // Usa la CourtCard adaptada
+            CourtCard(court = court) { 
                 navController.navigate("${Routes.courtDetail.path}/${court.id}")
             }
         }
@@ -143,24 +135,40 @@ fun PrincipalScreenContent(
                 }
             }
         }
-
         item { Spacer(modifier = Modifier.height(32.dp)) }
     }
 }
 
 @Composable
-fun CourtCard(court: CourtEntity, onClick: (CourtEntity) -> Unit) { // <-- Recibe CourtEntity
+fun CourtCard(court: CourtEntity, onClick: (CourtEntity) -> Unit) { 
     Card(
         modifier = Modifier.fillMaxWidth().height(230.dp).clickable { onClick(court) },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF333333))
     ) {
         Column {
+            // --- ¡BLOQUE DE IMAGEN CORREGIDO! ---
+            val painter = rememberAsyncImagePainter(model = court.imageUrl.ifEmpty { null })
             Box(
                 modifier = Modifier.fillMaxWidth().height(150.dp).background(Color.DarkGray),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Image, contentDescription = "Imagen de la cancha", tint = Color.LightGray, modifier = Modifier.size(50.dp))
+                when (painter.state) {
+                    is AsyncImagePainter.State.Loading -> {
+                        CircularProgressIndicator()
+                    }
+                    is AsyncImagePainter.State.Error -> {
+                        Icon(Icons.Default.Image, "Error al cargar imagen", tint = Color.LightGray)
+                    }
+                    else -> {
+                        Image(
+                            painter = painter,
+                            contentDescription = court.name,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
             }
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(text = court.name, color = LightGreen, fontSize = 18.sp, fontWeight = FontWeight.Bold)

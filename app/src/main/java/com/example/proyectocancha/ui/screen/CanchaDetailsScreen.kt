@@ -28,6 +28,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.example.proyectocancha.data.local.court.CourtRepository
 import com.example.proyectocancha.data.local.database.AppDatabase
 import com.example.proyectocancha.navigation.Routes
@@ -78,8 +80,6 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
                 ) {
                     Button(
                         onClick = { 
-                            // --- ¡CONEXIÓN FINAL! ---
-                            // Navega a la pantalla de detalle de reserva, pasando el ID de la cancha.
                             navController.navigate("${Routes.detalleReserva.path}/${court.id}")
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = DarkGreen),
@@ -102,11 +102,28 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
             }
         } else {
             Column(modifier = Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState())) {
+                // --- ¡BLOQUE DE IMAGEN CORREGIDO! ---
+                val painter = rememberAsyncImagePainter(model = court.imageUrl.ifEmpty { null })
                 Box(
                     modifier = Modifier.fillMaxWidth().height(250.dp).background(Color.DarkGray),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(Icons.Default.Image, "Imagen de cancha", tint = Color.LightGray, modifier = Modifier.size(60.dp))
+                    when (painter.state) {
+                        is AsyncImagePainter.State.Loading -> {
+                            CircularProgressIndicator()
+                        }
+                        is AsyncImagePainter.State.Error -> {
+                            Icon(Icons.Default.Image, "Error al cargar imagen", tint = Color.LightGray, modifier = Modifier.size(60.dp))
+                        }
+                        else -> {
+                            Image(
+                                painter = painter,
+                                contentDescription = court.name,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+                    }
                 }
 
                 Column(modifier = Modifier.padding(16.dp)) {
