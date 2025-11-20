@@ -51,7 +51,6 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
 
     val state by vm.state.collectAsStateWithLifecycle()
 
-    // Llama al ViewModel para que cargue la cancha por su ID
     LaunchedEffect(courtId) {
         vm.loadCourtById(courtId)
     }
@@ -79,8 +78,9 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
                 ) {
                     Button(
                         onClick = { 
-                            // ¡ERROR CORREGIDO! Se usa Routes en singular
-                            navController.navigate(Routes.misReservas.path)
+                            // --- ¡CONEXIÓN FINAL! ---
+                            // Navega a la pantalla de detalle de reserva, pasando el ID de la cancha.
+                            navController.navigate("${Routes.detalleReserva.path}/${court.id}")
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = DarkGreen),
                         modifier = Modifier.fillMaxWidth().height(50.dp)
@@ -117,15 +117,11 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
                     Text("Descripción", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     Text(court.description, color = Color.Gray, fontSize = 16.sp)
                     Spacer(Modifier.height(24.dp))
-
-                    Text("Seleccionar Fecha y Hora", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                    Spacer(Modifier.height(12.dp))
-                    Box(
-                        modifier = Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(12.dp)).background(LightGrayBg).padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("(Funcionalidad de reserva deshabilitada temporalmente)", color = Color.Gray)
-                    }
+                    Text(
+                        "Toca \"Reservar Ahora\" para elegir la fecha y la hora.",
+                        color = Color.Gray, 
+                        fontSize = 16.sp
+                    )
                 }
             }
         }

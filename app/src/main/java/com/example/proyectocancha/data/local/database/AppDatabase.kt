@@ -5,6 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.proyectocancha.data.local.booking.BookingDao
+import com.example.proyectocancha.data.local.booking.BookingEntity
 import com.example.proyectocancha.data.local.court.CourtDao
 import com.example.proyectocancha.data.local.court.CourtEntity
 import com.example.proyectocancha.data.local.user.UserDao
@@ -12,14 +14,15 @@ import com.example.proyectocancha.data.local.user.UserEntity
 import java.util.concurrent.Executors
 
 @Database(
-    entities = [UserEntity::class, CourtEntity::class], // <-- AÑADIMOS CourtEntity
-    version = 8, // <-- INCREMENTAMOS VERSIÓN
+    entities = [UserEntity::class, CourtEntity::class, BookingEntity::class], // <-- AÑADIMOS BookingEntity
+    version = 9, // <-- INCREMENTAMOS VERSIÓN
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
-    abstract fun courtDao(): CourtDao // <-- AÑADIMOS CourtDao
+    abstract fun courtDao(): CourtDao
+    abstract fun bookingDao(): BookingDao // <-- AÑADIMOS BookingDao
 
     companion object {
         @Volatile

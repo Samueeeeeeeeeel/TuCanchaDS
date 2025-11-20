@@ -8,7 +8,9 @@ import androidx.navigation.navArgument
 import androidx.navigation.NavType
 import com.example.proyectocancha.ui.screen.AdminScreen
 import com.example.proyectocancha.ui.screen.CanchaDetailsScreen
+import com.example.proyectocancha.ui.screen.DetalleReservaScreen // <-- NUEVO IMPORT
 import com.example.proyectocancha.ui.screen.LoginScreen
+import com.example.proyectocancha.ui.screen.MisReservasScreen // <-- NUEVO IMPORT
 import com.example.proyectocancha.ui.screen.PrincipalScreen
 import com.example.proyectocancha.ui.screen.ProfileScreen
 import com.example.proyectocancha.ui.screen.ReciboReservaScreen
@@ -27,34 +29,21 @@ fun AppNavGraph(navController: NavHostController) {
         composable(Routes.login.path) {
             LoginScreen(
                 onLoginOkNavigateHome = { isAdmin ->
-                    // --- ¡LÓGICA CORREGIDA! ---
                     if (isAdmin) {
-                        // Si es admin, va al panel de administrador
-                        navController.navigate(Routes.admin.path) {
-                            popUpTo(Routes.login.path) { inclusive = true }
-                        }
+                        navController.navigate(Routes.admin.path) { popUpTo(Routes.login.path) { inclusive = true } }
                     } else {
-                        // Si es usuario normal, va a la pantalla principal
-                        navController.navigate(Routes.principal.path) {
-                            popUpTo(Routes.login.path) { inclusive = true }
-                        }
+                        navController.navigate(Routes.principal.path) { popUpTo(Routes.login.path) { inclusive = true } }
                     }
                 },
-                onGoRegister = {
-                    navController.navigate(Routes.register.path)
-                }
+                onGoRegister = { navController.navigate(Routes.register.path) }
             )
         }
 
         // REGISTRO
         composable(Routes.register.path) {
             RegisterScreen(
-                onRegisteredOk = {
-                    navController.popBackStack()
-                },
-                onGoLogin = {
-                    navController.popBackStack()
-                }
+                onRegisteredOk = { navController.popBackStack() },
+                onGoLogin = { navController.popBackStack() }
             )
         }
 
@@ -68,24 +57,34 @@ fun AppNavGraph(navController: NavHostController) {
             VerCanchasScreen(navController = navController)
         }
 
-        // DETALLE DE CANCHA (recibe courtId)
+        // DETALLE DE CANCHA
         composable(
             route = "${Routes.courtDetail.path}/{courtId}",
-            arguments = listOf(
-                navArgument("courtId") { type = NavType.IntType }
-            )
+            arguments = listOf(navArgument("courtId") { type = NavType.IntType })
         ) { backStackEntry ->
             val courtId = backStackEntry.arguments?.getInt("courtId") ?: 0
-            CanchaDetailsScreen(
-                navController = navController,
-                courtId = courtId
-            )
+            CanchaDetailsScreen(navController = navController, courtId = courtId)
+        }
+
+        // --- ¡NUEVA RUTA DE RESERVA! ---
+        composable(
+            route = "${Routes.detalleReserva.path}/{courtId}",
+            arguments = listOf(navArgument("courtId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val courtId = backStackEntry.arguments?.getInt("courtId") ?: 0
+            DetalleReservaScreen(navController = navController, courtId = courtId)
+        }
+
+        // MIS RESERVAS
+        composable(Routes.misReservas.path) {
+            MisReservasScreen(navController = navController)
         }
 
         // RECIBO
         composable(Routes.reciboReserva.path) {
             ReciboReservaScreen(navController = navController)
         }
+        
         // PERFIL
         composable(Routes.profile.path) {
             ProfileScreen(navController = navController)
