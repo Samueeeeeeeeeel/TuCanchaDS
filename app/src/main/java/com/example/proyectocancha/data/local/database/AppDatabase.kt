@@ -14,15 +14,15 @@ import com.example.proyectocancha.data.local.user.UserEntity
 import java.util.concurrent.Executors
 
 @Database(
-    entities = [UserEntity::class, CourtEntity::class, BookingEntity::class], // <-- AÑADIMOS BookingEntity
-    version = 9, // <-- INCREMENTAMOS VERSIÓN
+    entities = [UserEntity::class, CourtEntity::class, BookingEntity::class],
+    version = 10, // Versión final de la estructura
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
     abstract fun courtDao(): CourtDao
-    abstract fun bookingDao(): BookingDao // <-- AÑADIMOS BookingDao
+    abstract fun bookingDao(): BookingDao
 
     companion object {
         @Volatile
@@ -35,12 +35,14 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "proyecto_cancha_db"
                 )
-                .fallbackToDestructiveMigration()
+                // --- ¡LÍNEA ELIMINADA! ---
+                // Ya no se destruirá la base de datos en cada cambio de versión.
+                // .fallbackToDestructiveMigration()
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
                         Executors.newSingleThreadExecutor().execute {
-                            // Precarga de usuarios y canchas
+                            // La precarga solo se ejecutará una vez en la vida de la app en el dispositivo
                             db.execSQL("INSERT INTO users (name, email, phone, password, isAdmin) VALUES ('Admin', 'admin@duoc.cl', '+56911111111', 'Admin123!', 1)")
                             db.execSQL("INSERT INTO users (name, email, phone, password, isAdmin) VALUES ('Víctor Rosendo', 'victor@duoc.cl', '+56922222222', '123456', 0)")
                             db.execSQL("INSERT INTO courts (name, price, description, imageUrl) VALUES ('Cancha Norte - Pasto Real', 20000.0, 'Cancha con excelentes instalaciones y ambiente familiar.', '')")

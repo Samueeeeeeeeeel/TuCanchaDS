@@ -126,7 +126,7 @@ private fun LoginScreenUi(
             modifier = Modifier.width(350.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("LOGIN", style = MaterialTheme.typography.headlineSmall, color = Color.White)
+            Text("Iniciar Sesión", style = MaterialTheme.typography.headlineSmall, color = Color.White)
             Spacer(Modifier.height(16.dp))
 
             OutlinedTextField(

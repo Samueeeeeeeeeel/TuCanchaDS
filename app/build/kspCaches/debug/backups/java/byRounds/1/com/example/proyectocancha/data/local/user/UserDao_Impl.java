@@ -35,32 +35,11 @@ public final class UserDao_Impl implements UserDao {
 
   private final EntityInsertionAdapter<UserEntity> __insertionAdapterOfUserEntity;
 
-  private final EntityInsertionAdapter<UserEntity> __insertionAdapterOfUserEntity_1;
-
   private final EntityDeletionOrUpdateAdapter<UserEntity> __updateAdapterOfUserEntity;
 
   public UserDao_Impl(@NonNull final RoomDatabase __db) {
     this.__db = __db;
     this.__insertionAdapterOfUserEntity = new EntityInsertionAdapter<UserEntity>(__db) {
-      @Override
-      @NonNull
-      protected String createQuery() {
-        return "INSERT OR ABORT INTO `users` (`id`,`name`,`email`,`phone`,`password`,`isAdmin`) VALUES (nullif(?, 0),?,?,?,?,?)";
-      }
-
-      @Override
-      protected void bind(@NonNull final SupportSQLiteStatement statement,
-          @NonNull final UserEntity entity) {
-        statement.bindLong(1, entity.getId());
-        statement.bindString(2, entity.getName());
-        statement.bindString(3, entity.getEmail());
-        statement.bindString(4, entity.getPhone());
-        statement.bindString(5, entity.getPassword());
-        final int _tmp = entity.isAdmin() ? 1 : 0;
-        statement.bindLong(6, _tmp);
-      }
-    };
-    this.__insertionAdapterOfUserEntity_1 = new EntityInsertionAdapter<UserEntity>(__db) {
       @Override
       @NonNull
       protected String createQuery() {
@@ -128,7 +107,7 @@ public final class UserDao_Impl implements UserDao {
       public Unit call() throws Exception {
         __db.beginTransaction();
         try {
-          __insertionAdapterOfUserEntity_1.insert(users);
+          __insertionAdapterOfUserEntity.insert(users);
           __db.setTransactionSuccessful();
           return Unit.INSTANCE;
         } finally {

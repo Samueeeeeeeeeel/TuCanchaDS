@@ -1,4 +1,4 @@
-package com.example.proyectocancha.data.local.user // <-- PAQUETE CORRECTO
+package com.example.proyectocancha.data.local.user
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -9,11 +9,13 @@ import androidx.room.Update
 @Dao
 interface UserDao {
 
-    @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(user: UserEntity): Long
+    // --- ¡ESTRATEGIA CORREGIDA! ---
+    // IGNORE: si el usuario ya existe (email duplicado), no lo inserta y devuelve -1.
+    @Insert(onConflict = OnConflictStrategy.IGNORE) 
+    suspend fun insert(user: UserEntity): Long // Devuelve el id de la fila o -1 si hay conflicto
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertAll(users: List<UserEntity>) // <-- FUNCIÓN REQUERIDA
+    suspend fun insertAll(users: List<UserEntity>)
 
     @Update
     suspend fun update(user: UserEntity)

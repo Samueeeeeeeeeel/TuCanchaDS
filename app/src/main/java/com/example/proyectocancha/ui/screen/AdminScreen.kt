@@ -27,7 +27,7 @@ import com.example.proyectocancha.data.local.court.CourtRepository
 import com.example.proyectocancha.data.local.database.AppDatabase
 import com.example.proyectocancha.data.local.user.UserEntity
 import com.example.proyectocancha.data.repository.UserRepository
-import com.example.proyectocancha.navigation.Routes // <-- Se usa Routes (singular)
+import com.example.proyectocancha.navigation.Routes
 import com.example.proyectocancha.ui.theme.Grey900
 import com.example.proyectocancha.ui.theme.LightGreen
 import com.example.proyectocancha.ui.viewmodel.AdminViewModel
@@ -95,7 +95,6 @@ fun AdminScreen(navController: NavController) {
                 selectedContent = selectedContent,
                 onUsersClicked = { selectedContent = "users"; scope.launch { drawerState.close() } },
                 onCanchasClicked = { selectedContent = "canchas"; scope.launch { drawerState.close() } },
-                // --- ¡ERROR CORREGIDO AQUÍ! ---
                 onLogoutClicked = { navController.navigate(Routes.login.path) { popUpTo(Routes.admin.path) { inclusive = true } } }
             )
         }
@@ -130,8 +129,6 @@ fun AdminScreen(navController: NavController) {
         }
     }
 }
-
-// El resto del archivo se mantiene igual
 
 @Composable
 fun AdminDrawerContent(selectedContent: String, onUsersClicked: () -> Unit, onCanchasClicked: () -> Unit, onLogoutClicked: () -> Unit) {
@@ -221,7 +218,17 @@ fun AddEditCourtDialog(courtToEdit: CourtEntity?, onDismiss: () -> Unit, onSave:
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Nombre") })
-                OutlinedTextField(value = price, onValueChange = { price = it }, label = { Text("Precio (CLP)") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+                OutlinedTextField(
+                    value = price,
+                    onValueChange = { newPrice ->
+                        // Filtra para que solo los dígitos sean aceptados
+                        if (newPrice.all { it.isDigit() }) {
+                            price = newPrice
+                        }
+                    },
+                    label = { Text("Precio (CLP)") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
                 OutlinedTextField(value = description, onValueChange = { description = it }, label = { Text("Descripción") })
             }
         },
