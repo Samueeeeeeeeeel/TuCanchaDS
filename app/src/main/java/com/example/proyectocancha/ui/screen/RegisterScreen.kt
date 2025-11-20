@@ -57,7 +57,7 @@ fun RegisterScreen(
             modifier = Modifier.verticalScroll(rememberScrollState())
         ) {
             Text(
-                "Crear una Cuenta",
+                "Crear una Cuenta",//
                 style = MaterialTheme.typography.headlineSmall,
                 color = Color.White
             )
