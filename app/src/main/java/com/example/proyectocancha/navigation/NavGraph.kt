@@ -8,9 +8,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.NavType
 import com.example.proyectocancha.ui.screen.AdminScreen
 import com.example.proyectocancha.ui.screen.CanchaDetailsScreen
-import com.example.proyectocancha.ui.screen.DetalleReservaScreen
 import com.example.proyectocancha.ui.screen.LoginScreen
-import com.example.proyectocancha.ui.screen.MisReservasScreen
 import com.example.proyectocancha.ui.screen.PrincipalScreen
 import com.example.proyectocancha.ui.screen.ProfileScreen
 import com.example.proyectocancha.ui.screen.ReciboReservaScreen
@@ -22,26 +20,34 @@ fun AppNavGraph(navController: NavHostController) {
 
     NavHost(
         navController = navController,
-        startDestination = Routess.login.path
+        startDestination = Routes.login.path
     ) {
 
         // LOGIN
-        composable(Routess.login.path) {
+        composable(Routes.login.path) {
             LoginScreen(
                 onLoginOkNavigateHome = { isAdmin ->
-                    // si quieres que el admin vaya a otra pantalla, cámbialo aquí
-                    navController.navigate(Routess.principal.path) {
-                        popUpTo(Routess.login.path) { inclusive = true }
+                    // --- ¡LÓGICA CORREGIDA! ---
+                    if (isAdmin) {
+                        // Si es admin, va al panel de administrador
+                        navController.navigate(Routes.admin.path) {
+                            popUpTo(Routes.login.path) { inclusive = true }
+                        }
+                    } else {
+                        // Si es usuario normal, va a la pantalla principal
+                        navController.navigate(Routes.principal.path) {
+                            popUpTo(Routes.login.path) { inclusive = true }
+                        }
                     }
                 },
                 onGoRegister = {
-                    navController.navigate(Routess.register.path)
+                    navController.navigate(Routes.register.path)
                 }
             )
         }
 
         // REGISTRO
-        composable(Routess.register.path) {
+        composable(Routes.register.path) {
             RegisterScreen(
                 onRegisteredOk = {
                     navController.popBackStack()
@@ -53,18 +59,18 @@ fun AppNavGraph(navController: NavHostController) {
         }
 
         // HOME PRINCIPAL
-        composable(Routess.principal.path) {
+        composable(Routes.principal.path) {
             PrincipalScreen(navController = navController)
         }
 
         // VER TODAS LAS CANCHAS
-        composable(Routess.verCanchas.path) {
+        composable(Routes.verCanchas.path) {
             VerCanchasScreen(navController = navController)
         }
 
         // DETALLE DE CANCHA (recibe courtId)
         composable(
-            route = "${Routess.courtDetail.path}/{courtId}",
+            route = "${Routes.courtDetail.path}/{courtId}",
             arguments = listOf(
                 navArgument("courtId") { type = NavType.IntType }
             )
@@ -76,41 +82,17 @@ fun AppNavGraph(navController: NavHostController) {
             )
         }
 
-        // DETALLE DE RESERVA (recibe courtId y pricePerHour)
-        composable(
-            route = "${Routess.detalleReserva.path}/{courtId}/{pricePerHour}",
-            arguments = listOf(
-                navArgument("courtId") { type = NavType.IntType },
-                navArgument("pricePerHour") { type = NavType.IntType }
-            )
-        ) { backStackEntry ->
-            val courtId = backStackEntry.arguments?.getInt("courtId") ?: 0
-            val pricePerHour = backStackEntry.arguments?.getInt("pricePerHour") ?: 0
-
-            DetalleReservaScreen(
-                navController = navController,
-                courtId = courtId,
-                pricePerHour = pricePerHour
-            )
-        }
-
         // RECIBO
-        composable(Routess.reciboReserva.path) {
+        composable(Routes.reciboReserva.path) {
             ReciboReservaScreen(navController = navController)
         }
-
-        // MIS RESERVAS
-        composable(Routess.misReservas.path) {
-            MisReservasScreen(navController = navController)
-        }
-
         // PERFIL
-        composable(Routess.profile.path) {
+        composable(Routes.profile.path) {
             ProfileScreen(navController = navController)
         }
 
-        // PANEL ADMIN (si no lo usas aún, igual compila)
-        composable(Routess.admin.path) {
+        // PANEL ADMIN
+        composable(Routes.admin.path) {
             AdminScreen(navController = navController)
         }
     }

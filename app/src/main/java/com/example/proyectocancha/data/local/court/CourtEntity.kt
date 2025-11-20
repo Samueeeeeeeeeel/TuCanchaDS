@@ -9,6 +9,6 @@ data class CourtEntity(
     val id: Int = 0,
     val name: String,
     val price: Double,
-    val imageUrl: String, // Usaremos un string para la URL o path de la imagen
+    val imageUrl: String, 
     val description: String
 )

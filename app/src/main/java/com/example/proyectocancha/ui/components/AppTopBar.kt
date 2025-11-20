@@ -14,61 +14,49 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.proyectocancha.ui.theme.BlueGrey900
-import com.example.proyectocancha.ui.theme.ProyectoCanchaTheme // Importación mantenida
-import com.example.proyectocancha.ui.theme.Grey900   // Asegúrate de tener esta importación
-import com.example.proyectocancha.ui.theme.LightGreen // Asegúrate de tener esta importación
+import com.example.proyectocancha.ui.theme.ProyectoCanchaTheme
+import com.example.proyectocancha.ui.theme.LightGreen
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Composable // Composable reutilizable: barra superior
+@Composable
 fun AppTopBar(
-    onOpenDrawer: () -> Unit,  // Abre el drawer (hamburguesa)
-    onGoLogin: () -> Unit     // <-- PARÁMETRO CAMBIADO: Navega a Login
+    onOpenDrawer: () -> Unit,
+    onGoProfile: () -> Unit // <-- PARÁMETRO CORREGIDO
 ) {
-    // CAMBIO CLAVE: Usar CenterAlignedTopAppBar para centrar el título
     CenterAlignedTopAppBar(
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors( // Usar centerAligned...
-            containerColor = BlueGrey900// Color de fondo de la barra (como en Cinemark)
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = BlueGrey900
         ),
-
-        // 1. TÍTULO (Centrado)
         title = {
             Text(
-                text = "TuCancha!", // Título visible
-                color = LightGreen,  // Color del título
+                text = "TuCancha!",
+                color = LightGreen,
                 fontWeight = FontWeight.Bold
             )
         },
-
-        // 2. ICONO DE NAVEGACIÓN (Izquierda - Hamburguesa)
         navigationIcon = {
-            IconButton(onClick = onOpenDrawer) { // Al presionar, abre drawer
+            IconButton(onClick = onOpenDrawer) {
                 Icon(
                     imageVector = Icons.Filled.Menu,
                     contentDescription = "Menú",
-                    tint = Color.White // Color del ícono de hamburguesa
+                    tint = Color.White
                 )
             }
         },
-
-        // 3. ACCIONES (Derecha - Botón Iniciar Sesión)
         actions = {
             Button(
-                onClick = onGoLogin, // Acción del botón
+                onClick = onGoProfile, // <-- ACCIÓN CORREGIDA
                 modifier = Modifier
-                    .padding(end = 8.dp) // Espacio desde el borde derecho
-                    .height(36.dp),     // Altura reducida para que quepa bien
-
-                // Color rojo similar al de la imagen
+                    .padding(end = 8.dp)
+                    .height(36.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = LightGreen // Un rojo oscuro
+                    containerColor = LightGreen
                 ),
-
-                // Reducimos el padding interno para que el texto se ajuste
                 contentPadding = PaddingValues(horizontal = 12.dp)
             ) {
                 Text(
                     text = "VER PERFIL",
-                    fontSize = 11.sp, // Fuente más pequeña para que quepa
+                    fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
@@ -82,8 +70,8 @@ fun AppTopBar(
 fun AppTopBarPreview() {
     ProyectoCanchaTheme {
         AppTopBar(
-            onOpenDrawer = { /* Acción vacía para el Preview */ },
-            onGoLogin = { /* Acción vacía para el Preview */ } // <-- PARÁMETRO CAMBIADO
+            onOpenDrawer = {},
+            onGoProfile = {} // <-- PARÁMETRO CORREGIDO
         )
     }
 }

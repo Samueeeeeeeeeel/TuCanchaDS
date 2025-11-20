@@ -1,7 +1,5 @@
-// ProfileScreen.kt
 package com.example.proyectocancha.ui.screen
 
-// --- NUEVO: Imports para la cámara y permisos ---
 import android.Manifest
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -12,8 +10,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
 import androidx.compose.foundation.Image
-// --- FIN NUEVO ---
-
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.proyectocancha.navigation.Routess
+import com.example.proyectocancha.navigation.Routes // <-- ¡ERROR CORREGIDO!
 import com.example.proyectocancha.ui.theme.Grey900
 import com.example.proyectocancha.ui.theme.LightGreen
 import com.example.proyectocancha.ui.theme.ProyectoCanchaTheme
@@ -112,8 +108,8 @@ fun ProfileScreen(
 
     // Acción de logout (solo navega y limpia el backstack)
     val onLogout: () -> Unit = {
-        navController.navigate(Routess.login.path) {
-            popUpTo(Routess.principal.path) { inclusive = true }
+        navController.navigate(Routes.login.path) { // <-- ¡ERROR CORREGIDO!
+            popUpTo(Routes.principal.path) { inclusive = true } // <-- ¡ERROR CORREGIDO!
         }
     }
 

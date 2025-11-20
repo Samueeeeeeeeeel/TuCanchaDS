@@ -44,10 +44,10 @@ class UserRepository(
     }
 
     // ----------------- UPDATE USUARIO (para perfil) -----------------
-    suspend fun updateUser(user: UserEntity): Result<Int> {
+    suspend fun updateUser(user: UserEntity): Result<Unit> { // <-- TIPO DE RETORNO CORREGIDO
         return try {
-            val rows = userDao.update(user)
-            Result.success(rows)
+            userDao.update(user)
+            Result.success(Unit) // <-- VALOR DE RETORNO CORREGIDO
         } catch (e: Exception) {
             Result.failure(e)
         }
