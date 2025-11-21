@@ -8,13 +8,15 @@ import androidx.navigation.navArgument
 import androidx.navigation.NavType
 import com.example.proyectocancha.ui.screen.AdminScreen
 import com.example.proyectocancha.ui.screen.CanchaDetailsScreen
-import com.example.proyectocancha.ui.screen.DetalleReservaScreen // <-- NUEVO IMPORT
+import com.example.proyectocancha.ui.screen.ChangePasswordScreen
+import com.example.proyectocancha.ui.screen.DetalleReservaScreen
 import com.example.proyectocancha.ui.screen.LoginScreen
-import com.example.proyectocancha.ui.screen.MisReservasScreen // <-- NUEVO IMPORT
+import com.example.proyectocancha.ui.screen.MisReservasScreen
 import com.example.proyectocancha.ui.screen.PrincipalScreen
 import com.example.proyectocancha.ui.screen.ProfileScreen
 import com.example.proyectocancha.ui.screen.ReciboReservaScreen
 import com.example.proyectocancha.ui.screen.RegisterScreen
+import com.example.proyectocancha.ui.screen.UserListScreen
 import com.example.proyectocancha.ui.screen.VerCanchasScreen
 
 @Composable
@@ -88,6 +90,16 @@ fun AppNavGraph(navController: NavHostController) {
         // PERFIL
         composable(Routes.profile.path) {
             ProfileScreen(navController = navController)
+        }
+
+        // CAMBIAR CONTRASEÑA
+        composable(Routes.changePassword.path) {
+            ChangePasswordScreen(navController = navController)
+        }
+
+        // LISTA DE USUARIOS (ADMIN)
+        composable(Routes.userList.path) {
+            UserListScreen(navController = navController)
         }
 
         // PANEL ADMIN

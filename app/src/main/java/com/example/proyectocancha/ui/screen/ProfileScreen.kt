@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.proyectocancha.navigation.Routes // <-- ¡ERROR CORREGIDO!
+import com.example.proyectocancha.navigation.Routes
 import com.example.proyectocancha.ui.theme.Grey900
 import com.example.proyectocancha.ui.theme.LightGreen
 import com.example.proyectocancha.ui.theme.ProyectoCanchaTheme
@@ -106,10 +106,9 @@ fun ProfileScreen(
         }
     )
 
-    // Acción de logout (solo navega y limpia el backstack)
     val onLogout: () -> Unit = {
-        navController.navigate(Routes.login.path) { // <-- ¡ERROR CORREGIDO!
-            popUpTo(Routes.principal.path) { inclusive = true } // <-- ¡ERROR CORREGIDO!
+        navController.navigate(Routes.login.path) { 
+            popUpTo(Routes.principal.path) { inclusive = true } 
         }
     }
 
@@ -136,7 +135,6 @@ fun ProfileScreen(
         }
     ) { innerPadding ->
 
-        // DIÁLOGO PARA ELEGIR CÁMARA O GALERÍA
         if (showImagePicker) {
             AlertDialog(
                 onDismissRequest = { showImagePicker = false },
@@ -190,7 +188,6 @@ fun ProfileScreen(
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
 
-            // ---------- TARJETA CON DATOS DEL USUARIO ----------
             item {
                 if (uiState.isLoading) {
                     Box(
@@ -214,7 +211,6 @@ fun ProfileScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
 
-                            // Foto de perfil
                             Box(
                                 modifier = Modifier
                                     .size(100.dp)
@@ -241,7 +237,6 @@ fun ProfileScreen(
 
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            // Información real del usuario
                             if (uiState.email.isBlank()) {
                                 Text(
                                     text = "No hay un usuario autenticado",
@@ -279,16 +274,27 @@ fun ProfileScreen(
 
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            // Botón cambiar foto
                             TextButton(onClick = { showImagePicker = true }) {
                                 Text("Cambiar Foto", color = accentColor)
+                            }
+
+                            // --- BOTÓN CAMBIAR CONTRASEÑA ---
+                            TextButton(onClick = { navController.navigate(Routes.changePassword.path) }) {
+                                Text("Cambiar contraseña", color = accentColor)
+                            }
+
+                            // --- BOTÓN SOLO PARA ADMINS ---
+                            if (uiState.isAdmin) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                TextButton(onClick = { navController.navigate(Routes.userList.path) }) {
+                                    Text("Admin: Ver Usuarios", color = Color.Yellow)
+                                }
                             }
                         }
                     }
                 }
             }
 
-            // ---------- BOTÓN CERRAR SESIÓN ----------
             item {
                 OutlinedButton(
                     onClick = onLogout,
@@ -306,7 +312,7 @@ fun ProfileScreen(
     }
 }
 
-// Placeholder para SettingItem (si más adelante lo necesitas)
+
 @Composable
 private fun SettingItem(icon: ImageVector, label: String, onClick: () -> Unit) {
     Row(

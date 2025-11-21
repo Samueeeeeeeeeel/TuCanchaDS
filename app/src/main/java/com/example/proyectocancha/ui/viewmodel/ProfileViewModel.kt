@@ -15,6 +15,7 @@ data class ProfileState(
     val nombre: String = "",
     val email: String = "",
     val telefono: String = "",
+    val isAdmin: Boolean = false, // <-- AÑADIDO
     val isLoading: Boolean = true,
     val isEditing: Boolean = false,
 
@@ -44,6 +45,7 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
                             nombre = user.name,
                             email = user.email,
                             telefono = user.phone,
+                            isAdmin = user.isAdmin, // <-- AÑADIDO
                             isLoading = false
                         )
                     }
