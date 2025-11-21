@@ -64,6 +64,7 @@ MERGED from [androidx.room:room-ktx:2.6.1] C:\Users\kurau\.gradle\caches\8.13\tr
 MERGED from [androidx.datastore:datastore-core-android:1.1.1] C:\Users\kurau\.gradle\caches\8.13\transforms\7cb8ab57d34f3fd3f86556712b23f560\transformed\datastore-core-release\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.datastore:datastore-android:1.1.1] C:\Users\kurau\.gradle\caches\8.13\transforms\fa46fa146fbf431a8f26474fcee1c1b4\transformed\datastore-release\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.datastore:datastore-preferences-android:1.1.1] C:\Users\kurau\.gradle\caches\8.13\transforms\c94b1be4f98a1e5afa10d06cd9337c84\transformed\datastore-preferences-release\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core-splashscreen:1.0.1] C:\Users\kurau\.gradle\caches\8.13\transforms\cac9abf434b66ec78e6b8c47a0748084\transformed\core-splashscreen-1.0.1\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.sqlite:sqlite-framework:2.4.0] C:\Users\kurau\.gradle\caches\8.13\transforms\ee97ef8e0447d91875b00548c3765b6c\transformed\sqlite-framework-2.4.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.sqlite:sqlite:2.4.0] C:\Users\kurau\.gradle\caches\8.13\transforms\01c03c182cd859ad5a14f70b91f7b2ad\transformed\sqlite-2.4.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.annotation:annotation-experimental:1.4.1] C:\Users\kurau\.gradle\caches\8.13\transforms\85a3a0dd36f53fa652f19500649efb3c\transformed\annotation-experimental-1.4.1\AndroidManifest.xml:2:1-7:12
@@ -153,7 +154,7 @@ ADDED from C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest
 	android:exported
 		ADDED from C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:26:13-36
 	android:theme
-		ADDED from C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:28:13-56
+		ADDED from C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:28:13-54
 	android:name
 		ADDED from C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:25:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
@@ -290,6 +291,8 @@ MERGED from [androidx.datastore:datastore-android:1.1.1] C:\Users\kurau\.gradle\
 MERGED from [androidx.datastore:datastore-android:1.1.1] C:\Users\kurau\.gradle\caches\8.13\transforms\fa46fa146fbf431a8f26474fcee1c1b4\transformed\datastore-release\AndroidManifest.xml:20:5-44
 MERGED from [androidx.datastore:datastore-preferences-android:1.1.1] C:\Users\kurau\.gradle\caches\8.13\transforms\c94b1be4f98a1e5afa10d06cd9337c84\transformed\datastore-preferences-release\AndroidManifest.xml:20:5-44
 MERGED from [androidx.datastore:datastore-preferences-android:1.1.1] C:\Users\kurau\.gradle\caches\8.13\transforms\c94b1be4f98a1e5afa10d06cd9337c84\transformed\datastore-preferences-release\AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core-splashscreen:1.0.1] C:\Users\kurau\.gradle\caches\8.13\transforms\cac9abf434b66ec78e6b8c47a0748084\transformed\core-splashscreen-1.0.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core-splashscreen:1.0.1] C:\Users\kurau\.gradle\caches\8.13\transforms\cac9abf434b66ec78e6b8c47a0748084\transformed\core-splashscreen-1.0.1\AndroidManifest.xml:20:5-22:41
 MERGED from [androidx.sqlite:sqlite-framework:2.4.0] C:\Users\kurau\.gradle\caches\8.13\transforms\ee97ef8e0447d91875b00548c3765b6c\transformed\sqlite-framework-2.4.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.sqlite:sqlite-framework:2.4.0] C:\Users\kurau\.gradle\caches\8.13\transforms\ee97ef8e0447d91875b00548c3765b6c\transformed\sqlite-framework-2.4.0\AndroidManifest.xml:20:5-44
 MERGED from [androidx.sqlite:sqlite:2.4.0] C:\Users\kurau\.gradle\caches\8.13\transforms\01c03c182cd859ad5a14f70b91f7b2ad\transformed\sqlite-2.4.0\AndroidManifest.xml:20:5-44

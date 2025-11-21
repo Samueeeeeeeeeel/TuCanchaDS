@@ -85,6 +85,8 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
+    // --- LIBRERÍA DE SPLASH SCREEN ---
+    implementation("androidx.core:core-splashscreen:1.0.1") // <-- AÑADIDO
 
 // ==== AGREGADOS PARA REST ====
     // Retrofit base
@@ -99,7 +101,7 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation("io.mockk:mockk:1.13.12")
     testImplementation("org.robolectric:robolectric:4.13")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0") // <-- AÑADIDO
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
     //Test de implementacion de UI
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
