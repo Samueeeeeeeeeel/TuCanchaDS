@@ -84,4 +84,28 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+
+
+// ==== AGREGADOS PARA REST ====
+    // Retrofit base
+    implementation("com.squareup.retrofit2:retrofit:2.11.0") // <-- NUEVO
+    // Convertidor JSON con Gson
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0") // <-- NUEVO
+    // OkHttp y logging interceptor
+    implementation("com.squareup.okhttp3:okhttp:4.12.0") // <-- NUEVO
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0") // <-- NUEVO
+
+    //librerias de test locales
+    testImplementation(libs.junit)
+    testImplementation("io.mockk:mockk:1.13.12")
+    testImplementation("org.robolectric:robolectric:4.13")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0") // <-- AÑADIDO
+    //Test de implementacion de UI
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    //reglas adicionales
+    androidTestImplementation("androidx.test:core-ktx:1.5.0")
+    androidTestImplementation("androidx.test:rules:1.5.0")
 }

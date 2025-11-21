@@ -1,13 +1,11 @@
 package com.example.proyectocancha.domain.validation
 
-import android.util.Patterns
-
 //Validacion de correo: Formato, no vacio
 fun validarEmail(email: String): String? {
     if (email.isBlank()) return "Por favor, ingresa un correo electrónico válido"
-    //Validar email true o false
-    val listo = Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    return  if(!listo) "Formato de Correo no valido" else null
+    // Expresión regular para validar emails, sin depender de Patterns
+    val emailRegex = Regex("^[A-Za-z0-9](.*)([@]{1})(.{1,})(\\.)(.{1,})")
+    return if (!emailRegex.matches(email)) "Formato de Correo no valido" else null
 }
 
 //Validacion clave: no vacio, mayuscula, longitud
@@ -41,4 +39,3 @@ fun validarConfirmacion(clave: String, confirmacion: String): String? {
     if (confirmacion.isBlank()) return "Debe confirmar su contraseña"
     return if (clave != confirmacion) "Las contraseñas no coinciden" else null
 }
-
