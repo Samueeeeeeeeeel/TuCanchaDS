@@ -32,12 +32,12 @@
         "source": "C:\\Users\\kurau\\.gradle\\daemon\\8.13\\com.example.proyectocancha.app-main-52:\\xml\\data_extraction_rules.xml"
     },
     {
-        "merged": "C:\\Users\\kurau\\.gradle\\daemon\\8.13\\com.example.proyectocancha.app-debug-50:\\mipmap-mdpi_ic_launcher_foreground.webp.flat",
-        "source": "C:\\Users\\kurau\\.gradle\\daemon\\8.13\\com.example.proyectocancha.app-main-52:\\mipmap-mdpi\\ic_launcher_foreground.webp"
-    },
-    {
         "merged": "C:\\Users\\kurau\\.gradle\\daemon\\8.13\\com.example.proyectocancha.app-debug-50:\\mipmap-hdpi_ic_launcher_foreground.webp.flat",
         "source": "C:\\Users\\kurau\\.gradle\\daemon\\8.13\\com.example.proyectocancha.app-main-52:\\mipmap-hdpi\\ic_launcher_foreground.webp"
+    },
+    {
+        "merged": "C:\\Users\\kurau\\.gradle\\daemon\\8.13\\com.example.proyectocancha.app-debug-50:\\mipmap-mdpi_ic_launcher_foreground.webp.flat",
+        "source": "C:\\Users\\kurau\\.gradle\\daemon\\8.13\\com.example.proyectocancha.app-main-52:\\mipmap-mdpi\\ic_launcher_foreground.webp"
     },
     {
         "merged": "C:\\Users\\kurau\\.gradle\\daemon\\8.13\\com.example.proyectocancha.app-debug-50:\\drawable_ic_launcher_background.xml.flat",
@@ -68,16 +68,16 @@
         "source": "C:\\Users\\kurau\\.gradle\\daemon\\8.13\\com.example.proyectocancha.app-main-52:\\drawable\\ic_launcher_foreground.xml"
     },
     {
+        "merged": "com.example.proyectocancha.app-debug-50:/xml_file_paths.xml.flat",
+        "source": "com.example.proyectocancha.app-main-52:/xml/file_paths.xml"
+    },
+    {
         "merged": "C:\\Users\\kurau\\.gradle\\daemon\\8.13\\com.example.proyectocancha.app-debug-50:\\mipmap-xxxhdpi_ic_launcher_round.webp.flat",
         "source": "C:\\Users\\kurau\\.gradle\\daemon\\8.13\\com.example.proyectocancha.app-main-52:\\mipmap-xxxhdpi\\ic_launcher_round.webp"
     },
     {
         "merged": "C:\\Users\\kurau\\.gradle\\daemon\\8.13\\com.example.proyectocancha.app-debug-50:\\mipmap-mdpi_ic_launcher_round.webp.flat",
         "source": "C:\\Users\\kurau\\.gradle\\daemon\\8.13\\com.example.proyectocancha.app-main-52:\\mipmap-mdpi\\ic_launcher_round.webp"
-    },
-    {
-        "merged": "com.example.proyectocancha.app-debug-50:/drawable_splash_icon.xml.flat",
-        "source": "com.example.proyectocancha.app-main-52:/drawable/splash_icon.xml"
     },
     {
         "merged": "C:\\Users\\kurau\\.gradle\\daemon\\8.13\\com.example.proyectocancha.app-debug-50:\\mipmap-xhdpi_ic_launcher_foreground.webp.flat",
@@ -90,6 +90,10 @@
     {
         "merged": "C:\\Users\\kurau\\.gradle\\daemon\\8.13\\com.example.proyectocancha.app-debug-50:\\drawable_court_3.jpg.flat",
         "source": "C:\\Users\\kurau\\.gradle\\daemon\\8.13\\com.example.proyectocancha.app-main-52:\\drawable\\court_3.jpg"
+    },
+    {
+        "merged": "C:\\Users\\kurau\\.gradle\\daemon\\8.13\\com.example.proyectocancha.app-debug-50:\\xml_file_paths.xml.flat",
+        "source": "C:\\Users\\kurau\\.gradle\\daemon\\8.13\\com.example.proyectocancha.app-main-52:\\xml\\file_paths.xml"
     },
     {
         "merged": "C:\\Users\\kurau\\.gradle\\daemon\\8.13\\com.example.proyectocancha.app-debug-50:\\mipmap-xxhdpi_ic_launcher_round.webp.flat",

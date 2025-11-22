@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -16,7 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -28,17 +26,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.example.proyectocancha.data.local.court.CourtRepository
 import com.example.proyectocancha.data.local.database.AppDatabase
 import com.example.proyectocancha.navigation.Routes
 import com.example.proyectocancha.ui.theme.DarkGreen
 import com.example.proyectocancha.ui.theme.Grey900
-import com.example.proyectocancha.ui.theme.LightGrayBg
 import com.example.proyectocancha.ui.theme.LightGreen
 import com.example.proyectocancha.ui.viewmodel.CanchaViewModel
 import com.example.proyectocancha.ui.viewmodel.CanchaViewModelFactory
+import java.io.File
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -102,27 +99,19 @@ fun CanchaDetailsScreen(navController: NavHostController, courtId: Int) {
             }
         } else {
             Column(modifier = Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState())) {
-                // --- ¡BLOQUE DE IMAGEN CORREGIDO! ---
-                val painter = rememberAsyncImagePainter(model = court.imageUrl.ifEmpty { null })
                 Box(
                     modifier = Modifier.fillMaxWidth().height(250.dp).background(Color.DarkGray),
                     contentAlignment = Alignment.Center
                 ) {
-                    when (painter.state) {
-                        is AsyncImagePainter.State.Loading -> {
-                            CircularProgressIndicator()
-                        }
-                        is AsyncImagePainter.State.Error -> {
-                            Icon(Icons.Default.Image, "Error al cargar imagen", tint = Color.LightGray, modifier = Modifier.size(60.dp))
-                        }
-                        else -> {
-                            Image(
-                                painter = painter,
-                                contentDescription = court.name,
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
+                    if (court.imageUrl.isNotEmpty()) {
+                        Image(
+                            painter = rememberAsyncImagePainter(model = File(court.imageUrl)),
+                            contentDescription = court.name,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(Icons.Default.Image, "Sin imagen", tint = Color.LightGray, modifier = Modifier.size(60.dp))
                     }
                 }
 

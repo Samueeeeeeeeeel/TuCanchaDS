@@ -1,25 +1,33 @@
 package com.example.proyectocancha.ui.viewmodel
 
+import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.proyectocancha.data.local.court.CourtEntity
 import com.example.proyectocancha.data.local.court.CourtRepository
 import com.example.proyectocancha.data.local.user.UserEntity
 import com.example.proyectocancha.data.repository.UserRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 
 data class AdminState(
     val userList: List<UserEntity> = emptyList(),
-    val courtList: List<CourtEntity> = emptyList(), // <-- Tipo actualizado a CourtEntity
+    val courtList: List<CourtEntity> = emptyList(),
     val isLoading: Boolean = true
 )
 
 class AdminViewModel(
+    private val application: Application,
     private val userRepository: UserRepository,
-    private val courtRepository: CourtRepository // <-- Inyectamos CourtRepository
+    private val courtRepository: CourtRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AdminState())
@@ -33,7 +41,7 @@ class AdminViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             val users = userRepository.getAllUsers()
-            val courts = courtRepository.getAllCourts() // <-- Obtenemos canchas de la BD
+            val courts = courtRepository.getAllCourts()
             _state.update { it.copy(userList = users, courtList = courts, isLoading = false) }
         }
     }
@@ -42,28 +50,57 @@ class AdminViewModel(
         viewModelScope.launch {
             val updatedUser = userToUpdate.copy(isAdmin = !userToUpdate.isAdmin)
             userRepository.updateUser(updatedUser)
-            loadAdminData() // Recargamos para ver el cambio
+            loadAdminData()
         }
     }
 
-    // --- Gestión de Canchas CONECTADA A LA BASE DE DATOS ---
-    fun addCourt(name: String, price: Double, imageUrl: String, description: String) {
+    private suspend fun saveImageToInternalStorage(uri: Uri): String? = withContext(Dispatchers.IO) {
+        val context = application.applicationContext
+        val inputStream = context.contentResolver.openInputStream(uri) ?: return@withContext null
+        val directory = File(context.filesDir, "court_images")
+        if (!directory.exists()) {
+            directory.mkdirs()
+        }
+        val imageFile = File(directory, "${System.currentTimeMillis()}.jpg")
+
+        FileOutputStream(imageFile).use { outputStream ->
+            inputStream.copyTo(outputStream)
+        }
+
+        imageFile.absolutePath
+    }
+
+    fun addCourt(name: String, price: Double, imageUri: String?, description: String) {
         viewModelScope.launch {
-            val newCourt = CourtEntity(name = name, price = price, imageUrl = imageUrl, description = description)
+            val finalImagePath = imageUri?.let { saveImageToInternalStorage(Uri.parse(it)) } ?: ""
+            val newCourt = CourtEntity(name = name, price = price, imageUrl = finalImagePath, description = description)
             courtRepository.insertCourt(newCourt)
             loadAdminData()
         }
     }
 
-    fun updateCourt(court: CourtEntity) {
+    fun updateCourt(court: CourtEntity, newImageUri: String?) {
         viewModelScope.launch {
-            courtRepository.updateCourt(court)
+            val finalImagePath = if (newImageUri != null) {
+                saveImageToInternalStorage(Uri.parse(newImageUri))
+            } else {
+                court.imageUrl
+            }
+            val updatedCourt = court.copy(imageUrl = finalImagePath ?: court.imageUrl)
+            courtRepository.updateCourt(updatedCourt)
             loadAdminData()
         }
     }
 
     fun deleteCourt(court: CourtEntity) {
         viewModelScope.launch {
+            if (court.imageUrl.isNotEmpty()) {
+                try {
+                    File(court.imageUrl).delete()
+                } catch (e: Exception) {
+                    // Ignorar error
+                }
+            }
             courtRepository.deleteCourt(court)
             loadAdminData()
         }

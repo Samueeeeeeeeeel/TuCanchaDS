@@ -19,3 +19,4 @@ style Theme.App.Starting
 style Theme.ProyectoCancha
 xml backup_rules
 xml data_extraction_rules
+xml file_paths

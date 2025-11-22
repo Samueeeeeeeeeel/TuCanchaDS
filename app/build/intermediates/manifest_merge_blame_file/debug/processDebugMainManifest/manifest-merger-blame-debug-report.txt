@@ -12,21 +12,21 @@
 11-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:5:5-65
 11-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:5:22-62
 12    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-12-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:7:5-76
-12-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:7:22-73
+12-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:6:5-76
+12-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:6:22-73
 13    <uses-permission
-13-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:9:5-10:38
+13-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:7:5-8:38
 14        android:name="android.permission.READ_EXTERNAL_STORAGE"
-14-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:9:22-77
+14-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:7:22-77
 15        android:maxSdkVersion="32" />
-15-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:10:9-35
+15-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:8:9-35
 16
 17    <uses-feature
-17-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:12:5-84
+17-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:9:5-84
 18        android:name="android.hardware.camera"
-18-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:12:19-57
+18-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:9:19-57
 19        android:required="true" />
-19-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:12:58-81
+19-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:9:58-81
 20
 21    <permission
 21-->[androidx.core:core:1.17.0] C:\Users\kurau\.gradle\caches\8.13\transforms\51d3e08c1b0f8e9727def94fe7b21b9a\transformed\core-1.17.0\AndroidManifest.xml:22:5-24:47
@@ -40,47 +40,47 @@
 25-->[androidx.core:core:1.17.0] C:\Users\kurau\.gradle\caches\8.13\transforms\51d3e08c1b0f8e9727def94fe7b21b9a\transformed\core-1.17.0\AndroidManifest.xml:26:22-94
 26
 27    <application
-27-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:14:5-35:19
+27-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:11:5-32:19
 28        android:allowBackup="true"
-28-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:16:9-35
+28-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:12:9-35
 29        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
 29-->[androidx.core:core:1.17.0] C:\Users\kurau\.gradle\caches\8.13\transforms\51d3e08c1b0f8e9727def94fe7b21b9a\transformed\core-1.17.0\AndroidManifest.xml:28:18-86
 30        android:dataExtractionRules="@xml/data_extraction_rules"
-30-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:17:9-65
+30-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:13:9-65
 31        android:debuggable="true"
 32        android:extractNativeLibs="false"
 33        android:fullBackupContent="@xml/backup_rules"
-33-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:18:9-54
+33-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:14:9-54
 34        android:icon="@mipmap/ic_launcher"
-34-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:19:9-43
+34-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:15:9-43
 35        android:label="@string/app_name"
-35-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:20:9-41
+35-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:16:9-41
 36        android:roundIcon="@mipmap/ic_launcher_round"
-36-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:21:9-54
+36-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:17:9-54
 37        android:supportsRtl="true"
-37-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:22:9-35
+37-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:18:9-35
 38        android:testOnly="true"
 39        android:theme="@style/Theme.ProyectoCancha" >
-39-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:23:9-52
+39-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:19:9-52
 40        <activity
-40-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:24:9-34:20
+40-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:21:9-30:20
 41            android:name="com.example.proyectocancha.MainActivity"
-41-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:25:13-41
+41-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:22:13-41
 42            android:exported="true"
-42-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:26:13-36
+42-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:23:13-36
 43            android:label="@string/app_name"
-43-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:27:13-45
-44            android:theme="@style/Theme.App.Starting" > <!-- CAMBIO AQUÍ -->
-44-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:28:13-54
+43-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:24:13-45
+44            android:theme="@style/Theme.App.Starting" >
+44-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:25:13-54
 45            <intent-filter>
-45-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:29:13-33:29
+45-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:26:13-29:29
 46                <action android:name="android.intent.action.MAIN" />
-46-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:30:17-69
-46-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:30:25-66
+46-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:27:17-69
+46-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:27:25-66
 47
 48                <category android:name="android.intent.category.LAUNCHER" />
-48-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:32:17-77
-48-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:32:27-74
+48-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:28:17-77
+48-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\src\main\AndroidManifest.xml:28:27-74
 49            </intent-filter>
 50        </activity>
 51        <activity

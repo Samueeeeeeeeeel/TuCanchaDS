@@ -1,5 +1,6 @@
 package com.example.proyectocancha.ui.screen
 
+import android.app.Application
 import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -42,6 +43,7 @@ import com.example.proyectocancha.ui.theme.LightGreen
 import com.example.proyectocancha.ui.viewmodel.AdminViewModel
 import com.example.proyectocancha.ui.viewmodel.AdminViewModelFactory
 import kotlinx.coroutines.launch
+import java.io.File
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -49,10 +51,11 @@ import java.util.Locale
 @Composable
 fun AdminScreen(navController: NavController) {
     val context = LocalContext.current
+    val application = context.applicationContext as Application
     val db = remember { AppDatabase.getInstance(context) }
     val userRepo = remember { UserRepository(db.userDao()) }
     val courtRepo = remember { CourtRepository(db.courtDao()) }
-    val factory = remember { AdminViewModelFactory(userRepo, courtRepo) }
+    val factory = remember { AdminViewModelFactory(application, userRepo, courtRepo) }
     val vm: AdminViewModel = viewModel(factory = factory)
 
     val state by vm.state.collectAsStateWithLifecycle()
@@ -75,11 +78,11 @@ fun AdminScreen(navController: NavController) {
         AddEditCourtDialog(
             courtToEdit = courtToEdit,
             onDismiss = { showCourtDialog = false },
-            onSave = {
+            onSave = { court, newImageUri ->
                 if (courtToEdit == null) {
-                    vm.addCourt(it.name, it.price, it.imageUrl, it.description)
+                    vm.addCourt(court.name, court.price, newImageUri, court.description)
                 } else {
-                    vm.updateCourt(it)
+                    vm.updateCourt(court, newImageUri)
                 }
             }
         )
@@ -152,7 +155,7 @@ fun CourtCard(court: CourtEntity, onEdit: () -> Unit, onDelete: () -> Unit, card
         Column {
             if (court.imageUrl.isNotEmpty()) {
                 Image(
-                    painter = rememberAsyncImagePainter(model = court.imageUrl),
+                    painter = rememberAsyncImagePainter(model = File(court.imageUrl)),
                     contentDescription = court.name,
                     modifier = Modifier.fillMaxWidth().height(150.dp),
                     contentScale = ContentScale.Crop
@@ -177,11 +180,11 @@ fun CourtCard(court: CourtEntity, onEdit: () -> Unit, onDelete: () -> Unit, card
 }
 
 @Composable
-fun AddEditCourtDialog(courtToEdit: CourtEntity?, onDismiss: () -> Unit, onSave: (CourtEntity) -> Unit) {
+fun AddEditCourtDialog(courtToEdit: CourtEntity?, onDismiss: () -> Unit, onSave: (CourtEntity, String?) -> Unit) {
     var name by remember { mutableStateOf(courtToEdit?.name ?: "") }
     var price by remember { mutableStateOf(courtToEdit?.price?.toInt()?.toString() ?: "") }
     var description by remember { mutableStateOf(courtToEdit?.description ?: "") }
-    var imageUrl by remember { mutableStateOf(courtToEdit?.imageUrl ?: "") }
+    var imageUri by remember { mutableStateOf<Uri?>(courtToEdit?.imageUrl?.let { if (File(it).exists()) Uri.fromFile(File(it)) else null }) }
 
     val context = LocalContext.current
 
@@ -189,8 +192,12 @@ fun AddEditCourtDialog(courtToEdit: CourtEntity?, onDismiss: () -> Unit, onSave:
         contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
         uri?.let {
-            context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            imageUrl = it.toString()
+            try {
+                context.contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                imageUri = it
+            } catch (e: SecurityException) {
+                // Handle error
+            }
         }
     }
 
@@ -212,9 +219,9 @@ fun AddEditCourtDialog(courtToEdit: CourtEntity?, onDismiss: () -> Unit, onSave:
                 Button(onClick = { imagePickerLauncher.launch(arrayOf("image/*")) }) {
                     Text("Seleccionar Imagen")
                 }
-                if (imageUrl.isNotEmpty()) {
+                imageUri?.let {
                     Image(
-                        painter = rememberAsyncImagePainter(model = imageUrl),
+                        painter = rememberAsyncImagePainter(model = it),
                         contentDescription = "Imagen seleccionada",
                         modifier = Modifier.fillMaxWidth().height(100.dp).clip(RoundedCornerShape(8.dp))
                     )
@@ -224,8 +231,8 @@ fun AddEditCourtDialog(courtToEdit: CourtEntity?, onDismiss: () -> Unit, onSave:
         confirmButton = {
             Button(onClick = {
                 val priceDouble = price.toDoubleOrNull() ?: 0.0
-                val updatedCourt = courtToEdit?.copy(name = name, price = priceDouble, description = description, imageUrl = imageUrl) ?: CourtEntity(name = name, price = priceDouble, description = description, imageUrl = imageUrl)
-                onSave(updatedCourt)
+                val updatedCourt = courtToEdit?.copy(name = name, price = priceDouble, description = description) ?: CourtEntity(name = name, price = priceDouble, description = description, imageUrl = "")
+                onSave(updatedCourt, imageUri?.toString())
                 onDismiss()
             }) { Text("Guardar") }
         },
@@ -234,6 +241,7 @@ fun AddEditCourtDialog(courtToEdit: CourtEntity?, onDismiss: () -> Unit, onSave:
         }
     )
 }
+
 
 @Composable
 fun AdminDrawerContent(selectedContent: String, onUsersClicked: () -> Unit, onCanchasClicked: () -> Unit, onLogoutClicked: () -> Unit) {
