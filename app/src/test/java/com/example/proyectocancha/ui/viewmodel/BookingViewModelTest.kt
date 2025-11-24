@@ -5,8 +5,14 @@ import com.example.proyectocancha.data.repository.BookingRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -22,24 +28,29 @@ class BookingViewModelTest {
 
     private lateinit var bookingRepository: BookingRepository
     private lateinit var viewModel: BookingViewModel
+    private val testDispatcher = StandardTestDispatcher()
 
     @Before
     fun setUp() {
+        Dispatchers.setMain(testDispatcher)
         bookingRepository = mockk(relaxed = true)
         viewModel = BookingViewModel(bookingRepository)
     }
 
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
     @Test
     fun `loadAllBookings - carga las reservas y el contador`() = runTest {
-        // Arrange
         val fakeBookings = listOf(BookingEntity(id = 1, userId = 1, courtId = 1, courtName = "Test", day = "01/01/2025", time = "10:00 - 11:00", total = 100.0))
         coEvery { bookingRepository.getMyBookings() } returns fakeBookings
         coEvery { bookingRepository.getMyActiveBookingCount() } returns 1
 
-        // Act
         viewModel.loadAllBookings()
+        advanceUntilIdle() // Esperamos a que la coroutina termine
 
-        // Assert
         val state = viewModel.state.value
         assertEquals(fakeBookings, state.bookings)
         assertEquals(1, state.activeCount)
@@ -48,27 +59,36 @@ class BookingViewModelTest {
 
     @Test
     fun `addBooking - con datos válidos - el resultado es exitoso`() = runTest {
-        // Arrange
-
-        // Act
         viewModel.addBooking(courtId = 1, courtName = "Cancha Test", day = "01/01/2025", time = "10:00 - 11:00", total = 100.0)
+        advanceUntilIdle() // Esperamos a que la coroutina termine
 
-        // Assert
         coVerify { bookingRepository.addBooking(1, "Cancha Test", "01/01/2025", "10:00 - 11:00", 100.0) }
         assertTrue(viewModel.bookingResult.value?.isSuccess == true)
     }
 
     @Test
-    fun `cancelBooking - llama al repositorio y recarga la lista`() = runTest {
+    fun `addBooking - cuando el repositorio falla - el resultado es de error`() = runTest {
+        // Arrange: Simulamos que el repositorio lanza una excepción
+        val errorMessage = "Error en la base de datos"
+        coEvery { bookingRepository.addBooking(any(), any(), any(), any(), any()) } throws Exception(errorMessage)
+
         // Act
-        viewModel.cancelBooking(1)
+        viewModel.addBooking(courtId = 1, courtName = "Cancha Test", day = "01/01/2025", time = "10:00 - 11:00", total = 100.0)
+        advanceUntilIdle() // Esperamos a que la coroutina termine
 
         // Assert
-        // --- ¡TEST CORREGIDO Y COMPLETO! ---
-        // Ahora verificamos las 3 acciones que realiza la función
+        assertTrue(viewModel.bookingResult.value?.isFailure == true)
+        assertEquals(errorMessage, viewModel.bookingResult.value?.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun `cancelBooking - llama al repositorio y recarga la lista`() = runTest {
+        viewModel.cancelBooking(1)
+        advanceUntilIdle() // Esperamos a que la coroutina termine
+
         coVerify { bookingRepository.cancelBooking(1) }
         coVerify { bookingRepository.getMyBookings() }
-        coVerify { bookingRepository.getMyActiveBookingCount() } // <-- VERIFICACIÓN AÑADIDA
+        coVerify { bookingRepository.getMyActiveBookingCount() }
     }
 
 }

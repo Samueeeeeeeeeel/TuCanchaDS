@@ -1,0 +1,47 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.proyectocancha.test" >
+4
+5    <uses-sdk
+5-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10722177709052528065.xml:5:5-74
+6        android:minSdkVersion="24"
+6-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10722177709052528065.xml:5:15-41
+7        android:targetSdkVersion="36" />
+7-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10722177709052528065.xml:5:42-71
+8
+9    <instrumentation
+9-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10722177709052528065.xml:11:5-15:76
+10        android:name="androidx.test.runner.AndroidJUnitRunner"
+10-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10722177709052528065.xml:11:22-76
+11        android:functionalTest="false"
+11-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10722177709052528065.xml:14:22-52
+12        android:handleProfiling="false"
+12-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10722177709052528065.xml:13:22-53
+13        android:label="Tests for com.example.proyectocancha"
+13-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10722177709052528065.xml:15:22-74
+14        android:targetPackage="com.example.proyectocancha" />
+14-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10722177709052528065.xml:12:22-72
+15
+16    <queries>
+16-->[androidx.test:runner:1.7.0] C:\Users\kurau\.gradle\caches\8.13\transforms\144e9f9107b04887419f597f2f077158\transformed\runner-1.7.0\AndroidManifest.xml:24:5-28:15
+17        <package android:name="androidx.test.orchestrator" />
+17-->[androidx.test:runner:1.7.0] C:\Users\kurau\.gradle\caches\8.13\transforms\144e9f9107b04887419f597f2f077158\transformed\runner-1.7.0\AndroidManifest.xml:25:9-62
+17-->[androidx.test:runner:1.7.0] C:\Users\kurau\.gradle\caches\8.13\transforms\144e9f9107b04887419f597f2f077158\transformed\runner-1.7.0\AndroidManifest.xml:25:18-59
+18        <package android:name="androidx.test.services" />
+18-->[androidx.test:runner:1.7.0] C:\Users\kurau\.gradle\caches\8.13\transforms\144e9f9107b04887419f597f2f077158\transformed\runner-1.7.0\AndroidManifest.xml:26:9-58
+18-->[androidx.test:runner:1.7.0] C:\Users\kurau\.gradle\caches\8.13\transforms\144e9f9107b04887419f597f2f077158\transformed\runner-1.7.0\AndroidManifest.xml:26:18-55
+19        <package android:name="com.google.android.apps.common.testing.services" />
+19-->[androidx.test:runner:1.7.0] C:\Users\kurau\.gradle\caches\8.13\transforms\144e9f9107b04887419f597f2f077158\transformed\runner-1.7.0\AndroidManifest.xml:27:9-83
+19-->[androidx.test:runner:1.7.0] C:\Users\kurau\.gradle\caches\8.13\transforms\144e9f9107b04887419f597f2f077158\transformed\runner-1.7.0\AndroidManifest.xml:27:18-80
+20    </queries>
+21
+22    <application
+22-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10722177709052528065.xml:7:5-9:19
+23        android:debuggable="true"
+24        android:extractNativeLibs="false" >
+25        <uses-library android:name="android.test.runner" />
+25-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10722177709052528065.xml:8:9-60
+25-->C:\Users\kurau\StudioProjects\TuCanchaDS\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest10722177709052528065.xml:8:23-57
+26    </application>
+27
+28</manifest>

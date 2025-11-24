@@ -346,6 +346,8 @@ style Theme_ProyectoCancha
 style Theme_SplashScreen
 style Theme_SplashScreen_Common
 style Theme_SplashScreen_IconBackground
+style WhiteBackgroundDialogTheme
+style WhiteBackgroundTheme
 style Widget_Compat_NotificationActionContainer
 style Widget_Compat_NotificationActionText
 styleable ActivityNavigator android_name action data dataPattern targetPackage

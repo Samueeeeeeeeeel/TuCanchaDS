@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.proyectocancha.app-mergeDebugResources-48:/values-v31/values-v31.xml",
+            "outputFile": "com.example.proyectocancha.app-mergeDebugResources-49:/values-v31/values-v31.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\samue\\.gradle\\caches\\8.13\\transforms\\cac9abf434b66ec78e6b8c47a0748084\\transformed\\core-splashscreen-1.0.1\\res\\values-v31\\values-v31.xml",
+                    "source": "C:\\Users\\kurau\\.gradle\\caches\\8.13\\transforms\\7b4404594479f3f4891ac52332d751eb\\transformed\\core-splashscreen-1.0.1\\res\\values-v31\\values-v31.xml",
                     "from": {
                         "startLines": "2,9",
                         "startColumns": "4,4",
