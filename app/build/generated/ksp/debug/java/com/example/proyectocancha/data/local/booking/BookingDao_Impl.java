@@ -169,7 +169,7 @@ public final class BookingDao_Impl implements BookingDao {
   @Override
   public Object getBookingsForCourtOnDay(final int courtId, final String day,
       final Continuation<? super List<BookingEntity>> $completion) {
-    final String _sql = "SELECT * FROM bookings WHERE bookings.courtId = ? AND bookings.day = ?";
+    final String _sql = "SELECT * FROM bookings WHERE bookings.courtId = ? AND bookings.day = ? AND bookings.status = 'Activa'";
     final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 2);
     int _argIndex = 1;
     _statement.bindLong(_argIndex, courtId);
