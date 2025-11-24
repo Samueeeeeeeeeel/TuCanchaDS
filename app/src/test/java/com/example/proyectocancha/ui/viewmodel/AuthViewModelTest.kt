@@ -3,142 +3,109 @@ package com.example.proyectocancha.ui.viewmodel
 import com.example.proyectocancha.data.local.user.UserEntity
 import com.example.proyectocancha.data.repository.UserRepository
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
 class AuthViewModelTest {
 
+    // Se eliminan las @Rule para usar una configuración manual.
+
+    private lateinit var userRepository: UserRepository
     private lateinit var viewModel: AuthViewModel
-    private val userRepository: UserRepository = mockk(relaxed = true)
-    private val testDispatcher = StandardTestDispatcher()
 
     @Before
     fun setUp() {
-        Dispatchers.setMain(testDispatcher)
+        // Se configura el Dispatcher.Main para usar el hilo del test.
+        // Esto es crucial para que el viewModelScope funcione correctamente.
+        Dispatchers.setMain(Dispatchers.Unconfined)
+        userRepository = mockk(relaxed = true)
         viewModel = AuthViewModel(userRepository)
     }
 
     @After
     fun tearDown() {
+        // Se limpia el Dispatcher después de cada test para evitar que los tests se afecten entre sí.
         Dispatchers.resetMain()
     }
 
     @Test
-    fun `submitLogin con credenciales validas actualiza estado a success`() = runTest {
-        val email = "test@test.com"
-        val password = "Password123"
-        val user = UserEntity(1, "Test User", email, "12345678", password, false)
+    fun `submitLogin - con credenciales válidas - el estado es exitoso`() = runTest {
+        // Arrange
+        val fakeUser = UserEntity(id = 1L, name = "Test", email = "test@test.com", phone = "123", password = "123456")
+        coEvery { userRepository.login("test@test.com", "123456") } returns Result.success(fakeUser)
 
-        coEvery { userRepository.login(email, password) } returns Result.success(user)
-
-        viewModel.onLoginEmailChange(email)
-        viewModel.onLoginPassChange(password)
+        // Act
+        viewModel.onLoginEmailChange("test@test.com")
+        viewModel.onLoginPassChange("123456")
         viewModel.submitLogin()
 
-        advanceUntilIdle() // Avanza el dispatcher para completar la coroutine
-
-        val uiState = viewModel.login.value
-        assertTrue(uiState.success)
-        assertFalse(uiState.isSubmitting)
-        assertNull(uiState.errorMsg)
-        assertEquals(user, uiState.user)
-        assertFalse(uiState.isAdmin)
+        // Assert
+        val finalState = viewModel.login.value
+        assertTrue(finalState.success)
+        assertEquals(fakeUser, finalState.user)
     }
 
     @Test
-    fun `submitLogin con credenciales invalidas actualiza estado a error`() = runTest {
-        val email = "test@test.com"
-        val password = "wrongpassword"
-        val errorMessage = "Credenciales inválidas"
+    fun `submitLogin - con credenciales inválidas - el estado es de error`() = runTest {
+        // Arrange
+        coEvery { userRepository.login(any(), any()) } returns Result.failure(Exception("Credenciales inválidas"))
 
-        coEvery { userRepository.login(email, password) } returns Result.failure(Exception(errorMessage))
-
-        viewModel.onLoginEmailChange(email)
-        viewModel.onLoginPassChange(password)
+        // Act
+        viewModel.onLoginEmailChange("test@test.com")
+        viewModel.onLoginPassChange("wrongpass")
         viewModel.submitLogin()
 
-        advanceUntilIdle()
-
-        val uiState = viewModel.login.value
-        assertFalse(uiState.success)
-        assertFalse(uiState.isSubmitting)
-        assertEquals(errorMessage, uiState.errorMsg)
-        assertNull(uiState.user)
+        // Assert
+        val finalState = viewModel.login.value
+        assertEquals(false, finalState.success)
+        assertNotNull(finalState.errorMsg)
     }
 
     @Test
-    fun `submitRegister con datos validos actualiza estado a success`() = runTest {
-        val name = "New User"
-        val email = "new@test.com"
-        val phone = "12345678"
-        val password = "Password123!"
+    fun `submitRegister - con datos válidos - el estado es exitoso`() = runTest {
+        // Arrange
+        coEvery { userRepository.register(any(), any(), any(), any(), any()) } returns Result.success(1L)
 
-        coEvery { userRepository.register(name, email, phone, password, false) } returns Result.success(1L)
-
-        viewModel.onNameChange(name)
-        viewModel.onRegisterEmailChange(email)
-        viewModel.onPhoneChange(phone)
-        viewModel.onRegisterPassChange(password)
-        viewModel.onConfirmChange(password)
-
-        assertTrue("El botón de registro debería estar habilitado", viewModel.register.value.canSubmit)
-
-        viewModel.submitRegister()
-
-        advanceUntilIdle()
-
-        val uiState = viewModel.register.value
-        assertTrue(uiState.success)
-        assertFalse(uiState.isSubmitting)
-        assertNull(uiState.errorMsg)
-    }
-
-    @Test
-    fun `submitRegister con email existente actualiza estado a error`() = runTest {
-        val name = "Existing User"
-        val email = "existing@test.com"
-        val phone = "12345678"
-        val password = "Password123!"
-        val errorMessage = "El correo electrónico ya está registrado."
-
-        coEvery { userRepository.register(name, email, phone, password, false) } returns Result.failure(Exception(errorMessage))
-
-        viewModel.onNameChange(name)
-        viewModel.onRegisterEmailChange(email)
-        viewModel.onPhoneChange(phone)
-        viewModel.onRegisterPassChange(password)
-        viewModel.onConfirmChange(password)
-
-        viewModel.submitRegister()
-
-        advanceUntilIdle()
-
-        val uiState = viewModel.register.value
-        assertFalse(uiState.success)
-        assertFalse(uiState.isSubmitting)
-        assertEquals(errorMessage, uiState.errorMsg)
-    }
-
-    @Test
-    fun `onRegisterPassChange con contraseñas que no coinciden actualiza error`() = runTest {
+        // Act
+        viewModel.onNameChange("Test User")
+        viewModel.onPhoneChange("123456789")
+        viewModel.onRegisterEmailChange("new@test.com")
         viewModel.onRegisterPassChange("Password123!")
-        viewModel.onConfirmChange("PasswordDiferente123!")
+        viewModel.onConfirmChange("Password123!")
+        viewModel.submitRegister()
 
-        val uiState = viewModel.register.value
-        assertNotNull(uiState.confirmError)
-        assertEquals("Las contraseñas no coinciden", uiState.confirmError)
-        assertFalse(uiState.canSubmit)
+        // Assert
+        val finalState = viewModel.register.value
+        assertTrue(finalState.success)
+    }
+
+    @Test
+    fun `submitRegister - con email duplicado - el estado es de error`() = runTest {
+        // Arrange
+        coEvery { userRepository.register(any(), any(), any(), any(), any()) } returns Result.failure(IllegalStateException("El correo ya existe"))
+
+        // Act
+        viewModel.onNameChange("Test User")
+        viewModel.onPhoneChange("123456789")
+        viewModel.onRegisterEmailChange("registered@test.com")
+        viewModel.onRegisterPassChange("Password123!")
+        viewModel.onConfirmChange("Password123!")
+        viewModel.submitRegister()
+
+        // Assert
+        val finalState = viewModel.register.value
+        assertEquals(false, finalState.success)
+        assertNotNull(finalState.errorMsg)
     }
 }

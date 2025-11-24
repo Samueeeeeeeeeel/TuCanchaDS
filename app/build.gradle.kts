@@ -72,11 +72,11 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
 
     // Room (SQLite) - runtime y extensiones KTX
-    implementation("androidx.room:room-runtime:2.6.1")    // <-- NUEVO
-    implementation("androidx.room:room-ktx:2.6.1")        // <-- NUEVO
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
 
     // Compilador de Room vía KSP
-    ksp("androidx.room:room-compiler:2.6.1")               // <-- NUEVO
+    ksp("androidx.room:room-compiler:2.6.1")
     //carga de imagenes en compose (caché)
     implementation("io.coil-kt:coil-compose:2.7.0")
 
@@ -86,22 +86,25 @@ dependencies {
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
     // --- LIBRERÍA DE SPLASH SCREEN ---
-    implementation("androidx.core:core-splashscreen:1.0.1") // <-- AÑADIDO
+    implementation("androidx.core:core-splashscreen:1.0.1")
 
 // ==== AGREGADOS PARA REST ====
     // Retrofit base
-    implementation("com.squareup.retrofit2:retrofit:2.11.0") // <-- NUEVO
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
     // Convertidor JSON con Gson
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0") // <-- NUEVO
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     // OkHttp y logging interceptor
-    implementation("com.squareup.okhttp3:okhttp:4.12.0") // <-- NUEVO
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0") // <-- NUEVO
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     //librerias de test locales
     testImplementation(libs.junit)
     testImplementation("io.mockk:mockk:1.13.12")
     testImplementation("org.robolectric:robolectric:4.13")
+    // --- ¡CONFLICTO RESUELTO! Se mantiene solo la versión más nueva.
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+    
+
     //Test de implementacion de UI
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
