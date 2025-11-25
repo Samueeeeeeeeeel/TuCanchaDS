@@ -10,6 +10,7 @@ drawable court_5
 drawable court_6
 drawable ic_launcher_background
 drawable ic_launcher_foreground
+drawable logotucancha
 drawable splash_icon
 mipmap ic_launcher
 mipmap ic_launcher_foreground

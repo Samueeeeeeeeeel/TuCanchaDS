@@ -104,6 +104,10 @@
         "source": "com.example.proyectocancha.app-main-53:/mipmap-xxhdpi/ic_launcher.webp"
     },
     {
+        "merged": "com.example.proyectocancha.app-debug-51:/drawable_logotucancha.png.flat",
+        "source": "com.example.proyectocancha.app-main-53:/drawable/logotucancha.png"
+    },
+    {
         "merged": "com.example.proyectocancha.app-debug-51:/drawable_court_4.jpg.flat",
         "source": "com.example.proyectocancha.app-main-53:/drawable/court_4.jpg"
     },

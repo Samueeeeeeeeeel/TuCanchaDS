@@ -6,6 +6,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +42,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -48,13 +51,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.ui.platform.LocalContext
+import com.example.proyectocancha.R
+import com.example.proyectocancha.data.local.database.AppDatabase
 import com.example.proyectocancha.data.local.user.AuthManager
+import com.example.proyectocancha.data.repository.UserRepository
 import com.example.proyectocancha.ui.theme.Grey900
 import com.example.proyectocancha.ui.viewmodel.AuthViewModel
 import com.example.proyectocancha.ui.viewmodel.AuthViewModelFactory
-import com.example.proyectocancha.data.local.database.AppDatabase
-import com.example.proyectocancha.data.repository.UserRepository
 
 @Composable
 fun LoginScreen(
@@ -124,6 +127,15 @@ private fun LoginScreenUi(
             modifier = Modifier.width(350.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // --- LOGO FINAL Y CORRECTO ---
+            Image(
+                painter = painterResource(id = R.drawable.logotucancha),
+                contentDescription = "Logo de la aplicación",
+                modifier = Modifier.size(180.dp) // Tamaño aumentado
+            )
+            Spacer(Modifier.height(24.dp))
+            // --------------------------
+
             Text("Iniciar Sesión", style = MaterialTheme.typography.headlineSmall, color = Color.White)
             Spacer(Modifier.height(16.dp))
 
@@ -162,7 +174,7 @@ private fun LoginScreenUi(
                 onValueChange = onPassChange,
                 label = { Text("Contraseña", color = Color.White) },
                 singleLine = true,
-                isError = passwordError != null, // Corregido: el error se muestra si no es nulo
+                isError = passwordError != null,
                 visualTransformation = if (showPass) VisualTransformation.None else PasswordVisualTransformation(),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.White,
@@ -179,7 +191,6 @@ private fun LoginScreenUi(
                 },
                 modifier = Modifier.fillMaxWidth()
             )
-            // --- ¡BLOQUE DE ERROR AÑADIDO! ---
             AnimatedVisibility(
                 visible = passwordError != null,
                 enter = fadeIn() + expandVertically(),
@@ -235,4 +246,10 @@ private fun LoginScreenUi(
             )
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LoginScreenPreview() {
+    LoginScreen(onLoginOkNavigateHome = {}, onGoRegister = {})
 }
