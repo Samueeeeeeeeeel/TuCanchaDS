@@ -9,7 +9,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
-// Línea 2: import de nuestro DTO
+
 
 
 // Línea 4: interfaz con endpoints del servicio

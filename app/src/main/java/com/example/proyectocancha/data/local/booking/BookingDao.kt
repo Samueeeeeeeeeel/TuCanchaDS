@@ -14,8 +14,7 @@ interface BookingDao {
     @Query("SELECT * FROM bookings WHERE bookings.userId = :userId ORDER BY bookings.id DESC")
     suspend fun getBookingsForUser(userId: Int): List<BookingEntity>
 
-    // --- ¡CONSULTA MEJORADA! ---
-    // Ahora solo devuelve las reservas ACTIVAS para una cancha y día.
+
     @Query("SELECT * FROM bookings WHERE bookings.courtId = :courtId AND bookings.day = :day AND bookings.status = 'Activa'")
     suspend fun getBookingsForCourtOnDay(courtId: Int, day: String): List<BookingEntity>
 

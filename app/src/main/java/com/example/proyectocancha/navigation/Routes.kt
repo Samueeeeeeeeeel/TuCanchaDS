@@ -11,6 +11,6 @@ sealed class Routes(val path: String) {
     data object verCanchas : Routes("verCanchas")
     data object admin : Routes("admin")
     data object detalleReserva : Routes("detalleReserva")
-    data object changePassword : Routes("changePassword") // <-- NUEVA RUTA
-    data object userList : Routes("userList")           // <-- NUEVA RUTA
+    data object changePassword : Routes("changePassword")
+    data object userList : Routes("userList")
 }

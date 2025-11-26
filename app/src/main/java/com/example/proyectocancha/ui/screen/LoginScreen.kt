@@ -127,7 +127,7 @@ private fun LoginScreenUi(
             modifier = Modifier.width(350.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // --- LOGO FINAL Y CORRECTO ---
+
             Image(
                 painter = painterResource(id = R.drawable.logotucancha),
                 contentDescription = "Logo de la aplicación",

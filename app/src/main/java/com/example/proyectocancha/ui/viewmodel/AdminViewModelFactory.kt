@@ -7,7 +7,7 @@ import com.example.proyectocancha.data.local.court.CourtRepository
 import com.example.proyectocancha.data.repository.UserRepository
 
 class AdminViewModelFactory(
-    private val application: Application, // <-- AÑADIDO
+    private val application: Application,
     private val userRepository: UserRepository,
     private val courtRepository: CourtRepository
 ) : ViewModelProvider.Factory {

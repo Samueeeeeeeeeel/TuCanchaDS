@@ -168,8 +168,6 @@ fun DetalleReservaScreen(navController: NavHostController, courtId: Int) {
                         }
                     }
                 }
-
-                // --- ¡LÓGICA COMPLETADA AQUÍ! ---
                 if (selectedDate != null) {
                     Card(shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF333333))) {
                         Column(modifier = Modifier.padding(16.dp)) {

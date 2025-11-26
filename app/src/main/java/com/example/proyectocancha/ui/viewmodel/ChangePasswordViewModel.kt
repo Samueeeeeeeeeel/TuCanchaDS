@@ -23,9 +23,9 @@ data class ChangePasswordUiState(
     val isLoading: Boolean = false,
     val success: Boolean = false,
     val isSubmittable: Boolean = false,
-    val isCurrentPasswordVisible: Boolean = false, // <-- AÑADIDO
-    val isNewPasswordVisible: Boolean = false,      // <-- AÑADIDO
-    val isConfirmPasswordVisible: Boolean = false   // <-- AÑADIDO
+    val isCurrentPasswordVisible: Boolean = false,
+    val isNewPasswordVisible: Boolean = false,
+    val isConfirmPasswordVisible: Boolean = false
 )
 
 class ChangePasswordViewModel(private val userRepository: UserRepository) : ViewModel() {

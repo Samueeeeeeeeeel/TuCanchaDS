@@ -44,7 +44,7 @@ class BookingViewModel(private val repository: BookingRepository) : ViewModel() 
         }
     }
 
-    // --- ¡SIGNATURA CORREGIDA Y ORDENADA! ---
+
     fun addBooking(courtId: Int, courtName: String, day: String, time: String, total: Double) {
         viewModelScope.launch {
             try {

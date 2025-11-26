@@ -44,7 +44,7 @@ fun AppDrawer(
         items.forEach { item -> // Por cada ítem
             NavigationDrawerItem( // Ítem con estados Material
                 label = { Text(item.label) }, // Texto visible
-                selected = false, // Puedes usar currentRoute == ... si quieres marcar
+                selected = false,
                 onClick = item.onClick, // Acción al pulsar
                 icon = { Icon(item.icon, contentDescription = item.label) }, // Ícono
                 modifier = Modifier, // Sin mods extra
@@ -59,7 +59,7 @@ fun AppDrawer(
                     unselectedIconColor = Color.White    // Icono blanco (no seleccionado)
                     // --- FIN DEL CAMBIO ---
 
-                ) // Estilo por defecto
+                )
             )
         }
     }
@@ -76,24 +76,23 @@ fun defaultDrawerItems(
 ): List<com.example.proyectocancha.ui.components.DrawerItem> = listOf(
     DrawerItem("Home", Icons.Filled.Home, onHome),          // Ítem Home
     DrawerItem("Perfil", Icons.Filled.AccountCircle, onProfile),   // Ítem Perfil
-    DrawerItem("Ver Canchas", Icons.Filled.ArrowForward, onVerCanchas), // <-- AÑADIDO
-    DrawerItem("Mis Reservas", Icons.Filled.Menu, onMisReservas),     // <-- AÑADIDO
-    DrawerItem("Cerrar Sesión", Icons.Filled.Logout, onLogout) // <-- ¡NUEVO! Ítem de Logout
+    DrawerItem("Ver Canchas", Icons.Filled.ArrowForward, onVerCanchas),
+    DrawerItem("Mis Reservas", Icons.Filled.Menu, onMisReservas),
+    DrawerItem("Cerrar Sesión", Icons.Filled.Logout, onLogout) //  Ítem de Logout
 )
 
 @Preview(showBackground = true)
 @Composable
 fun AppDrawerPreview() {
-    // Lo llamamos directamente, sin el "ProyectoCanchaTheme { ... }"
-    // Le ponemos un fondo para que se vea, ya que tu drawer es transparente
+    // Lo llamamos directamente, sin el "ProyectoCanchaTheme "
     AppDrawer(
         currentRoute = null,
         items = defaultDrawerItems(
             onHome = { },
             onProfile = { },
-            onVerCanchas = { }, // <-- AÑADIDO
-            onMisReservas = { },  // <-- AÑADIDO
-            onLogout = { }       // <-- ¡NUEVO! Añadido para el preview
+            onVerCanchas = { },
+            onMisReservas = { },
+            onLogout = { }
         ),
         // Añadimos un fondo al preview para que el texto verde se vea
         modifier = Modifier.background(Color.DarkGray)

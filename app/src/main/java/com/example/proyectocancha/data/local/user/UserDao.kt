@@ -9,7 +9,6 @@ import androidx.room.Update
 @Dao
 interface UserDao {
 
-    // --- ¡ESTRATEGIA CORREGIDA! ---
     // IGNORE: si el usuario ya existe (email duplicado), no lo inserta y devuelve -1.
     @Insert(onConflict = OnConflictStrategy.IGNORE) 
     suspend fun insert(user: UserEntity): Long // Devuelve el id de la fila o -1 si hay conflicto

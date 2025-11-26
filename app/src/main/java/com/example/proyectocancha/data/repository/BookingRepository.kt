@@ -8,14 +8,13 @@ class BookingRepository(private val bookingDao: BookingDao) {
 
     // Obtiene todas las reservas del usuario actualmente logueado
     suspend fun getMyBookings(): List<BookingEntity> {
-        // ¡ERROR CORREGIDO! Se convierte el ID de Long a Int
+
         val userId = AuthManager.currentUser.value?.id?.toInt() ?: return emptyList()
         return bookingDao.getBookingsForUser(userId)
     }
 
     // Crea una nueva reserva para el usuario actual
     suspend fun addBooking(courtId: Int, courtName: String, day: String, time: String, total: Double) {
-        // ¡ERROR CORREGIDO! Se convierte el ID de Long a Int
         val userId = AuthManager.currentUser.value?.id?.toInt()
         if (userId != null) {
             val newBooking = BookingEntity(
@@ -38,7 +37,6 @@ class BookingRepository(private val bookingDao: BookingDao) {
 
     // Obtiene el contador de reservas activas para el usuario actual
     suspend fun getMyActiveBookingCount(): Int {
-        // ¡ERROR CORREGIDO! Se convierte el ID de Long a Int
         val userId = AuthManager.currentUser.value?.id?.toInt() ?: return 0
         return bookingDao.getActiveBookingCount(userId)
     }

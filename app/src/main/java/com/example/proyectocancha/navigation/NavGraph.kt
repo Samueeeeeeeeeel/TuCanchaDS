@@ -68,7 +68,7 @@ fun AppNavGraph(navController: NavHostController) {
             CanchaDetailsScreen(navController = navController, courtId = courtId)
         }
 
-        // --- ¡NUEVA RUTA DE RESERVA! ---
+        // ---  RUTA DE RESERVA ---
         composable(
             route = "${Routes.detalleReserva.path}/{courtId}",
             arguments = listOf(navArgument("courtId") { type = NavType.IntType })

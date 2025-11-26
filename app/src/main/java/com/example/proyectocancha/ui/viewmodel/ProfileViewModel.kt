@@ -15,7 +15,7 @@ data class ProfileState(
     val nombre: String = "",
     val email: String = "",
     val telefono: String = "",
-    val isAdmin: Boolean = false, // <-- AÑADIDO
+    val isAdmin: Boolean = false,
     val isLoading: Boolean = true,
     val isEditing: Boolean = false,
 
@@ -45,7 +45,7 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
                             nombre = user.name,
                             email = user.email,
                             telefono = user.phone,
-                            isAdmin = user.isAdmin, // <-- AÑADIDO
+                            isAdmin = user.isAdmin,
                             isLoading = false
                         )
                     }
@@ -133,7 +133,7 @@ class ProfileViewModel(private val userRepository: UserRepository) : ViewModel()
                         currentPassword = "",
                         newPassword = "",
                         confirmPassword = "",
-                        passwordChangeSuccess = true // <-- Para mostrar un mensaje de éxito
+                        passwordChangeSuccess = true
                     )
                 }
             }

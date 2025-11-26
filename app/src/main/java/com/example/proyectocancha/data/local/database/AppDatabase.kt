@@ -22,7 +22,7 @@ import java.io.FileOutputStream
 
 @Database(
     entities = [UserEntity::class, CourtEntity::class, BookingEntity::class],
-    version = 1, // Reiniciamos la versión
+    version = 1,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -119,7 +119,7 @@ abstract class AppDatabase : RoomDatabase() {
                     imageUrl = copyDrawableToInternalStorage(context, R.drawable.court_6, "court_6.png")
                 )
             )
-            courtDao.insertAll(courts) // <-- ¡ARREGLO FINAL AQUÍ!
+            courtDao.insertAll(courts)
         }
     }
 }

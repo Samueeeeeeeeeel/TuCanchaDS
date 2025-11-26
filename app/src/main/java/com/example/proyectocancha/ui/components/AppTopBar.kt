@@ -21,7 +21,7 @@ import com.example.proyectocancha.ui.theme.LightGreen
 @Composable
 fun AppTopBar(
     onOpenDrawer: () -> Unit,
-    onGoProfile: () -> Unit // <-- PARÁMETRO CORREGIDO
+    onGoProfile: () -> Unit
 ) {
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -45,7 +45,7 @@ fun AppTopBar(
         },
         actions = {
             Button(
-                onClick = onGoProfile, // <-- ACCIÓN CORREGIDA
+                onClick = onGoProfile,
                 modifier = Modifier
                     .padding(end = 8.dp)
                     .height(36.dp),
@@ -71,7 +71,7 @@ fun AppTopBarPreview() {
     ProyectoCanchaTheme {
         AppTopBar(
             onOpenDrawer = {},
-            onGoProfile = {} // <-- PARÁMETRO CORREGIDO
+            onGoProfile = {}
         )
     }
 }

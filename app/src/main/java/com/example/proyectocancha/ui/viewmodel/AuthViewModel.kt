@@ -26,7 +26,7 @@ data class LoginUistate(
     val success: Boolean = false,
     val isAdmin: Boolean = false,
     val errorMsg: String? = null,
-    val user: UserEntity? = null        // <-- usuario logueado
+    val user: UserEntity? = null
 )
 
 // Estado de REGISTRO

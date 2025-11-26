@@ -81,7 +81,7 @@ fun ChangePasswordScreen(navController: NavHostController) {
                 value = uiState.currentPassword,
                 onValueChange = { viewModel.onCurrentPasswordChange(it) },
                 label = { Text("Contraseña actual") },
-                textStyle = TextStyle(color = Color.White), // <-- FORZAMOS EL COLOR DEL TEXTO
+                textStyle = TextStyle(color = Color.White),
                 visualTransformation = if (uiState.isCurrentPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 isError = uiState.currentPasswordError != null,
                 modifier = Modifier.fillMaxWidth(),
@@ -104,7 +104,7 @@ fun ChangePasswordScreen(navController: NavHostController) {
                 value = uiState.newPassword,
                 onValueChange = { viewModel.onNewPasswordChange(it) },
                 label = { Text("Nueva contraseña") },
-                textStyle = TextStyle(color = Color.White), // <-- FORZAMOS EL COLOR DEL TEXTO
+                textStyle = TextStyle(color = Color.White),
                 visualTransformation = if (uiState.isNewPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 isError = uiState.newPasswordError != null,
                 modifier = Modifier.fillMaxWidth(),
@@ -127,7 +127,7 @@ fun ChangePasswordScreen(navController: NavHostController) {
                 value = uiState.confirmPassword,
                 onValueChange = { viewModel.onConfirmPasswordChange(it) },
                 label = { Text("Confirmar nueva contraseña") },
-                textStyle = TextStyle(color = Color.White), // <-- FORZAMOS EL COLOR DEL TEXTO
+                textStyle = TextStyle(color = Color.White),
                 visualTransformation = if (uiState.isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 isError = uiState.confirmPasswordError != null,
                 modifier = Modifier.fillMaxWidth(),

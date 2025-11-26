@@ -30,7 +30,7 @@ class UserRepository(
         }
     }
 
-    // --- ¡LÓGICA DE REGISTRO A PRUEBA DE CRASHES! ---
+    // --- LÓGICA DE REGISTRO A PRUEBA ---
     suspend fun register(
         name: String,
         email: String,

@@ -98,7 +98,6 @@ class AdminViewModel(
                 try {
                     File(court.imageUrl).delete()
                 } catch (e: Exception) {
-                    // Ignorar error
                 }
             }
             courtRepository.deleteCourt(court)
