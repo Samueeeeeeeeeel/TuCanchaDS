@@ -8,6 +8,9 @@
         android:minSdkVersion="24"
         android:targetSdkVersion="36" />
 
+    <!-- PERMISOS DE INTERNET para conectar con los microservicios -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission
@@ -37,7 +40,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:testOnly="true"
-        android:theme="@style/Theme.ProyectoCancha" >
+        android:theme="@style/Theme.ProyectoCancha"
+        android:usesCleartextTraffic="true" >
         <activity
             android:name="com.example.proyectocancha.MainActivity"
             android:exported="true"

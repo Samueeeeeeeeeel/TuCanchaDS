@@ -58,6 +58,8 @@ import com.example.proyectocancha.data.repository.UserRepository
 import com.example.proyectocancha.ui.theme.Grey900
 import com.example.proyectocancha.ui.viewmodel.AuthViewModel
 import com.example.proyectocancha.ui.viewmodel.AuthViewModelFactory
+import com.example.proyectocancha.ui.viewmodel.RemoteAuthViewModel
+import com.example.proyectocancha.ui.viewmodel.RemoteAuthViewModelFactory
 
 @Composable
 fun LoginScreen(
@@ -67,9 +69,9 @@ fun LoginScreen(
     val context = LocalContext.current
     val db = remember { AppDatabase.getInstance(context) }
     val repository = remember { UserRepository(db.userDao()) }
-    val vm: AuthViewModel = viewModel(factory = AuthViewModelFactory(repository))
+    val viewModel: RemoteAuthViewModel = viewModel(factory = RemoteAuthViewModelFactory())
 
-    val state by vm.login.collectAsStateWithLifecycle()
+    val state by viewModel.login.collectAsStateWithLifecycle()
 
     LaunchedEffect(state.success) {
         if (state.success) {
@@ -80,7 +82,7 @@ fun LoginScreen(
             } ?: run {
                 Log.e("LOGIN_ERROR", "Login fue exitoso pero el objeto de usuario es nulo.")
             }
-            vm.clearLoginResult()
+            viewModel.clearLoginResult()
         }
     }
 
@@ -92,10 +94,10 @@ fun LoginScreen(
         canSubmit = state.canSubmit,
         isSubmitting = state.isSubmitting,
         errorMsg = state.errorMsg,
-        onEmailChange = vm::onLoginEmailChange,
-        onPassChange = vm::onLoginPassChange,
-        onSubmit = vm::submitLogin,
-        onClearError = vm::clearLoginResult,
+        onEmailChange = viewModel::onLoginEmailChange,
+        onPassChange = viewModel::onLoginPassChange,
+        onSubmit = viewModel::submitLogin,
+        onClearError = viewModel::clearLoginResult,
         onGoRegister = onGoRegister
     )
 }
