@@ -78,7 +78,14 @@ public class UsuarioService {
     }
     
     public void eliminarUsuario(Long id) {
-        usuarioRepository.deleteById(id);
+        usuarioRepository.findById(id)
+                .ifPresent(usuario -> {
+                    // Proteger al admin predeterminado
+                    if ("Admin@admin.cl".equalsIgnoreCase(usuario.getEmail())) {
+                        throw new RuntimeException("No se puede eliminar al administrador predeterminado del sistema");
+                    }
+                    usuarioRepository.deleteById(id);
+                });
     }
     
     public void desactivarUsuario(Long id) {
@@ -122,6 +129,10 @@ public class UsuarioService {
     public Usuario cambiarRol(Long id, Rol nuevoRol) {
         return usuarioRepository.findById(id)
                 .map(usuario -> {
+                    // Proteger al admin predeterminado
+                    if ("Admin@admin.cl".equalsIgnoreCase(usuario.getEmail())) {
+                        throw new RuntimeException("No se puede cambiar el rol del administrador predeterminado del sistema");
+                    }
                     usuario.setRol(nuevoRol);
                     return usuarioRepository.save(usuario);
                 })

@@ -9,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +36,7 @@ class CanchaServiceTest {
         cancha.setNombre("Cancha de Fútbol 1");
         cancha.setDescripcion("Cancha de fútbol 11");
         cancha.setTipo("Fútbol");
-        cancha.setPrecioPorHora(new BigDecimal("50000"));
+        cancha.setPrecioPorHora(50000);
         cancha.setDireccion("Calle 123");
         cancha.setCiudad("Bogotá");
         cancha.setActiva(true);
@@ -47,7 +46,7 @@ class CanchaServiceTest {
         cancha2.setNombre("Cancha de Tenis");
         cancha2.setDescripcion("Cancha de tenis profesional");
         cancha2.setTipo("Tenis");
-        cancha2.setPrecioPorHora(new BigDecimal("30000"));
+        cancha2.setPrecioPorHora(30000);
         cancha2.setDireccion("Avenida 456");
         cancha2.setCiudad("Medellín");
         cancha2.setActiva(true);
@@ -162,7 +161,7 @@ class CanchaServiceTest {
         Cancha nuevaCancha = new Cancha();
         nuevaCancha.setNombre("Nueva Cancha");
         nuevaCancha.setTipo("Básquet");
-        nuevaCancha.setPrecioPorHora(new BigDecimal("40000"));
+        nuevaCancha.setPrecioPorHora(40000);
         nuevaCancha.setDireccion("Calle Nueva");
         nuevaCancha.setCiudad("Cali");
         nuevaCancha.setActiva(null); // Para probar que se establece en true
@@ -189,7 +188,7 @@ class CanchaServiceTest {
         canchaActualizada.setNombre("Cancha Actualizada");
         canchaActualizada.setDescripcion("Nueva descripción");
         canchaActualizada.setTipo("Fútbol");
-        canchaActualizada.setPrecioPorHora(new BigDecimal("60000"));
+        canchaActualizada.setPrecioPorHora(60000);
         canchaActualizada.setDireccion("Nueva Dirección");
         canchaActualizada.setCiudad("Bogotá");
         canchaActualizada.setActiva(true);

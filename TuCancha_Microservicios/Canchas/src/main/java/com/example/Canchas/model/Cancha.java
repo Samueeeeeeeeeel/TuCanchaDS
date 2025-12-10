@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -35,8 +34,8 @@ public class Cancha {
     private String tipo; // Fútbol, Tenis, Básquet, etc.
     
     @Column(nullable = false)
-    @Schema(description = "Precio por hora de alquiler de la cancha", example = "50000.00", requiredMode = Schema.RequiredMode.REQUIRED)
-    private BigDecimal precioPorHora;
+    @Schema(description = "Precio por hora de alquiler de la cancha (número entero)", example = "50000", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Integer precioPorHora;
     
     @Column(nullable = false, length = 200)
     @Schema(description = "Dirección física de la cancha", example = "Calle 123 #45-67", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -45,6 +44,10 @@ public class Cancha {
     @Column(length = 50)
     @Schema(description = "Ciudad donde se encuentra la cancha", example = "Bogotá")
     private String ciudad;
+    
+    @Column(name = "imagen_url", length = 500)
+    @Schema(description = "URL de la imagen/foto de la cancha", example = "https://example.com/cancha1.jpg")
+    private String imagenUrl;
     
     @Column(nullable = false)
     @Schema(description = "Indica si la cancha está activa y disponible para reservas", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)

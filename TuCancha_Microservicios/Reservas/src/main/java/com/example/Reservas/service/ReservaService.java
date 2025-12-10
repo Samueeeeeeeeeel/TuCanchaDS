@@ -1,5 +1,6 @@
 package com.example.Reservas.service;
 
+import com.example.Reservas.config.DisponibilidadClient;
 import com.example.Reservas.model.Reserva;
 import com.example.Reservas.repository.ReservaRepository;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +19,8 @@ import java.util.Optional;
 public class ReservaService {
     
     private final ReservaRepository reservaRepository;
+    private final DisponibilidadClient disponibilidadClient;
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
     
     public List<Reserva> obtenerTodasLasReservas() {
         return reservaRepository.findAll();
@@ -69,7 +73,24 @@ public class ReservaService {
             reserva.setEstado(Reserva.EstadoReserva.PENDIENTE);
         }
         
-        return reservaRepository.save(reserva);
+        Reserva reservaGuardada = reservaRepository.save(reserva);
+        
+        // Crear disponibilidad marcada como "no disponible" en el microservicio de Disponibilidad
+        try {
+            String fechaInicioStr = reserva.getFechaInicio().format(FORMATTER);
+            String fechaFinStr = reserva.getFechaFin().format(FORMATTER);
+            disponibilidadClient.crearDisponibilidadOcupada(
+                reserva.getCanchaId(),
+                fechaInicioStr,
+                fechaFinStr
+            );
+        } catch (Exception e) {
+            // Si falla crear disponibilidad, no es crítico
+            // La reserva ya está guardada
+            System.err.println("Error al crear disponibilidad: " + e.getMessage());
+        }
+        
+        return reservaGuardada;
     }
     
     public Reserva actualizarReserva(Long id, Reserva reservaActualizada) {
@@ -124,7 +145,24 @@ public class ReservaService {
                     if (motivo != null) {
                         reserva.setObservaciones(motivo);
                     }
-                    return reservaRepository.save(reserva);
+                    
+                    Reserva reservaCancelada = reservaRepository.save(reserva);
+                    
+                    // Liberar disponibilidad (eliminar o marcar como disponible)
+                    try {
+                        String fechaInicioStr = reserva.getFechaInicio().format(FORMATTER);
+                        String fechaFinStr = reserva.getFechaFin().format(FORMATTER);
+                        disponibilidadClient.eliminarDisponibilidad(
+                            reserva.getCanchaId(),
+                            fechaInicioStr,
+                            fechaFinStr
+                        );
+                    } catch (Exception e) {
+                        // Si falla, no es crítico
+                        System.err.println("Error al liberar disponibilidad: " + e.getMessage());
+                    }
+                    
+                    return reservaCancelada;
                 })
                 .orElseThrow(() -> new RuntimeException("Reserva no encontrada con id: " + id));
     }
