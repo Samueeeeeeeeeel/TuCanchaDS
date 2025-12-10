@@ -18,22 +18,18 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.proyectocancha.ui.theme.Grey900
-import com.example.proyectocancha.ui.viewmodel.AuthViewModel
-import com.example.proyectocancha.ui.viewmodel.AuthViewModelFactory
+import com.example.proyectocancha.ui.viewmodel.RemoteAuthViewModel
+import com.example.proyectocancha.ui.viewmodel.RemoteAuthViewModelFactory
 import com.example.proyectocancha.ui.viewmodel.RegisterUistate
-import com.example.proyectocancha.data.repository.UserRepository
-import com.example.proyectocancha.data.local.database.AppDatabase
 
 @Composable
 fun RegisterScreen(
     onRegisteredOk: () -> Unit,
     onGoLogin: () -> Unit
 ) {
-    val context = LocalContext.current
-    val db = remember { AppDatabase.getInstance(context) }
-    val repository = remember { UserRepository(db.userDao()) }
-    val viewModel: AuthViewModel = viewModel(
-        factory = AuthViewModelFactory(repository)
+    // Usar RemoteAuthViewModel para guardar en el BACKEND (microservicios)
+    val viewModel: RemoteAuthViewModel = viewModel(
+        factory = RemoteAuthViewModelFactory()
     )
 
     val state: RegisterUistate by viewModel.register.collectAsStateWithLifecycle()
