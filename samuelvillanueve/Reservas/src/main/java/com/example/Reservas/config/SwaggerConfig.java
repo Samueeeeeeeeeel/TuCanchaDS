@@ -1,0 +1,31 @@
+package com.example.Reservas.config;
+
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class SwaggerConfig {
+
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .info(new Info()
+                        .title("Microservicio de Reservas - API Documentation")
+                        .version("1.0.0")
+                        .description("API REST para la gestión de reservas de canchas. " +
+                                "Permite crear, consultar, actualizar y gestionar reservas. " +
+                                "Incluye validación de disponibilidad, estados de reserva " +
+                                "(PENDIENTE, CONFIRMADA, CANCELADA, COMPLETADA) y búsquedas avanzadas.")
+                        .contact(new Contact()
+                                .name("TuCancha")
+                                .email("support@tucancha.com"))
+                        .license(new License()
+                                .name("Apache 2.0")
+                                .url("https://www.apache.org/licenses/LICENSE-2.0.html")));
+    }
+}
+
