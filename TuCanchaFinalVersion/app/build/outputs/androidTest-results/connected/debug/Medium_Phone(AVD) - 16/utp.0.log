@@ -1,0 +1,45 @@
+INFORMACIÓN: Constructing runner from config.
+INFORMACIÓN: Configuring Android Instrumentation driver: android_instrumentation_runtime {
+  instrumentation_info {
+    app_package: "com.example.proyectocancha"
+    test_package: "com.example.proyectocancha.test"
+    test_runner_class: "androidx.test.runner.AndroidJUnitRunner"
+  }
+  instrumentation_args {
+    args_map {
+      key: "additionalTestOutputDir"
+      value: "/sdcard/Android/media/com.example.proyectocancha/additional_test_output"
+    }
+    args_map {
+      key: "class"
+      value: "com.example.proyectocancha.LoginFlowTest"
+    }
+  }
+}
+am_instrument_timeout: 31536000
+
+INFORMACIÓN: Configuring AndroidTestApkInstallerPlugin: apks_to_install {
+  apk_paths: "C:\\Users\\kurau\\StudioProjects\\TuCanchaDS\\app\\build\\intermediates\\apk\\debug\\app-debug.apk"
+  install_options {
+  }
+  uninstall_after_test: true
+}
+apks_to_install {
+  apk_paths: "C:\\Users\\kurau\\StudioProjects\\TuCanchaDS\\app\\build\\intermediates\\apk\\androidTest\\debug\\app-debug-androidTest.apk"
+  install_options {
+  }
+  uninstall_after_test: true
+}
+instrumentation_target_package_id: "com.example.proyectocancha"
+
+INFORMACIÓN: No installables found in test fixture. Nothing to install.
+INFORMACIÓN: Installing [C:\Users\kurau\StudioProjects\TuCanchaDS\app\build\intermediates\apk\debug\app-debug.apk] on device emulator-5554.
+INFORMACIÓN: Installing [C:\Users\kurau\StudioProjects\TuCanchaDS\app\build\intermediates\apk\androidTest\debug\app-debug-androidTest.apk] on device emulator-5554.
+INFORMACIÓN: Start logcat streaming.
+INFORMACIÓN: Running Android Instrumentation driver.
+INFORMACIÓN: Copying files from device to host: /sdcard/Android/media/com.example.proyectocancha/additional_test_output to C:\Users\kurau\StudioProjects\TuCanchaDS\app\build\outputs\connected_android_test_additional_output\debugAndroidTest\connected\Medium_Phone(AVD) - 16
+INFORMACIÓN: Stop logcat streaming.
+INFORMACIÓN: Uninstalling com.example.proyectocancha for device emulator-5554.
+INFORMACIÓN: Uninstalling com.example.proyectocancha.test for device emulator-5554.
+INFORMACIÓN: Execute com.example.proyectocancha.LoginFlowTest.registroExitoso_navegaAPantallaLogin: PASSED
+INFORMACIÓN: Execute com.example.proyectocancha.LoginFlowTest.loginExitoso_comoAdmin_navegaAPantallaAdmin: PASSED

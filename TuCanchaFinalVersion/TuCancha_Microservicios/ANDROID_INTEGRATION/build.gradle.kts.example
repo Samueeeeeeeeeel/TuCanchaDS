@@ -1,0 +1,40 @@
+// ============================================
+// DEPENDENCIAS PARA build.gradle.kts (Module: app)
+// ============================================
+// Agregar estas dependencias en el bloque dependencies { }
+
+dependencies {
+    // Retrofit - Cliente HTTP para consumir APIs REST
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    
+    // OkHttp - Cliente HTTP con logging para debug
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    
+    // Gson - Serialización/deserialización JSON
+    implementation("com.google.code.gson:gson:2.10.1")
+    
+    // Coroutines - Para llamadas asíncronas
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    
+    // ViewModel y LiveData
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    
+    // DataStore - Para guardar datos del usuario logueado
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+}
+
+// ============================================
+// En el AndroidManifest.xml agregar permisos:
+// ============================================
+// <uses-permission android:name="android.permission.INTERNET" />
+// <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+//
+// Y en <application> agregar:
+// android:usesCleartextTraffic="true"
+// (Esto permite HTTP sin SSL para desarrollo local)
+

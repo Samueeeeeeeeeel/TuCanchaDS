@@ -1,0 +1,67 @@
+### ============================================================
+### SCRIPT PARA CREAR 4 CANCHAS DE FÚTBOL VÍA API
+### Usar en Postman, Insomnia o cualquier cliente HTTP
+### O ejecutar con curl desde terminal
+### ============================================================
+
+### 1. Crear Cancha Fútbol 1
+POST http://localhost:8081/api/canchas
+Content-Type: application/json
+
+{
+  "nombre": "Cancha Fútbol 1",
+  "descripcion": "Cancha de fútbol 11 con césped sintético de última generación. Iluminación LED para partidos nocturnos. Incluye vestuarios y duchas.",
+  "tipo": "Fútbol",
+  "precioPorHora": 45000.00,
+  "direccion": "Av. Principal 1234",
+  "ciudad": "Santiago",
+  "activa": true
+}
+
+### 2. Crear Cancha Fútbol 2
+POST http://localhost:8081/api/canchas
+Content-Type: application/json
+
+{
+  "nombre": "Cancha Fútbol 2",
+  "descripcion": "Cancha de fútbol 7 ideal para partidos rápidos. Superficie de césped natural. Perfecta para grupos pequeños.",
+  "tipo": "Fútbol",
+  "precioPorHora": 35000.00,
+  "direccion": "Calle Los Olivos 567",
+  "ciudad": "Santiago",
+  "activa": true
+}
+
+### 3. Crear Cancha Fútbol 3
+POST http://localhost:8081/api/canchas
+Content-Type: application/json
+
+{
+  "nombre": "Cancha Fútbol 3",
+  "descripcion": "Cancha de fútbol 11 profesional con graderías. Ideal para torneos y eventos deportivos. Incluye sistema de sonido.",
+  "tipo": "Fútbol",
+  "precioPorHora": 55000.00,
+  "direccion": "Av. Deportiva 890",
+  "ciudad": "Providencia",
+  "activa": true
+}
+
+### 4. Crear Cancha Fútbol 4
+POST http://localhost:8081/api/canchas
+Content-Type: application/json
+
+{
+  "nombre": "Cancha Fútbol 4",
+  "descripcion": "Cancha de fútbol 5 techada. Perfecta para jugar en cualquier clima. Incluye iluminación y vestuarios modernos.",
+  "tipo": "Fútbol",
+  "precioPorHora": 40000.00,
+  "direccion": "Calle Deportes 321",
+  "ciudad": "Las Condes",
+  "activa": true
+}
+
+### 5. Verificar todas las canchas creadas
+GET http://localhost:8081/api/canchas
+
+### 6. Verificar solo canchas activas
+GET http://localhost:8081/api/canchas/activas

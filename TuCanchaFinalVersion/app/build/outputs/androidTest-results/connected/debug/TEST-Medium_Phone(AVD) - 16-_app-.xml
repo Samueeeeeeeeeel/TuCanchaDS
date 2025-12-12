@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.example.proyectocancha.LoginFlowTest" tests="2" failures="0" errors="0" skipped="0" time="10.285" timestamp="2025-11-24T20:41:28" hostname="localhost">
+  <properties>
+    <property name="device" value="Medium_Phone(AVD) - 16" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="registroExitoso_navegaAPantallaLogin" classname="com.example.proyectocancha.LoginFlowTest" time="4.937" />
+  <testcase name="loginExitoso_comoAdmin_navegaAPantallaAdmin" classname="com.example.proyectocancha.LoginFlowTest" time="3.447" />
+</testsuite>
