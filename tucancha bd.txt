@@ -1,0 +1,11 @@
+nombre base de datos: tucancha
+
+db_canchas
+db_login
+db_reservas
+db_disponibilidad
+
+http://localhost:8081/swagger-ui/index.html
+http://localhost:8082/swagger-ui/index.html#/
+http://localhost:8083/swagger-ui/index.html
+http://localhost:8084/swagger-ui/index.html
